@@ -7,10 +7,12 @@
 - D1: `vikaseditor`, binding `DB`
 
 Cloudflare Workers Builds watches `main`. Its root directory is `/`, build
-command is empty, and deploy command is `pnpm run cf:deploy`. The deploy script
+command is empty, and deploy command is `pnpm run cf:deploy`. Builds use the
+`vikaseditor build token` and `PNPM_VERSION=11.15.1`. The deploy script
 builds the application and deploys Nitro's generated Worker. Use Node 22 or
 newer and pnpm 11.15.1. Preview branch deployments must stay disabled so an
-unreviewed branch cannot deploy this production configuration.
+unreviewed branch cannot deploy this production configuration. Worker version
+preview URLs are also disabled in the production config.
 
 `deploy/cloudflare.json` contains public production settings. The deploy script
 copies it into the ignored `wrangler.jsonc` and supplies the same public values

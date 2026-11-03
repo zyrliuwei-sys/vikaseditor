@@ -139,6 +139,7 @@ export function isMaskedConfigValue(value: string): boolean {
 
 /** Endpoint settings → the saved secrets that get sent to that endpoint. */
 const ENDPOINT_SECRETS: Record<string, string[]> = {
+  evolink_base_url: ['evolink_api_key'],
   openai_base_url: ['openai_api_key'],
   anthropic_base_url: ['anthropic_api_key'],
   r2_endpoint: ['r2_secret_key'],

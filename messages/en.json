@@ -1800,5 +1800,11 @@
   "vikas.template.living-memory.occasion2": "Travel memory clips",
   "vikas.template.living-memory.example2": "Sunlit couple portrait as a still starting frame",
   "vikas.template.living-memory.occasion3": "Gentle couple portrait motion",
-  "vikas.template.living-memory.example3": "Calm beach composition for subtle camera drift"
+  "vikas.template.living-memory.example3": "Calm beach composition for subtle camera drift",
+  "admin.settings.groups.evolink.title": "EvoLink",
+  "admin.settings.groups.evolink.description": "EvoLink image, video and audio API",
+  "admin.settings.fields.evolink_base_url": "Base URL",
+  "admin.settings.fields.evolink_api_key": "API Key",
+  "admin.settings.tips.evolink_base_url": "Official image/video API endpoint. Leave the default URL unless EvoLink instructs otherwise.",
+  "admin.settings.tips.evolink_api_key": "Create a key in the EvoLink dashboard. Test checks account credits without generating content. Save to keep your settings."
 }

@@ -4,6 +4,12 @@ Read this when a project built from this template pulls newer template code.
 Entries are newest first. Apply **every entry dated after the template version
 the project last pulled**, oldest of those first.
 
+## 2026-11-03 — EvoLink admin settings
+
+- Admin Settings → AI now includes an EvoLink card with `evolink_base_url` and a masked `evolink_api_key`, using the existing config storage. Configure `CONFIG_ENCRYPTION_KEY` to encrypt saved credentials, as for other provider secrets.
+- The Test button authenticates with the official `GET https://api.evolink.ai/v1/credits` endpoint. It does not create generation jobs or deduct application credits. Only the official HTTPS API host is accepted; redirects are refused and endpoint changes require the key to be re-entered.
+- No schema migration, provider environment variable, generation adapter or payment change is required. This adds credential configuration only; it does not enable EvoLink generation in the product.
+
 ## 2026-11-03 — Public SEO routes and template pages
 
 - Image/video navigation now uses `/create/image` and `/create/video`; `/create` remains directly accessible without a default-query redirect. Robots still excludes private and authentication routes but no longer blocks all query strings.

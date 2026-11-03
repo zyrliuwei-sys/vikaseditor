@@ -189,6 +189,12 @@ export function getSettingGroups(): SettingGroup[] {
 
     // AI
     {
+      name: 'evolink',
+      title: 'EvoLink',
+      description: 'EvoLink image, video and audio API',
+      tab: 'ai',
+    },
+    {
       name: 'openai',
       title: 'OpenAI',
       description: 'OpenAI (or compatible) API',
@@ -971,6 +977,25 @@ export function getSettings(): Setting[] {
       placeholder: 'https://cdn.example.com',
       group: 'r2',
       tab: 'storage',
+    },
+
+    // ─── AI / EvoLink ────────────────────────────────────────────────
+    {
+      name: 'evolink_base_url',
+      title: 'Base URL',
+      type: 'text',
+      placeholder: 'https://api.evolink.ai',
+      defaultValue: 'https://api.evolink.ai',
+      group: 'evolink',
+      tab: 'ai',
+    },
+    {
+      name: 'evolink_api_key',
+      title: 'API Key',
+      type: 'password',
+      placeholder: 'sk-xxx',
+      group: 'evolink',
+      tab: 'ai',
     },
 
     // ─── AI / OpenAI ─────────────────────────────────────────────────

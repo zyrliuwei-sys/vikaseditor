@@ -1800,5 +1800,11 @@
   "vikas.template.living-memory.occasion2": "旅行回忆短片",
   "vikas.template.living-memory.example2": "作为静态起始画面的阳光情侣写真",
   "vikas.template.living-memory.occasion3": "双人人像微动作",
-  "vikas.template.living-memory.example3": "适合细微镜头漂移的安静海滩构图"
+  "vikas.template.living-memory.example3": "适合细微镜头漂移的安静海滩构图",
+  "admin.settings.groups.evolink.title": "EvoLink",
+  "admin.settings.groups.evolink.description": "EvoLink 图片、视频和音频 API",
+  "admin.settings.fields.evolink_base_url": "API 基础地址",
+  "admin.settings.fields.evolink_api_key": "API 密钥",
+  "admin.settings.tips.evolink_base_url": "图片与视频使用的官方 API 地址，通常保持默认即可。",
+  "admin.settings.tips.evolink_api_key": "在 EvoLink 控制台创建密钥。测试仅查询账户额度，不生成内容；点击保存后配置才会保留。"
 }

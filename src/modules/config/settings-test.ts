@@ -22,6 +22,7 @@ import {
 import { PaymentType, type PaymentOrder } from '@/core/payment/types';
 import { R2Provider } from '@/core/storage/r2';
 import { envConfigs } from '@/config';
+import { testEvoLinkConnection } from '@/lib/evolink-settings';
 import { getUniSeq } from '@/lib/hash';
 
 import type { TestResult } from './settings-test-specs';
@@ -36,6 +37,8 @@ export async function runTest(
 ): Promise<TestResult> {
   try {
     switch (group) {
+      case 'evolink':
+        return await testEvoLinkConnection(configs);
       case 'resend':
         return await testResend(inputs, configs);
       case 'stripe':

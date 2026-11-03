@@ -26,6 +26,7 @@ export interface TestResult {
 }
 
 export const testSpecs: Record<string, TestSpec> = {
+  evolink: { group: 'evolink', fields: [] },
   resend: {
     group: 'resend',
     fields: [

@@ -636,3 +636,7 @@ grant_<orderNo>`, so the unique index allows one grant per order. Older
   `utm_source` filter (`users_sources` operation, `GET /api/admin/users/sources`,
   `users.read`). The subscriptions and credits list APIs now also return
   `userName` / `userImage`.
+
+## 2026-11-03 — Footer badge rendering and import
+
+Footer badges now accept image or text links, preserve qualified `rel` values, and ignore safe presentation markup. Existing image records remain compatible. Keep `FooterBadgeList` mounted in custom marketing footers; the root loader supplies its server-rendered data so reciprocal-link verifiers can read the initial HTML. Rebuild and deploy to apply this change.

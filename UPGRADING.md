@@ -4,6 +4,14 @@ Read this when a project built from this template pulls newer template code.
 Entries are newest first. Apply **every entry dated after the template version
 the project last pulled**, oldest of those first.
 
+## 2026-11-03 — Public SEO routes and template pages
+
+- Image/video navigation now uses `/create/image` and `/create/video`; `/create` remains directly accessible without a default-query redirect. Robots still excludes private and authentication routes but no longer blocks all query strings.
+- `/guest-post` is retained with `noindex, follow`, removed from the sitemap and public navigation. Empty blog lists are also excluded and marked `noindex`; publishing the first article restores the blog and article URLs automatically, per available locale.
+- Nine template detail routes now expose localized descriptions, original English prompts, three reference images and related-template links. Homepage cards link to these routes. Generation availability is stated explicitly; generation and payment services require no change.
+- With no published articles, the sitemap contains 32 URLs (16 English and 16 Chinese). Existing canonical, `en`/`zh`/`x-default` alternates and locale-specific Open Graph metadata are retained. No migration or environment change is required.
+- Verify a built preview with `python3 scripts/verify-seo.py --base-url http://127.0.0.1:4175`. Details and production verification URLs are in `docs/research/seo-fixes-2026-11-03.md`.
+
 ## 2026-11-03 — Ordinary-user journey fixes
 
 - Account navigation now normalizes locale prefixes, uses a single link per item, and keeps the overview active only on its own page. Profile updates refresh the authentication session so the account name changes immediately. Shared user-info queries retain one consistent response shape.
@@ -11,6 +19,7 @@ the project last pulled**, oldest of those first.
 - Image/video controls on `/create` update the URL; header navigation selects the requested mode. Loading failures show a retry action rather than an empty balance/history, and a closed guest-post feature no longer offers new submissions or payment.
 - Saved dark mode hydrates without a text mismatch. Optional footer badge failures no longer take down the root page. Email-verification callbacks use the shared same-origin and auth-loop validation.
 - Template detail actions preserve the selected template and its image/video mode in the workspace; unknown template query values safely fall back to the default style.
+- Successful sign-out cancels pending queries and clears the browser query cache, so switching accounts cannot reuse the previous account's profile or records.
 - Development D1 now accepts `DATABASE_D1_REMOTE=true` (shared remote data) or `false` (local D1), independently of the Wrangler file that deployment regenerates. Empty preserves the binding’s original behavior. This project’s ignored `.env.development` opts into the shared remote database. No schema migration or permission-code change is required.
 
 ## 2026-11-03 — GitHub to Cloudflare Workers deployment

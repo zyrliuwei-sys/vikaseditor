@@ -27,12 +27,13 @@ export function VikasTemplatePage({
   prompt: string;
   related: VikasTemplate[];
 }) {
-  const [copied, setCopied] = useState(false);
+  const [copiedPrompt, setCopiedPrompt] = useState<string | null>(null);
+  const copied = copiedPrompt === prompt;
   const images = templateExamples(page);
   async function copyPrompt() {
     try {
       await navigator.clipboard.writeText(prompt);
-      setCopied(true);
+      setCopiedPrompt(prompt);
       toast.success(m['vikas.gallery.copied']());
     } catch {
       toast.error(m['vikas.gallery.copy_failed']());

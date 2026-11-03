@@ -21,3 +21,9 @@ export function getQueryClient() {
   if (!browserClient) browserClient = makeQueryClient();
   return browserClient;
 }
+
+/** Clear private records, including late responses, before another account signs in. */
+export async function clearAccountCache(client: QueryClient) {
+  await client.cancelQueries();
+  client.clear();
+}

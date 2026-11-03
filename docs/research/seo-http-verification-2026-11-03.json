@@ -1,0 +1,281 @@
+{
+  "production": {
+    "sitemap_count": 32,
+    "sitemap_urls": [
+      "https://vikas-editor.net/",
+      "https://vikas-editor.net/zh",
+      "https://vikas-editor.net/pricing",
+      "https://vikas-editor.net/zh/pricing",
+      "https://vikas-editor.net/create",
+      "https://vikas-editor.net/zh/create",
+      "https://vikas-editor.net/create/image",
+      "https://vikas-editor.net/zh/create/image",
+      "https://vikas-editor.net/create/video",
+      "https://vikas-editor.net/zh/create/video",
+      "https://vikas-editor.net/privacy-policy",
+      "https://vikas-editor.net/zh/privacy-policy",
+      "https://vikas-editor.net/terms-of-service",
+      "https://vikas-editor.net/zh/terms-of-service",
+      "https://vikas-editor.net/template/golden-hour-hero",
+      "https://vikas-editor.net/zh/template/golden-hour-hero",
+      "https://vikas-editor.net/template/emerald-saree",
+      "https://vikas-editor.net/zh/template/emerald-saree",
+      "https://vikas-editor.net/template/midnight-city",
+      "https://vikas-editor.net/zh/template/midnight-city",
+      "https://vikas-editor.net/template/diwali-glow",
+      "https://vikas-editor.net/zh/template/diwali-glow",
+      "https://vikas-editor.net/template/sunset-together",
+      "https://vikas-editor.net/zh/template/sunset-together",
+      "https://vikas-editor.net/template/pink-editorial",
+      "https://vikas-editor.net/zh/template/pink-editorial",
+      "https://vikas-editor.net/template/cinematic-push",
+      "https://vikas-editor.net/zh/template/cinematic-push",
+      "https://vikas-editor.net/template/night-drive",
+      "https://vikas-editor.net/zh/template/night-drive",
+      "https://vikas-editor.net/template/living-memory",
+      "https://vikas-editor.net/zh/template/living-memory"
+    ],
+    "pages": [
+      {
+        "path": "/",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/pricing",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/pricing",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/create",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/create",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/create/image",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/create/image",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/create/video",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/create/video",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/privacy-policy",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/privacy-policy",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/terms-of-service",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/terms-of-service",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/template/golden-hour-hero",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/template/golden-hour-hero",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/template/emerald-saree",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/template/emerald-saree",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/template/midnight-city",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/template/midnight-city",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/template/diwali-glow",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/template/diwali-glow",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/template/sunset-together",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/template/sunset-together",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/template/pink-editorial",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/template/pink-editorial",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/template/cinematic-push",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/template/cinematic-push",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/template/night-drive",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/template/night-drive",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/template/living-memory",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/template/living-memory",
+        "status": 200,
+        "robots": "index (default)",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/guest-post",
+        "status": 200,
+        "robots": "noindex, follow",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/guest-post",
+        "status": 200,
+        "robots": "noindex, follow",
+        "og_locale": "zh_CN"
+      },
+      {
+        "path": "/blog",
+        "status": 200,
+        "robots": "noindex, follow",
+        "og_locale": "en_US"
+      },
+      {
+        "path": "/zh/blog",
+        "status": 200,
+        "robots": "noindex, follow",
+        "og_locale": "zh_CN"
+      }
+    ],
+    "images_checked": 18,
+    "status": "passed"
+  },
+  "isolated_blog_lifecycle": [
+    {
+      "state": "empty",
+      "sitemap_urls": 32,
+      "blog_indexable": false
+    },
+    {
+      "state": "draft",
+      "sitemap_urls": 32,
+      "blog_indexable": false
+    },
+    {
+      "state": "first published post",
+      "sitemap_urls": 36,
+      "blog_indexable": true
+    },
+    {
+      "state": "unpublished again",
+      "sitemap_urls": 32,
+      "blog_indexable": false
+    }
+  ]
+}

@@ -1173,7 +1173,7 @@ html[lang='zh'] .vikas-hero h1 > span {
   margin-bottom: 2px;
 }
 .vikas-card-meta > span,
-.vikas-card-meta button {
+.vikas-card-meta :is(button, a) {
   display: inline-flex;
   gap: 6px;
   align-items: center;
@@ -1184,11 +1184,11 @@ html[lang='zh'] .vikas-hero h1 > span {
 .vikas-card-meta > span > svg {
   color: var(--primary);
 }
-.vikas-card-meta button {
+.vikas-card-meta :is(button, a) {
   min-height: 44px;
   padding: 0 0 0 5px;
 }
-.vikas-card-meta button:hover {
+.vikas-card-meta :is(button, a):hover {
   color: var(--primary);
 }
 .vikas-gallery-more {
@@ -1400,12 +1400,12 @@ html[lang='zh'] .vikas-hero h1 > span {
     font-size: 11px;
     margin-top: 0;
   }
-  .vikas-card-meta button,
+  .vikas-card-meta :is(button, a),
   .vikas-card-meta > span {
     font-size: 10px;
     gap: 4px;
   }
-  .vikas-card-meta button svg {
+  .vikas-card-meta :is(button, a) svg {
     width: 12px;
     height: 12px;
   }
@@ -1800,7 +1800,7 @@ html[lang='zh'] .vikas-hero h1 > span {
 }
 .vikas-button-small,
 .vikas-filter-list button,
-.vikas-card-meta button,
+.vikas-card-meta :is(button, a),
 .vikas-card-caption button,
 .vs-copy,
 .vs-text-button,

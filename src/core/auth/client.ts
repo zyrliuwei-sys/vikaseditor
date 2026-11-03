@@ -1,6 +1,8 @@
 import { oneTapClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
+import { clearAccountCache, getQueryClient } from '@/lib/query-client';
+
 const baseURL =
   typeof window !== 'undefined'
     ? window.location.origin
@@ -11,11 +13,16 @@ export const authClient = createAuthClient({ baseURL });
 export const {
   signIn,
   signUp,
-  signOut,
   useSession,
   requestPasswordReset,
   resetPassword,
 } = authClient;
+
+export async function signOut(...args: Parameters<typeof authClient.signOut>) {
+  const result = await authClient.signOut(...args);
+  if (!result.error) await clearAccountCache(getQueryClient());
+  return result;
+}
 
 // Build a per-call auth client with the Google One Tap plugin attached.
 // The plugin needs the client_id at construction time, so we can't add

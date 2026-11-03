@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { authClient, signIn, useSession } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { authErrorMessage } from '@/lib/auth-errors';
 import { resolveAfterAuthUrl, safeInternalPath } from '@/lib/redirect';
 import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
@@ -23,12 +24,11 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 
-const signInSchema = z.object({
-  email: z.string().email(m['common.sign.email_placeholder']()),
-  password: z.string().min(1),
-});
-
 function SignInPage() {
+  const signInSchema = z.object({
+    email: z.string().trim().email(m['common.validation.email']()),
+    password: z.string().min(1, m['common.validation.password_required']()),
+  });
   const router = useRouter();
   const { data: session, isPending: sessionPending } = useSession();
   // Set right before we navigate so the already-signed-in effect doesn't also fire.
@@ -93,7 +93,7 @@ function SignInPage() {
       setError('');
       try {
         const result: any = await signIn.email({
-          email: value.email,
+          email: value.email.trim(),
           password: value.password,
         });
         if (result.error) {
@@ -108,13 +108,13 @@ function SignInPage() {
               value.email
             )}&callbackUrl=${encodeURIComponent(afterLoginUrl)}`;
             void authClient.sendVerificationEmail({
-              email: value.email,
+              email: value.email.trim(),
               callbackURL: localizeHref(afterLoginUrl),
             });
             router.push(verifyPath);
             return;
           }
-          setError(msg || 'Sign in failed');
+          setError(authErrorMessage(result.error));
         } else {
           // Hard navigation so the destination reloads with a fresh session
           // cookie — a client push would let the guard read a stale (logged-out)
@@ -123,7 +123,7 @@ function SignInPage() {
           window.location.assign(localizeHref(afterLoginUrl));
         }
       } catch (err: any) {
-        setError(err.message || 'Sign in failed');
+        setError(authErrorMessage(err));
       }
     },
   });
@@ -226,6 +226,7 @@ function SignInPage() {
                             field={field}
                             label={m['common.sign.email_title']()}
                             type="email"
+                            autoComplete="email"
                             required
                             placeholder={m['common.sign.email_placeholder']()}
                           />
@@ -263,6 +264,7 @@ function SignInPage() {
                                 id={field.name}
                                 name={field.name}
                                 type="password"
+                                autoComplete="current-password"
                                 value={field.state.value}
                                 onChange={(e) =>
                                   field.handleChange(e.target.value)

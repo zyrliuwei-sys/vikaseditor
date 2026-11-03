@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { resetPassword } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { authErrorMessage } from '@/lib/auth-errors';
 import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
@@ -19,17 +20,16 @@ import {
 } from '@/components/ui/card';
 import { Field, FieldDescription, FieldGroup } from '@/components/ui/field';
 
-const resetSchema = z
-  .object({
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
-  })
-  .refine((d) => d.password === d.confirmPassword, {
-    path: ['confirmPassword'],
-    message: m['common.sign.password_mismatch'](),
-  });
-
 function ResetPasswordPage() {
+  const resetSchema = z
+    .object({
+      password: z.string().min(8, m['common.validation.password']()),
+      confirmPassword: z.string().min(8, m['common.validation.password']()),
+    })
+    .refine((d) => d.password === d.confirmPassword, {
+      path: ['confirmPassword'],
+      message: m['common.sign.password_mismatch'](),
+    });
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [tokenChecked, setTokenChecked] = useState(false);
@@ -59,13 +59,13 @@ function ResetPasswordPage() {
           token,
         });
         if (result.error) {
-          setError(result.error.message || 'Reset failed');
+          setError(authErrorMessage(result.error));
         } else {
           setSuccess(true);
           setTimeout(() => router.push('/sign-in'), 1500);
         }
       } catch (err: any) {
-        setError(err.message || 'Reset failed');
+        setError(authErrorMessage(err));
       }
     },
   });
@@ -138,6 +138,7 @@ function ResetPasswordPage() {
                         field={field}
                         label={m['common.sign.new_password_title']()}
                         type="password"
+                        autoComplete="new-password"
                         required
                         placeholder={m[
                           'common.sign.new_password_placeholder'
@@ -151,6 +152,7 @@ function ResetPasswordPage() {
                         field={field}
                         label={m['common.sign.confirm_password_title']()}
                         type="password"
+                        autoComplete="new-password"
                         required
                         placeholder={m[
                           'common.sign.confirm_new_password_placeholder'

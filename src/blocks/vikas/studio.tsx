@@ -29,7 +29,7 @@ import {
 import { z } from 'zod';
 
 import { useSession } from '@/core/auth/client';
-import { Link } from '@/core/i18n/navigation';
+import { Link, usePathname } from '@/core/i18n/navigation';
 import { ApiError, apiGet, apiPost } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
@@ -64,10 +64,13 @@ function readImage(file: File): Promise<string> {
 export function VikasStudio({
   templates,
   selection,
+  onModeChange,
 }: {
   templates: VikasTemplate[];
   selection: StudioSelection;
+  onModeChange?: (mode: MediaMode) => void;
 }) {
+  const pathname = usePathname();
   const { data: session, isPending: sessionPending } = useSession();
   const queryClient = useQueryClient();
   const initialTemplate = templates.find(
@@ -176,7 +179,7 @@ export function VikasStudio({
 
   function errorMessage(cause: unknown) {
     const message = cause instanceof Error ? cause.message : '';
-    if (/insufficient credits/i.test(message))
+    if (/insufficient credits|not enough credits/i.test(message))
       return m['vikas.studio.credits_error']();
     if (/unauthorized|sign in|authentication/i.test(message))
       return m['vikas.studio.sign_in_hint']();
@@ -198,8 +201,8 @@ export function VikasStudio({
         prompt: z
           .string()
           .trim()
-          .min(1, m['vikas.studio.prompt_required']())
-          .max(2000),
+          .min(3, m['vikas.studio.prompt_length']())
+          .max(2000, m['vikas.studio.prompt_length']()),
         aspectRatio: z.enum(ASPECT_RATIOS),
       }),
     },
@@ -330,6 +333,7 @@ export function VikasStudio({
     edited();
     setMode(nextMode);
     if (selectedTemplate?.mediaType !== nextMode) setTemplateId('');
+    onModeChange?.(nextMode);
   }
 
   function chooseTemplate(nextId: string) {
@@ -353,7 +357,9 @@ export function VikasStudio({
     }
   }
 
-  const signInUrl = '/sign-in?callbackUrl=%2F%23studio';
+  const returnPath =
+    pathname === '/' ? '/#studio' : `${pathname}?mode=${mode}#studio`;
+  const signInUrl = `/sign-in?callbackUrl=${encodeURIComponent(returnPath)}`;
 
   return (
     <section
@@ -561,7 +567,7 @@ export function VikasStudio({
                 <div className="vs-prompt-meta" id="vikas-prompt-help">
                   <span>
                     {field.state.meta.errors.length
-                      ? m['vikas.studio.prompt_required']()
+                      ? m['vikas.studio.prompt_length']()
                       : m['vikas.studio.prompt_hint']()}
                   </span>
                   <span>{field.state.value.length}/2000</span>

@@ -17,15 +17,20 @@ export const Route = createFileRoute('/guest-post')({
       description: m['guest_posts.landing.description']({}, { locale }),
     };
   },
-  head: ({ loaderData }) =>
-    loaderData
-      ? vikasPageHead(
-          '/guest-post',
-          `${loaderData.title} | ${envConfigs.app_name}`,
-          loaderData.description,
-          loaderData.locale
-        )
-      : {},
+  head: ({ loaderData }) => {
+    const locale = loaderData?.locale ?? 'en';
+    const head = vikasPageHead(
+      '/guest-post',
+      `${loaderData?.title ?? m['guest_posts.landing.title']({}, { locale })} | ${envConfigs.app_name}`,
+      loaderData?.description ??
+        m['guest_posts.landing.description']({}, { locale }),
+      locale
+    );
+    return {
+      ...head,
+      meta: [...head.meta, { name: 'robots', content: 'noindex, follow' }],
+    };
+  },
   component: GuestPostPage,
 });
 

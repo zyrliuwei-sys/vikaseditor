@@ -12,6 +12,7 @@ import {
 import { createServerFn } from '@tanstack/react-start';
 import { ThemeProvider } from 'next-themes';
 
+import { Link } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import {
   APPEARANCE_CONFIG_KEYS,
@@ -28,6 +29,7 @@ import {
 } from '@/config/appearance';
 import { parseCookieConsent } from '@/lib/cookie-consent';
 import { getQueryClient } from '@/lib/query-client';
+import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useCookieConsent } from '@/hooks/use-cookie-consent';
@@ -54,7 +56,11 @@ const getAnalyticsConfigs = createServerFn().handler(async () => {
   const { safeEmbedSetting } = await import('@/lib/embed-ids');
   const [configs, storedFooterBadges] = await Promise.all([
     getAllConfigs(),
-    getStoredFooterBadges(),
+    // An optional footer decoration must never take down the whole site.
+    getStoredFooterBadges().catch(() => {
+      console.warn('[footer-badges] unavailable; rendering without badges');
+      return undefined;
+    }),
   ]);
   // Host allow-list (PLAUSIBLE_SCRIPT_HOSTS) is runtime server env. A
   // configured src that fails it turns Plausible off rather than falling
@@ -195,7 +201,12 @@ function RootComponent() {
           <CookieConsent initial={analytics?.cookieConsent ?? null} />
         ) : null}
       </ThemeProvider>
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      {import.meta.env.DEV && (
+        <ReactQueryDevtools
+          initialIsOpen={false}
+          buttonPosition="bottom-left"
+        />
+      )}
     </QueryClientProvider>
   );
 }
@@ -224,10 +235,13 @@ function NotFound() {
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center gap-4">
       <h1 className="text-6xl font-bold">404</h1>
-      <p className="text-muted-foreground">Page not found</p>
-      <a href="/" className="text-sm underline underline-offset-4">
-        Back to home
-      </a>
+      <p className="text-muted-foreground">{m['common.errors.not_found']()}</p>
+      <Link
+        href="/"
+        className="inline-flex min-h-11 items-center text-sm underline underline-offset-4"
+      >
+        {m['common.errors.back_home']()}
+      </Link>
     </div>
   );
 }
@@ -235,9 +249,9 @@ function NotFound() {
 function RootError({ error, reset }: ErrorComponentProps) {
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col items-center justify-center gap-4">
-      <h1 className="text-4xl font-bold">Oops</h1>
+      <h1 className="text-4xl font-bold">{m['common.errors.title']()}</h1>
       <p className="text-muted-foreground">
-        Something went wrong. Please try again.
+        {m['common.errors.description']()}
       </p>
       {import.meta.env.DEV && error instanceof Error && (
         <pre className="bg-muted mt-2 max-w-lg overflow-auto rounded p-4 text-xs">
@@ -247,9 +261,9 @@ function RootError({ error, reset }: ErrorComponentProps) {
       <button
         type="button"
         onClick={reset}
-        className="text-sm underline underline-offset-4"
+        className="min-h-11 text-sm underline underline-offset-4"
       >
-        Try again
+        {m['common.errors.retry']()}
       </button>
     </div>
   );

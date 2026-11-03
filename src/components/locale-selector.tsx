@@ -13,9 +13,11 @@ import {
 export function LocaleSelector({
   variant = 'icon',
   className,
+  label = 'Switch language',
 }: {
   variant?: 'icon' | 'pill';
   className?: string;
+  label?: string;
 }) {
   const locale = getLocale();
 
@@ -27,6 +29,7 @@ export function LocaleSelector({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        aria-label={label}
         className={cn(
           'inline-flex items-center transition-colors outline-none',
           variant === 'icon'
@@ -38,7 +41,7 @@ export function LocaleSelector({
         {variant === 'icon' ? (
           <>
             <Languages className="size-4" />
-            <span className="sr-only">Switch language</span>
+            <span className="sr-only">{label}</span>
           </>
         ) : (
           <>

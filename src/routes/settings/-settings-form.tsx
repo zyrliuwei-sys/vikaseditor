@@ -4,10 +4,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { useSession } from '@/core/auth/client';
 import { apiPatch } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
+import { ImageUploader, ImageUploaderValue } from '@/blocks/image-uploader';
 import { TextField } from '@/components/form-field';
-import { ImageUploader, ImageUploaderValue } from '@/components/image-uploader';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,10 +20,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const profileSchema = z.object({
-  name: z.string().min(1),
-});
-
 export function SettingsForm({
   name: initialName,
   email,
@@ -32,13 +29,23 @@ export function SettingsForm({
   email: string;
   image: string;
 }) {
+  const { refetch: refreshSession } = useSession();
+  const [uploadIncomplete, setUploadIncomplete] = useState(false);
+  const profileSchema = z.object({
+    name: z
+      .string()
+      .trim()
+      .min(1, m['common.validation.name_required']())
+      .max(100, m['common.validation.name_length']()),
+  });
   const [image, setImage] = useState(initialImage);
   const queryClient = useQueryClient();
 
   const saveMutation = useMutation({
     mutationFn: (values: { name: string; image: string }) =>
       apiPatch('/api/user/profile', values),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await refreshSession({ query: { disableCookieCache: true } });
       toast.success(m['settings.profile.saved']());
       queryClient.invalidateQueries({ queryKey: ['user-info'] });
     },
@@ -52,12 +59,18 @@ export function SettingsForm({
     validators: { onSubmit: profileSchema },
     onSubmit: async ({ value }) => {
       await saveMutation
-        .mutateAsync({ name: value.name, image })
+        .mutateAsync({ name: value.name.trim(), image })
         .catch(() => {});
     },
   });
 
   function handleAvatarChange(items: ImageUploaderValue[]) {
+    setUploadIncomplete(
+      items.some(
+        (item) => item.status === 'uploading' || item.status === 'error'
+      )
+    );
+    if (items.some((item) => item.status !== 'uploaded')) return;
     const uploaded = items.find(
       (item) => item.status === 'uploaded' && item.url
     );
@@ -114,7 +127,9 @@ export function SettingsForm({
             {(isSubmitting) => (
               <Button
                 type="submit"
-                disabled={isSubmitting || saveMutation.isPending}
+                disabled={
+                  isSubmitting || saveMutation.isPending || uploadIncomplete
+                }
               >
                 {isSubmitting || saveMutation.isPending
                   ? m['settings.profile.saving']()

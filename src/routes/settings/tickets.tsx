@@ -9,18 +9,10 @@ import { MessageSquare, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { tDynamic } from '@/core/i18n/dynamic';
+import { envConfigs } from '@/config';
 import { apiGet, apiPatch, apiPost, type PageResult } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
-import { DataTable, type Column } from '@/components/data-table';
-import {
-  ImageUploader,
-  type ImageUploaderValue,
-} from '@/components/image-uploader';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -28,7 +20,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/blocks/dialog';
+import {
+  ImageUploader,
+  type ImageUploaderValue,
+} from '@/blocks/image-uploader';
+import { QueryError } from '@/blocks/query-error';
+import { DataTable, type Column } from '@/components/data-table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -287,6 +289,9 @@ function TicketsPage() {
     },
   ];
 
+  if (listQuery.isError)
+    return <QueryError retry={() => Promise.all([listQuery.refetch()])} />;
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-start justify-between gap-4">
@@ -519,6 +524,11 @@ function TicketsPage() {
 }
 
 export const Route = createFileRoute('/settings/tickets')({
+  head: () => ({
+    meta: [
+      { title: `${m['settings.tickets.title']()} | ${envConfigs.app_name}` },
+    ],
+  }),
   component: () => (
     <FeatureGate feature="tickets">
       <TicketsPage />

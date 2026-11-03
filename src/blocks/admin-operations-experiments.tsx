@@ -13,16 +13,16 @@ import {
 } from '@/lib/operations';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
-import { TextField } from '@/components/form-field';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/blocks/dialog';
+import { TextField } from '@/components/form-field';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 const KEY = ['admin-operations-experiments'];
 

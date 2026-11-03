@@ -11,13 +11,10 @@ import { toast } from 'sonner';
 
 import { tDynamic } from '@/core/i18n/dynamic';
 import { Link } from '@/core/i18n/navigation';
+import { envConfigs } from '@/config';
 import { ApiError, apiGet, apiPost, type PageResult } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
-import { DataTable, type Column } from '@/components/data-table';
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -25,7 +22,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/blocks/dialog';
+import { QueryError } from '@/blocks/query-error';
+import { DataTable, type Column } from '@/components/data-table';
+import { Badge } from '@/components/ui/badge';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -257,6 +259,13 @@ function BillingPage() {
     },
   ];
 
+  if (currentQuery.isError || listQuery.isError)
+    return (
+      <QueryError
+        retry={() => Promise.all([currentQuery.refetch(), listQuery.refetch()])}
+      />
+    );
+
   return (
     <div className="space-y-6 p-6">
       <div>
@@ -481,6 +490,11 @@ function DetailRow({
 }
 
 export const Route = createFileRoute('/settings/billing')({
+  head: () => ({
+    meta: [
+      { title: `${m['settings.billing.title']()} | ${envConfigs.app_name}` },
+    ],
+  }),
   component: () => (
     <FeatureGate feature="billing">
       <BillingPage />

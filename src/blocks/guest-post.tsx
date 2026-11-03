@@ -4,11 +4,12 @@ import { Link } from '@/core/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
 import { formatPrice, useGuestPostInfo } from '@/hooks/use-guest-posts';
+import { QueryError } from '@/blocks/query-error';
 import { buttonVariants } from '@/components/ui/button';
 
 // /guest-post: how guest posts work and the packages.
 export function GuestPostLanding() {
-  const { data: info, isPending } = useGuestPostInfo();
+  const { data: info, isPending, isError, refetch } = useGuestPostInfo();
   const steps = [
     { icon: FileText, text: m['guest_posts.landing.step_write']() },
     { icon: Search, text: m['guest_posts.landing.step_review']() },
@@ -27,7 +28,13 @@ export function GuestPostLanding() {
           </p>
         </div>
 
-        {!isPending && !info?.enabled ? (
+        {isPending ? (
+          <p role="status" className="mt-12 text-center">
+            {m['common.loading']()}
+          </p>
+        ) : isError ? (
+          <QueryError retry={refetch} />
+        ) : !info?.enabled ? (
           <p className="text-muted-foreground mt-12 text-center">
             {m['guest_posts.closed']()}
           </p>

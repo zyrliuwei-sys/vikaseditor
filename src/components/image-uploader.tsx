@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { ImageIcon, RefreshCw, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { apiUpload } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -18,6 +20,7 @@ export interface ImageUploaderValue {
 }
 
 interface ImageUploaderProps {
+  labels?: Partial<ImageUploaderLabels>;
   allowMultiple?: boolean;
   maxImages?: number;
   maxSizeMB?: number;
@@ -27,6 +30,38 @@ interface ImageUploaderProps {
   defaultPreviews?: string[];
   onChange?: (items: ImageUploaderValue[]) => void;
 }
+
+type ImageUploaderLabels = {
+  upload: string;
+  limit: (size: number) => string;
+  replace: string;
+  remove: string;
+  preview: string;
+  uploading: string;
+  failed: string;
+  error: string;
+  typeError: string;
+  sizeError: (size: number) => string;
+  count: (count: number) => string;
+};
+
+const defaultLabels: ImageUploaderLabels = {
+  upload: 'Upload photo',
+  limit: (size) => `Up to ${size} MB`,
+  replace: 'Replace image',
+  remove: 'Remove image',
+  preview: 'Image preview',
+  uploading: 'Uploading…',
+  failed: 'Upload failed',
+  error:
+    'The image could not be uploaded. Try again or remove it to save your other changes.',
+  typeError: 'Choose a JPG, PNG, WebP or GIF image.',
+  sizeError: (size) => `Choose an image no larger than ${size} MB.`,
+  count: (count) => `Only the first ${count} images can be added.`,
+};
+
+const supportedImage = (file: File) =>
+  ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type);
 
 interface UploadItem extends ImageUploaderValue {
   file?: File;
@@ -46,21 +81,12 @@ const uploadImageFile = async (file: File) => {
   const formData = new FormData();
   formData.append('files', file);
 
-  const response = await fetch('/api/storage/upload-image', {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Upload failed with status ${response.status}`);
-  }
-
-  const result = await response.json();
-  if (result.code !== 0 || !result.data?.urls?.length) {
-    throw new Error(result.message || 'Upload failed');
-  }
-
-  return result.data.urls[0] as string;
+  const result = await apiUpload<{ urls: string[] }>(
+    '/api/storage/upload-image',
+    formData
+  );
+  if (!result.urls?.length) throw new Error('Upload failed');
+  return result.urls[0];
 };
 
 export function ImageUploader({
@@ -72,7 +98,10 @@ export function ImageUploader({
   className,
   defaultPreviews,
   onChange,
+  labels: labelOverrides,
 }: ImageUploaderProps) {
+  const labels = { ...defaultLabels, ...labelOverrides };
+  const upload = useMutation({ mutationFn: uploadImageFile });
   const inputRef = useRef<HTMLInputElement | null>(null);
   const isInitializedRef = useRef(false);
   const onChangeRef = useRef(onChange);
@@ -183,7 +212,8 @@ export function ImageUploader({
         })
       );
 
-      uploadImageFile(file)
+      upload
+        .mutateAsync(file)
         .then((url) => {
           setItems((prev) =>
             prev.map((item) => {
@@ -204,9 +234,7 @@ export function ImageUploader({
         })
         .catch((error: any) => {
           console.error('Upload failed:', error);
-          toast.error(
-            error?.message ? `Upload failed: ${error.message}` : 'Upload failed'
-          );
+          toast.error(labels.error);
           setItems((prev) =>
             prev.map((item) => {
               if (item.id !== id) return item;
@@ -227,13 +255,13 @@ export function ImageUploader({
       replaceTargetIdRef.current = null;
       const file = selectedFiles[0];
       if (!file) return;
-      if (!file.type?.startsWith('image/')) {
-        toast.error('Only image files are supported');
+      if (!supportedImage(file)) {
+        toast.error(labels.typeError);
         if (inputRef.current) inputRef.current.value = '';
         return;
       }
       if (file.size > maxBytes) {
-        toast.error(`"${file.name}" exceeds the ${maxSizeMB}MB limit`);
+        toast.error(labels.sizeError(maxSizeMB));
         if (inputRef.current) inputRef.current.value = '';
         return;
       }
@@ -244,12 +272,12 @@ export function ImageUploader({
     const availableSlots = maxCount - items.length;
     const filesToAdd = selectedFiles
       .filter((file) => {
-        if (!file.type?.startsWith('image/')) {
-          toast.error(`"${file.name}" is not an image`);
+        if (!supportedImage(file)) {
+          toast.error(labels.typeError);
           return false;
         }
         if (file.size > maxBytes) {
-          toast.error(`"${file.name}" exceeds the ${maxSizeMB}MB limit`);
+          toast.error(labels.sizeError(maxSizeMB));
           return false;
         }
         return true;
@@ -258,9 +286,7 @@ export function ImageUploader({
 
     if (!filesToAdd.length) {
       if (items.length) {
-        const normalized = selectedFiles.filter((file) =>
-          file.type?.startsWith('image/')
-        );
+        const normalized = selectedFiles.filter((file) => supportedImage(file));
         if (!normalized.length) return;
 
         const k = Math.min(normalized.length, items.length);
@@ -281,9 +307,7 @@ export function ImageUploader({
     }
 
     if (availableSlots < selectedFiles.length) {
-      toast.message(
-        `Only the first ${filesToAdd.length} image(s) will be added`
-      );
+      toast.message(labels.count(filesToAdd.length));
     }
 
     const newItems = filesToAdd.map((file) => ({
@@ -300,7 +324,7 @@ export function ImageUploader({
     Promise.all(
       newItems.map(async (item) => {
         try {
-          const url = await uploadImageFile(item.file as File);
+          const url = await upload.mutateAsync(item.file as File);
           setItems((prev) =>
             prev.map((current) => {
               if (current.id !== item.id) return current;
@@ -325,9 +349,7 @@ export function ImageUploader({
           );
         } catch (error: any) {
           console.error('Upload failed:', error);
-          toast.error(
-            error?.message ? `Upload failed: ${error.message}` : 'Upload failed'
-          );
+          toast.error(labels.error);
           setItems((prev) =>
             prev.map((current) => {
               if (current.id !== item.id) return current;
@@ -392,7 +414,7 @@ export function ImageUploader({
     setIsDragActive(false);
 
     const files = Array.from(event.dataTransfer?.files || []).filter((file) =>
-      file.type?.startsWith('image/')
+      supportedImage(file)
     );
     if (!files.length) return;
     handleFiles(files);
@@ -448,7 +470,7 @@ export function ImageUploader({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/gif"
         multiple={allowMultiple}
         onChange={handleSelect}
         className="hidden"
@@ -478,7 +500,7 @@ export function ImageUploader({
             <div className="relative overflow-hidden rounded-lg">
               <img
                 src={item.preview}
-                alt="Preview"
+                alt={labels.preview}
                 className="h-32 w-32 rounded-lg object-cover"
               />
               {item.size && (
@@ -494,7 +516,7 @@ export function ImageUploader({
                     variant="secondary"
                     className="bg-background/50 text-foreground hover:bg-background/50 h-10 w-10 rounded-full shadow-sm backdrop-blur focus-visible:ring-2 focus-visible:ring-white/70"
                     onClick={() => openReplacePicker(item.id)}
-                    aria-label="Replace image"
+                    aria-label={labels.replace}
                   >
                     <RefreshCw className="h-5 w-5" />
                   </Button>
@@ -502,12 +524,12 @@ export function ImageUploader({
               )}
               {item.status === 'uploading' && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 text-xs font-medium text-white">
-                  Uploading...
+                  {labels.uploading}
                 </div>
               )}
               {item.status === 'error' && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-red-500/70 text-xs font-medium text-white">
-                  Failed
+                  {labels.failed}
                 </div>
               )}
               <Button
@@ -516,7 +538,7 @@ export function ImageUploader({
                 variant="destructive"
                 className="absolute top-2 right-2 z-20 h-7 w-7"
                 onClick={() => handleRemove(item.id)}
-                aria-label="Remove image"
+                aria-label={labels.remove}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -535,8 +557,10 @@ export function ImageUploader({
                 <div className="border-border flex h-10 w-10 items-center justify-center rounded-full border border-dashed">
                   <Upload className="h-5 w-5" />
                 </div>
-                <span className="text-xs font-medium">Upload</span>
-                <span className="text-primary text-xs">Max {maxSizeMB}MB</span>
+                <span className="text-xs font-medium">{labels.upload}</span>
+                <span className="text-primary text-xs">
+                  {labels.limit(maxSizeMB)}
+                </span>
               </button>
             </div>
           </div>

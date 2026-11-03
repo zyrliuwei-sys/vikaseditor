@@ -5,9 +5,11 @@ import { Coins } from 'lucide-react';
 
 import { tDynamic } from '@/core/i18n/dynamic';
 import { Link } from '@/core/i18n/navigation';
+import { envConfigs } from '@/config';
 import { apiGet, type PageResult } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
+import { QueryError } from '@/blocks/query-error';
 import { DataTable, type Column } from '@/components/data-table';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
@@ -135,6 +137,13 @@ function CreditsPage() {
     },
   ];
 
+  if (balanceQuery.isError || query.isError)
+    return (
+      <QueryError
+        retry={() => Promise.all([balanceQuery.refetch(), query.refetch()])}
+      />
+    );
+
   return (
     <div className="space-y-6 p-6">
       <div>
@@ -207,6 +216,11 @@ function CreditsPage() {
 }
 
 export const Route = createFileRoute('/settings/credits')({
+  head: () => ({
+    meta: [
+      { title: `${m['settings.credits.title']()} | ${envConfigs.app_name}` },
+    ],
+  }),
   component: () => (
     <FeatureGate feature="credits">
       <CreditsPage />

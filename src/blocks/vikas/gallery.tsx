@@ -1,36 +1,15 @@
 import { useState } from 'react';
 import type { TemplateCategory, VikasTemplate } from '@/types/vikas';
-import {
-  ArrowDown,
-  ArrowUpRight,
-  Check,
-  Copy,
-  Search,
-  SlidersHorizontal,
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { ArrowDown, Search, SlidersHorizontal } from 'lucide-react';
 
+import { Link } from '@/core/i18n/navigation';
+import { templatePath } from '@/config/template-pages';
 import { m } from '@/paraglide/messages.js';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { VikasArtwork } from '@/components/vikas/artwork';
 import { VikasTemplateCard } from '@/components/vikas/template-card';
 
-export function VikasGallery({
-  templates,
-  onTemplate,
-}: {
-  templates: VikasTemplate[];
-  onTemplate: (template: VikasTemplate) => void;
-}) {
+export function VikasGallery({ templates }: { templates: VikasTemplate[] }) {
   const [category, setCategory] = useState<TemplateCategory>('all');
   const [search, setSearch] = useState('');
-  const [detail, setDetail] = useState<VikasTemplate | null>(null);
-  const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const categories: { id: TemplateCategory; label: string }[] = [
     { id: 'all', label: m['vikas.gallery.all']() },
@@ -48,16 +27,6 @@ export function VikasGallery({
         .includes(search.toLowerCase().trim())
   );
   const visible = expanded ? filtered : filtered.slice(0, 6);
-  async function copyPrompt() {
-    if (!detail) return;
-    try {
-      await navigator.clipboard.writeText(detail.prompt);
-      setCopied(true);
-      toast.success(m['vikas.gallery.copied']());
-    } catch {
-      toast.error(m['vikas.gallery.copy_failed']());
-    }
-  }
   return (
     <section
       id="templates"
@@ -115,18 +84,15 @@ export function VikasGallery({
           <VikasTemplateCard
             key={template.id}
             template={template}
-            useLabel={m['vikas.gallery.use']()}
+            useLabel={m['vikas.template_page.view']()}
             detailLabel={m['vikas.gallery.details']()}
             typeLabel={
               template.mediaType === 'video'
                 ? m['vikas.gallery.motion']()
                 : m['vikas.gallery.photo']()
             }
-            onUse={() => onTemplate(template)}
-            onDetails={() => {
-              setDetail(template);
-              setCopied(false);
-            }}
+            href={templatePath(template.id)}
+            detailHref={`${templatePath(template.id)}#prompt`}
           />
         ))}
       </div>
@@ -164,52 +130,16 @@ export function VikasGallery({
           </button>
         </div>
       )}
-      <Dialog
-        open={!!detail}
-        onOpenChange={(open) => {
-          if (!open) setDetail(null);
-        }}
+      <nav
+        className="vikas-template-index"
+        aria-label={m['vikas.template_page.all_templates']()}
       >
-        <DialogContent className="vikas-template-dialog">
-          {detail && (
-            <>
-              <div className="vikas-dialog-art">
-                <VikasArtwork index={detail.artwork} alt={detail.title} />
-                <span>{m['vikas.gallery.example']()}</span>
-              </div>
-              <div className="vikas-dialog-copy">
-                <DialogTitle className="text-2xl">{detail.title}</DialogTitle>
-                <DialogDescription>{detail.description}</DialogDescription>
-                <p className="vikas-dialog-label">
-                  {m['vikas.gallery.prompt']()}
-                </p>
-                <p className="vikas-prompt-text">{detail.prompt}</p>
-                <div className="vikas-dialog-actions">
-                  <button
-                    className="vikas-button-secondary"
-                    onClick={copyPrompt}
-                  >
-                    {copied ? <Check size={16} /> : <Copy size={16} />}{' '}
-                    {copied
-                      ? m['vikas.gallery.copied']()
-                      : m['vikas.gallery.copy']()}
-                  </button>
-                  <button
-                    className="vikas-button"
-                    onClick={() => {
-                      onTemplate(detail);
-                      setDetail(null);
-                    }}
-                  >
-                    {m['vikas.gallery.use']()}
-                    <ArrowUpRight size={16} />
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+        {templates.map((template) => (
+          <Link key={template.id} href={templatePath(template.id)}>
+            {template.title}
+          </Link>
+        ))}
+      </nav>
     </section>
   );
 }

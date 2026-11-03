@@ -26,6 +26,8 @@ export const envConfigs: Record<string, string> = {
   database_url: procEnv.DATABASE_URL ?? '',
   database_auth_token: procEnv.DATABASE_AUTH_TOKEN ?? '',
   database_provider: procEnv.DATABASE_PROVIDER ?? 'sqlite',
+  // Development only: opt into the same D1 database used by the Worker.
+  database_d1_remote: procEnv.DATABASE_D1_REMOTE ?? '',
   db_schema: procEnv.DB_SCHEMA ?? 'public',
   db_singleton_enabled: procEnv.DB_SINGLETON_ENABLED ?? 'false',
   db_max_connections: procEnv.DB_MAX_CONNECTIONS ?? '1',

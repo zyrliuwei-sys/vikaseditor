@@ -13,6 +13,7 @@ import {
 
 import { useSession } from '@/core/auth/client';
 import { Link } from '@/core/i18n/navigation';
+import { envConfigs } from '@/config';
 import { apiGet, type PageResult } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
@@ -485,5 +486,10 @@ function DashboardPage() {
 }
 
 export const Route = createFileRoute('/settings/')({
+  head: () => ({
+    meta: [
+      { title: `${m['settings.nav.overview']()} | ${envConfigs.app_name}` },
+    ],
+  }),
   component: DashboardPage,
 });

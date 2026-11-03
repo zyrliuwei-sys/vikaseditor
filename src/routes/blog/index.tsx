@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { ArrowRight } from 'lucide-react';
 
-import { Link } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { blogIsIndexable } from '@/lib/blog-indexing';
 import { vikasPageHead } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
@@ -10,31 +9,40 @@ import { Footer } from '@/blocks/footer';
 import { Header } from '@/blocks/header';
 import { BlogCard } from '@/components/blog-card';
 import { formatPostDate } from '@/content/posts';
-import { getBlogPostsFn, getGuestPostsOpenFn } from '@/content/posts/server';
+import { getBlogPostsFn } from '@/content/posts/server';
 
 export const Route = createFileRoute('/blog/')({
   loader: async () => {
     const locale = getLocale();
-    const [posts, guestPostsOpen] = await Promise.all([
-      getBlogPostsFn({ data: { locale } }),
-      getGuestPostsOpenFn(),
-    ]);
-    return { locale, posts, guestPostsOpen };
+    const posts = await getBlogPostsFn({ data: { locale } });
+    return { locale, posts };
   },
   head: ({ loaderData }) => {
     const locale = loaderData?.locale ?? 'en';
-    return vikasPageHead(
+    const head = vikasPageHead(
       '/blog',
       `${m['blog.title']({}, { locale })} | ${envConfigs.app_name}`,
       m['blog.description']({}, { locale }),
       locale
     );
+    return {
+      ...head,
+      meta: [
+        ...head.meta,
+        {
+          name: 'robots',
+          content: blogIsIndexable(loaderData?.posts ?? [])
+            ? 'index, follow'
+            : 'noindex, follow',
+        },
+      ],
+    };
   },
   component: BlogPage,
 });
 
 function BlogPage() {
-  const { locale, posts, guestPostsOpen } = Route.useLoaderData();
+  const { locale, posts } = Route.useLoaderData();
 
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col">
@@ -48,15 +56,6 @@ function BlogPage() {
             <p className="text-muted-foreground mx-auto mt-5 max-w-lg">
               {m['blog.description']()}
             </p>
-            {guestPostsOpen && (
-              <Link
-                href="/guest-post"
-                className="text-muted-foreground hover:text-foreground mt-4 inline-flex items-center gap-1 text-sm font-medium underline-offset-4 hover:underline"
-              >
-                {m['blog.write_for_us']()}
-                <ArrowRight className="size-3.5" />
-              </Link>
-            )}
           </div>
           {posts.length === 0 ? (
             <p className="text-muted-foreground text-center">

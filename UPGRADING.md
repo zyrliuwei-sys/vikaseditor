@@ -4,6 +4,14 @@ Read this when a project built from this template pulls newer template code.
 Entries are newest first. Apply **every entry dated after the template version
 the project last pulled**, oldest of those first.
 
+## 2026-11-03 — Ordinary-user journey fixes
+
+- Account navigation now normalizes locale prefixes, uses a single link per item, and keeps the overview active only on its own page. Profile updates refresh the authentication session so the account name changes immediately. Shared user-info queries retain one consistent response shape.
+- Form validation, image uploads, dialogs, error pages and all nine template prompts now have Chinese copy. Credit and subscription links say “Credit guide” because this project’s pricing page explains usage costs rather than selling plans.
+- Image/video controls on `/create` update the URL; header navigation selects the requested mode. Loading failures show a retry action rather than an empty balance/history, and a closed guest-post feature no longer offers new submissions or payment.
+- Saved dark mode hydrates without a text mismatch. Optional footer badge failures no longer take down the root page. Email-verification callbacks use the shared same-origin and auth-loop validation.
+- Development D1 now accepts `DATABASE_D1_REMOTE=true` (shared remote data) or `false` (local D1), independently of the Wrangler file that deployment regenerates. Empty preserves the binding’s original behavior. This project’s ignored `.env.development` opts into the shared remote database. No schema migration or permission-code change is required.
+
 ## 2026-11-03 — GitHub to Cloudflare Workers deployment
 
 - `deploy/cloudflare.json` is the public production configuration for `vikaseditor`, its existing D1 binding, and `https://vikas-editor.net`. `pnpm cf:build` and `pnpm cf:deploy` materialize the ignored root `wrangler.jsonc` and use these same values at build time and runtime. Node 22 or newer is required. Cloud builds do not need a local `.env.production`.

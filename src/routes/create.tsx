@@ -9,7 +9,9 @@ import { VikasCreate } from '@/blocks/vikas/create';
 
 export const Route = createFileRoute('/create')({
   validateSearch: (search: Record<string, unknown>) => ({
-    mode: search.mode === 'video' ? ('video' as const) : ('image' as const),
+    ...(search.mode === 'video' || search.mode === 'image'
+      ? { mode: search.mode }
+      : {}),
   }),
   loader: () => ({ locale: getLocale() }),
   head: ({ loaderData }) => {
@@ -25,11 +27,22 @@ export const Route = createFileRoute('/create')({
 });
 function CreatePage() {
   const { mode } = Route.useSearch();
+  const navigate = Route.useNavigate();
   return (
     <div className="vikas-site">
       <Header />
       <main id="main-content">
-        <VikasCreate mode={mode} />
+        <VikasCreate
+          mode={mode === 'video' ? 'video' : 'image'}
+          onModeChange={(nextMode) => {
+            void navigate({
+              to: nextMode === 'video' ? '/create/video' : '/create/image',
+              search: {},
+              replace: true,
+              resetScroll: false,
+            });
+          }}
+        />
       </main>
       <Footer />
     </div>

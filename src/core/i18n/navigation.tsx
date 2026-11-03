@@ -5,7 +5,7 @@ import {
   useRouter as useTanStackRouter,
 } from '@tanstack/react-router';
 
-import { getLocale } from '@/paraglide/runtime.js';
+import { deLocalizeHref, getLocale } from '@/paraglide/runtime.js';
 
 // Locale-aware navigation. Locale prefixes are handled entirely by the
 // router rewrite (Paraglide localizeUrl/deLocalizeUrl) — internal hrefs
@@ -31,9 +31,8 @@ export function Link({ href, locale, prefetch, ...rest }: LinkProps) {
 }
 
 export function usePathname(): string {
-  // Routes are matched against the de-localized tree, so pathname here is
-  // already locale-free.
-  return useLocation().pathname;
+  // The current browser location can retain its locale prefix after rewrites.
+  return deLocalizeHref(useLocation().pathname);
 }
 
 function toNavigateOptions(href: string) {

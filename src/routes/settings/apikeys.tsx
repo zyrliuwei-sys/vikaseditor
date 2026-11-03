@@ -9,6 +9,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Check, Copy, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { envConfigs } from '@/config';
 import {
   apiDelete,
   apiGet,
@@ -17,9 +18,6 @@ import {
   type PageResult,
 } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
-import { DataTable, type Column } from '@/components/data-table';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -28,7 +26,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/blocks/dialog';
+import { DataTable, type Column } from '@/components/data-table';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -345,6 +346,11 @@ function ApiKeysPage() {
 }
 
 export const Route = createFileRoute('/settings/apikeys')({
+  head: () => ({
+    meta: [
+      { title: `${m['settings.apikeys.title']()} | ${envConfigs.app_name}` },
+    ],
+  }),
   component: () => (
     <FeatureGate feature="apikeys">
       <ApiKeysPage />

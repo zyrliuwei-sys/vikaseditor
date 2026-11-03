@@ -1,27 +1,25 @@
-import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
-import { apiGet } from '@/lib/api-client';
+import { envConfigs } from '@/config';
 import { m } from '@/paraglide/messages.js';
+import { useUserInfo } from '@/hooks/use-user-info';
+import { Button } from '@/components/ui/button';
 
 import { SettingsForm } from './-settings-form';
 
 function SettingsPage() {
-  const { data: user } = useQuery({
-    queryKey: ['user-info'],
-    queryFn: async () => {
-      const data = await apiGet<{
-        name?: string;
-        email?: string;
-        image?: string;
-      }>('/api/user/info');
-      return {
-        name: data.name || '',
-        email: data.email || '',
-        image: data.image || '',
-      };
-    },
-  });
+  const query = useUserInfo();
+  const user = query.data;
+  if (query.isError) {
+    return (
+      <div role="alert" className="space-y-3 p-6">
+        <p>{m['settings.profile.load_failed']()}</p>
+        <Button variant="outline" onClick={() => void query.refetch()}>
+          {m['common.errors.retry']()}
+        </Button>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -32,10 +30,19 @@ function SettingsPage() {
   }
 
   return (
-    <SettingsForm name={user.name} email={user.email} image={user.image} />
+    <SettingsForm
+      name={user.name || ''}
+      email={user.email || ''}
+      image={user.image || ''}
+    />
   );
 }
 
 export const Route = createFileRoute('/settings/profile')({
+  head: () => ({
+    meta: [
+      { title: `${m['settings.profile.title']()} | ${envConfigs.app_name}` },
+    ],
+  }),
   component: SettingsPage,
 });

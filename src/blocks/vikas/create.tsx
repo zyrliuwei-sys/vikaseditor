@@ -4,7 +4,13 @@ import { m } from '@/paraglide/messages.js';
 import { VikasStudio } from '@/blocks/vikas/studio';
 import { getVikasTemplates } from '@/blocks/vikas/templates';
 
-export function VikasCreate({ mode = 'image' }: { mode?: MediaMode }) {
+export function VikasCreate({
+  mode = 'image',
+  onModeChange,
+}: {
+  mode?: MediaMode;
+  onModeChange?: (mode: MediaMode) => void;
+}) {
   const templates = getVikasTemplates();
   return (
     <div className="vikas-create-page">
@@ -20,6 +26,7 @@ export function VikasCreate({ mode = 'image' }: { mode?: MediaMode }) {
         </div>
       </div>
       <VikasStudio
+        onModeChange={onModeChange}
         templates={templates}
         selection={{
           mode,

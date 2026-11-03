@@ -25,7 +25,6 @@ export const Route = createFileRoute('/robots.txt')({
               '/redeem-invite',
             ].map((path) => `Disallow: ${prefix}${path}`);
           }),
-          'Disallow: /*?*',
           '',
           `Sitemap: ${new URL('/sitemap.xml', envConfigs.app_url).href}`,
           '',

@@ -19,6 +19,7 @@ interface NavigationProps {
     skip: string;
     lightTheme: string;
     darkTheme: string;
+    language: string;
   };
   user?: { name: string; email: string; image?: string | null };
 }
@@ -73,7 +74,7 @@ export function VikasNavigation({
               />
             </div>
             <div className="vikas-language">
-              <LocaleSelector />
+              <LocaleSelector label={copy.language} />
             </div>
             {user ? (
               <SiteUserMenu
@@ -115,7 +116,7 @@ export function VikasNavigation({
               </Link>
             ))}
             <div className="vikas-mobile-bottom">
-              <LocaleSelector variant="pill" />
+              <LocaleSelector variant="pill" label={copy.language} />
               <ThemeToggle
                 lightLabel={copy.lightTheme}
                 darkLabel={copy.darkTheme}

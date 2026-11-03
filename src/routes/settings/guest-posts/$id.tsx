@@ -20,23 +20,24 @@ import {
   type GuestPostStatus,
 } from '@/hooks/use-guest-posts';
 import {
-  ImageUploader,
-  type ImageUploaderValue,
-} from '@/components/image-uploader';
-import { MarkdownContent } from '@/components/markdown-content';
-import { PaymentProviderModal } from '@/components/payment-provider-modal';
-import { RichTextEditor } from '@/components/rich-text-editor';
-import { SlugInput } from '@/components/slug-input';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/blocks/dialog';
+import {
+  ImageUploader,
+  type ImageUploaderValue,
+} from '@/blocks/image-uploader';
+import { QueryError } from '@/blocks/query-error';
+import { MarkdownContent } from '@/components/markdown-content';
+import { PaymentProviderModal } from '@/components/payment-provider-modal';
+import { RichTextEditor } from '@/components/rich-text-editor';
+import { SlugInput } from '@/components/slug-input';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -182,7 +183,28 @@ function GuestPostEditorPage() {
     },
   });
 
-  if (!isNew && (detail.isPending || !loaded)) {
+  if (info.isError) return <QueryError retry={info.refetch} />;
+  if (info.isPending)
+    return (
+      <p role="status" className="p-6">
+        {m['common.loading']()}
+      </p>
+    );
+  if (isNew && !info.data?.enabled)
+    return (
+      <div className="space-y-4 p-6">
+        <h1 className="text-2xl font-bold">{m['guest_posts.title']()}</h1>
+        <p>{m['guest_posts.closed']()}</p>
+        <Link
+          href="/settings"
+          className="inline-flex min-h-11 items-center underline"
+        >
+          {m['settings.nav.overview']()}
+        </Link>
+      </div>
+    );
+
+  if (!isNew && !detail.isError && (detail.isPending || !loaded)) {
     return (
       <div className="text-muted-foreground p-6">
         {m['guest_posts.loading']()}
@@ -190,9 +212,7 @@ function GuestPostEditorPage() {
     );
   }
   if (!isNew && detail.isError) {
-    return (
-      <div className="text-muted-foreground p-6">{detail.error.message}</div>
-    );
+    return <QueryError retry={detail.refetch} />;
   }
 
   const busy = save.isPending || checkout.pending || remove.isPending;

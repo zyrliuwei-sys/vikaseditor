@@ -1,6 +1,7 @@
 import type { VikasTemplate } from '@/types/vikas';
 import { ArrowUpRight, Copy, Film, Image as ImageIcon } from 'lucide-react';
 
+import { Link } from '@/core/i18n/navigation';
 import { VikasArtwork } from '@/components/vikas/artwork';
 
 export function VikasTemplateCard({
@@ -8,21 +9,21 @@ export function VikasTemplateCard({
   useLabel,
   detailLabel,
   typeLabel,
-  onUse,
-  onDetails,
+  href,
+  detailHref,
 }: {
   template: VikasTemplate;
   useLabel: string;
   detailLabel: string;
   typeLabel: string;
-  onUse: () => void;
-  onDetails: () => void;
+  href: string;
+  detailHref: string;
 }) {
   return (
     <article className="vikas-template-card">
-      <button
+      <Link
         className="vikas-template-image"
-        onClick={onUse}
+        href={href}
         aria-label={`${useLabel}: ${template.title}`}
       >
         <VikasArtwork
@@ -38,7 +39,7 @@ export function VikasTemplateCard({
           {useLabel}
           <ArrowUpRight size={17} />
         </span>
-      </button>
+      </Link>
       <div className="vikas-card-caption">
         <div className="vikas-card-meta">
           <span>
@@ -49,15 +50,17 @@ export function VikasTemplateCard({
             )}
             {typeLabel}
           </span>
-          <button
+          <Link
             aria-label={`${detailLabel}: ${template.title}`}
-            onClick={onDetails}
+            href={detailHref}
           >
             <Copy size={14} />
             <span>{detailLabel}</span>
-          </button>
+          </Link>
         </div>
-        <h3>{template.title}</h3>
+        <h3>
+          <Link href={href}>{template.title}</Link>
+        </h3>
         <p>{template.description}</p>
       </div>
     </article>

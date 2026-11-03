@@ -151,7 +151,10 @@ export async function ensureDevD1Binding(): Promise<void> {
     );
     if (!binding)
       throw new Error('Configure a D1 binding named DB in wrangler.jsonc.');
-    if (binding.remote) {
+    // Deploys regenerate wrangler.jsonc without dev-only `remote` flags.
+    // Keep an explicit local choice stable across those production builds.
+    const remote = process.env.DATABASE_D1_REMOTE;
+    if (remote === 'true' || (remote !== 'false' && binding.remote)) {
       return {
         DB: createD1HttpBinding(
           config.account_id || '',

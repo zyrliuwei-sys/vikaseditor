@@ -13,8 +13,8 @@ export function Footer() {
     {
       title: m['vikas.footer.create'](),
       links: [
-        { href: '/create?mode=image', label: m['vikas.nav.image']() },
-        { href: '/create?mode=video', label: m['vikas.nav.video']() },
+        { href: '/create/image', label: m['vikas.nav.image']() },
+        { href: '/create/video', label: m['vikas.nav.video']() },
         { href: '/settings', label: m['landing.footer.settings']() },
       ],
     },

@@ -66,7 +66,7 @@ export function VikasHome() {
         onCreate={create}
         onTemplate={selectTemplate}
       />
-      <VikasGallery templates={templates} onTemplate={selectTemplate} />
+      <VikasGallery templates={templates} />
       <VikasStudio templates={templates} selection={selection} />
       <VikasHowItWorks />
       <VikasVideoStory onCreate={() => selectTemplate(templates[7])} />

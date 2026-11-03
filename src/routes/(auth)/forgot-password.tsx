@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { requestPasswordReset } from '@/core/auth/client';
 import { Link } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { authErrorMessage } from '@/lib/auth-errors';
 import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
 import { getLocale, localizeHref } from '@/paraglide/runtime.js';
@@ -20,11 +21,10 @@ import {
 } from '@/components/ui/card';
 import { Field, FieldDescription, FieldGroup } from '@/components/ui/field';
 
-const forgotSchema = z.object({
-  email: z.string().email(m['common.sign.email_placeholder']()),
-});
-
 function ForgotPasswordPage() {
+  const forgotSchema = z.object({
+    email: z.string().trim().email(m['common.validation.email']()),
+  });
   const [error, setError] = useState('');
   const [sent, setSent] = useState(false);
   const [sentEmail, setSentEmail] = useState('');
@@ -44,17 +44,17 @@ function ForgotPasswordPage() {
         const origin = window.location.origin;
         const redirectTo = `${origin}${localizeHref('/reset-password')}`;
         const result = await requestPasswordReset({
-          email: value.email,
+          email: value.email.trim(),
           redirectTo,
         });
         if (result.error) {
-          setError(result.error.message || 'Request failed');
+          setError(authErrorMessage(result.error));
         } else {
           setSentEmail(value.email);
           setSent(true);
         }
       } catch (err: any) {
-        setError(err.message || 'Request failed');
+        setError(authErrorMessage(err));
       }
     },
   });
@@ -75,14 +75,20 @@ function ForgotPasswordPage() {
                 ? m['common.sign.reset_link_sent_title']()
                 : m['common.sign.forgot_password_title']()}
             </h1>
-            {!sent && (
+            {!sent && configsLoaded && passwordResetEnabled && (
               <CardDescription>
                 {m['common.sign.forgot_password_description']()}
               </CardDescription>
             )}
           </CardHeader>
           <CardContent>
-            {configsLoaded && !passwordResetEnabled ? (
+            {!configsLoaded ? (
+              <p role="status" className="text-center text-sm">
+                {configQuery.isError
+                  ? m['common.sign.request_failed']()
+                  : m['common.loading']()}
+              </p>
+            ) : !passwordResetEnabled ? (
               <FieldGroup>
                 <div className="rounded-lg border border-dashed p-6 text-center">
                   <p className="text-sm font-medium">
@@ -91,6 +97,12 @@ function ForgotPasswordPage() {
                   <p className="text-muted-foreground mt-1 text-sm">
                     {m['common.sign.password_reset_unavailable_description']()}
                   </p>
+                  <a
+                    href="mailto:support@vikas-editor.net"
+                    className="mt-3 inline-flex min-h-11 items-center text-sm underline"
+                  >
+                    {m['common.sign.contact_support']()}
+                  </a>
                 </div>
                 <Field>
                   <Link
@@ -136,6 +148,7 @@ function ForgotPasswordPage() {
                         field={field}
                         label={m['common.sign.email_title']()}
                         type="email"
+                        autoComplete="email"
                         required
                         placeholder={m['common.sign.email_placeholder']()}
                       />

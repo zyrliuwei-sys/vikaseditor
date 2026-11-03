@@ -7,6 +7,7 @@ import { authClient, signIn, signUp, useSession } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { apiPost } from '@/lib/api-client';
+import { authErrorMessage } from '@/lib/auth-errors';
 import { resolveAfterAuthUrl, safeInternalPath } from '@/lib/redirect';
 import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
@@ -22,20 +23,23 @@ import {
   FieldSeparator,
 } from '@/components/ui/field';
 
-const signUpSchema = z
-  .object({
-    name: z.string().min(1),
-    email: z.string().email(m['common.sign.email_placeholder']()),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
-    inviteCode: z.string(),
-  })
-  .refine((d) => d.password === d.confirmPassword, {
-    path: ['confirmPassword'],
-    message: m['common.sign.password_mismatch'](),
-  });
-
 function SignUpPage() {
+  const signUpSchema = z
+    .object({
+      name: z
+        .string()
+        .trim()
+        .min(1, m['common.validation.name_required']())
+        .max(100, m['common.validation.name_length']()),
+      email: z.string().trim().email(m['common.validation.email']()),
+      password: z.string().min(8, m['common.validation.password']()),
+      confirmPassword: z.string().min(8, m['common.validation.password']()),
+      inviteCode: z.string(),
+    })
+    .refine((d) => d.password === d.confirmPassword, {
+      path: ['confirmPassword'],
+      message: m['common.sign.password_mismatch'](),
+    });
   const router = useRouter();
   const { data: session, isPending: sessionPending } = useSession();
   // Set right before we navigate so the already-signed-in effect doesn't also fire.
@@ -122,12 +126,12 @@ function SignUpPage() {
         }
 
         const result = await signUp.email({
-          name: value.name,
-          email: value.email,
+          name: value.name.trim(),
+          email: value.email.trim(),
           password: value.password,
         });
         if (result.error) {
-          setError(result.error.message || 'Sign up failed');
+          setError(authErrorMessage(result.error));
           return;
         }
 
@@ -146,7 +150,7 @@ function SignUpPage() {
             value.email
           )}&callbackUrl=${encodeURIComponent(afterLoginUrl)}`;
           void authClient.sendVerificationEmail({
-            email: value.email,
+            email: value.email.trim(),
             callbackURL: localizeHref(afterLoginUrl),
           });
           router.push(verifyPath);
@@ -158,7 +162,7 @@ function SignUpPage() {
           window.location.assign(localizeHref(afterLoginUrl));
         }
       } catch (err: any) {
-        setError(err.message || 'Sign up failed');
+        setError(authErrorMessage(err));
       }
     },
   });
@@ -272,6 +276,7 @@ function SignUpPage() {
                             field={field}
                             label={m['common.sign.email_title']()}
                             type="email"
+                            autoComplete="email"
                             required
                             placeholder={m['common.sign.email_placeholder']()}
                           />
@@ -283,6 +288,7 @@ function SignUpPage() {
                             field={field}
                             label={m['common.sign.password_title']()}
                             type="password"
+                            autoComplete="new-password"
                             required
                             placeholder={m[
                               'common.sign.password_placeholder'
@@ -296,6 +302,7 @@ function SignUpPage() {
                             field={field}
                             label={m['common.sign.confirm_password_title']()}
                             type="password"
+                            autoComplete="new-password"
                             required
                             placeholder={m[
                               'common.sign.confirm_password_placeholder'

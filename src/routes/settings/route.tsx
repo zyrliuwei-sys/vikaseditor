@@ -102,6 +102,8 @@ function SettingsLayout() {
 
   return (
     <AppLayout
+      loadingLabel={m['common.loading']()}
+      toggleSidebarLabel={m['common.sidebar.toggle']()}
       navItems={navItems}
       footerNavItems={footerNavItems}
       brand={envConfigs.app_name}

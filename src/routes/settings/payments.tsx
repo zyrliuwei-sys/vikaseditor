@@ -5,9 +5,11 @@ import { ExternalLink } from 'lucide-react';
 
 import { tDynamic } from '@/core/i18n/dynamic';
 import { Link } from '@/core/i18n/navigation';
+import { envConfigs } from '@/config';
 import { apiGet, type PageResult } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
+import { QueryError } from '@/blocks/query-error';
 import { DataTable, type Column } from '@/components/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -196,6 +198,9 @@ function PaymentsPage() {
     },
   ];
 
+  if (query.isError)
+    return <QueryError retry={() => Promise.all([query.refetch()])} />;
+
   return (
     <div className="space-y-6 p-6">
       <div>
@@ -265,6 +270,11 @@ function PaymentsPage() {
 }
 
 export const Route = createFileRoute('/settings/payments')({
+  head: () => ({
+    meta: [
+      { title: `${m['settings.payments.title']()} | ${envConfigs.app_name}` },
+    ],
+  }),
   component: () => (
     <FeatureGate feature="payments">
       <PaymentsPage />

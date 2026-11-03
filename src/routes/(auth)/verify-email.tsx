@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { authClient, useSession } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { safeInternalPath } from '@/lib/redirect';
 import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
 import {
@@ -25,14 +26,9 @@ import {
 const RESEND_COOLDOWN_SECONDS = 60;
 
 function safeDecodeCallbackUrl(raw?: string | null) {
-  if (!raw) return '/';
-  try {
-    const decoded = decodeURIComponent(raw);
-    if (decoded.startsWith('/')) return decoded;
-    return '/';
-  } catch {
-    return '/';
-  }
+  // URLSearchParams has already decoded this value. Apply the same origin
+  // and auth-loop checks as sign-in, including protocol-relative URLs.
+  return safeInternalPath(raw) || '/';
 }
 
 function stripLocalePrefix(path: string) {
@@ -99,8 +95,13 @@ function VerifyEmailPage() {
 
   // If user lands here without context, send to sign-in.
   useEffect(() => {
-    if (paramsReady && !email && !callbackUrl) {
-      router.replace('/sign-in');
+    if (paramsReady && !email) {
+      const target = safeInternalPath(callbackUrl);
+      router.replace(
+        target
+          ? `/sign-in?callbackUrl=${encodeURIComponent(target)}`
+          : '/sign-in'
+      );
     }
   }, [paramsReady, email, callbackUrl, router]);
 
@@ -143,10 +144,10 @@ function VerifyEmailPage() {
 
   // If session exists, redirect to next.
   useEffect(() => {
-    if (!isPending && session?.user) {
+    if (paramsReady && !isPending && session?.user) {
       hardNavigateToNextUrl();
     }
-  }, [isPending, session?.user, nextUrl]);
+  }, [paramsReady, isPending, session?.user, nextUrl]);
 
   // Brief polling on mount: detect verification link → cookie → session.
   useEffect(() => {

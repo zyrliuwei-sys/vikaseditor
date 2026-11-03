@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useQuery } from '@tanstack/react-query';
 
 import { useSession } from '@/core/auth/client';
 import { usePathname, useRouter } from '@/core/i18n/navigation';
-import { apiGet } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { useAppearance } from '@/hooks/use-appearance';
+import { useUserInfo } from '@/hooks/use-user-info';
 import { useUserPermissions } from '@/hooks/use-user-permissions';
 import { AppSidebar, type NavItem } from '@/components/app-sidebar';
 import { Separator } from '@/components/ui/separator';
@@ -30,6 +29,8 @@ export function AppLayout({
   profileHref,
   requirePermission,
   unauthorizedRedirect = '/settings',
+  loadingLabel = 'Loading...',
+  toggleSidebarLabel = 'Toggle sidebar',
 }: {
   children: React.ReactNode;
   navItems: NavItem[];
@@ -42,6 +43,8 @@ export function AppLayout({
   profileHref?: string;
   requirePermission?: string;
   unauthorizedRedirect?: string;
+  loadingLabel?: string;
+  toggleSidebarLabel?: string;
 }) {
   const { data: session, isPending } = useSession();
   const { appearance } = useAppearance();
@@ -54,12 +57,7 @@ export function AppLayout({
 
   // Invite-only gate: needs the user's membership status (also covers social
   // logins). `needsInvite` is computed server-side in /api/user/info.
-  const userInfoQuery = useQuery({
-    queryKey: ['user-info'],
-    queryFn: () => apiGet<{ needsInvite?: boolean }>('/api/user/info'),
-    staleTime: 60_000,
-    enabled: !!session?.user,
-  });
+  const userInfoQuery = useUserInfo(!!session?.user);
   const needsInvite = userInfoQuery.data?.needsInvite === true;
   const membershipResolved =
     !session?.user || userInfoQuery.isSuccess || userInfoQuery.isError;
@@ -133,7 +131,7 @@ export function AppLayout({
       <div className="bg-background flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="border-primary size-6 animate-spin rounded-full border-2 border-t-transparent" />
-          <span className="text-muted-foreground text-sm">Loading...</span>
+          <span className="text-muted-foreground text-sm">{loadingLabel}</span>
         </div>
       </div>
     );
@@ -151,7 +149,7 @@ export function AppLayout({
         footerNavItems={footerNavItems}
         footer={
           <UserMenu
-            name={session.user.name || 'User'}
+            name={session.user.name || session.user.email}
             email={session.user.email}
             image={session.user.image}
             profileHref={profileHref}
@@ -170,7 +168,7 @@ export function AppLayout({
           )}
         >
           <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
+            <SidebarTrigger className="-ml-1" aria-label={toggleSidebarLabel} />
           </div>
           <div className="flex-1" />
           {headerExtra && (

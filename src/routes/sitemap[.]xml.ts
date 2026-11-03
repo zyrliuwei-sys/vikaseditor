@@ -1,15 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { envConfigs } from '@/config';
+import { TEMPLATE_PAGES } from '@/config/template-pages';
 import { baseLocale, locales, localizeUrl } from '@/paraglide/runtime.js';
-import { getLocalPosts, mergePosts } from '@/content/posts';
 
 const STATIC_PATHS = [
   '',
   '/pricing',
   '/create',
-  '/blog',
-  '/guest-post',
+  '/create/image',
+  '/create/video',
   '/privacy-policy',
   '/terms-of-service',
 ];
@@ -19,6 +19,7 @@ type Entry = {
   lastModified?: string;
   changeFrequency: string;
   priority: number;
+  languages?: readonly (typeof locales)[number][];
 };
 
 function urlFor(path: string, locale: string): string {
@@ -42,13 +43,17 @@ function xmlEscape(value: string): string {
 }
 
 function entryXml(e: Entry): string {
-  const alternates = [...locales, 'x-default']
+  const languages = e.languages ?? locales;
+  const alternates = [
+    ...languages,
+    ...(languages.includes(baseLocale) ? ['x-default'] : []),
+  ]
     .map(
       (loc) =>
         `    <xhtml:link rel="alternate" hreflang="${loc}" href="${xmlEscape(urlFor(e.path, loc === 'x-default' ? baseLocale : loc))}"/>`
     )
     .join('\n');
-  return locales
+  return languages
     .map((locale) =>
       [
         '  <url>',
@@ -73,42 +78,22 @@ export const Route = createFileRoute('/sitemap.xml')({
       GET: async () => {
         const entries: Entry[] = STATIC_PATHS.map((path) => ({
           path,
-          changeFrequency: path === '/blog' ? 'daily' : 'weekly',
+          changeFrequency: 'weekly',
           priority: path === '' ? 1 : 0.8,
         }));
 
-        // Blog posts: db posts merged with local MDX posts.
-        try {
-          const { listPublishedArticles } =
-            await import('@/modules/posts/service');
-          const rows = await listPublishedArticles().catch(() => []);
-          const dbPosts = rows.map((row) => ({
-            slug: row.slug,
-            title: row.title || row.slug,
-            description: row.description || '',
-            createdAt: new Date(row.createdAt).toISOString(),
-            source: 'db' as const,
-          }));
-          const posts = mergePosts(dbPosts, getLocalPosts(baseLocale));
-          for (const post of posts) {
-            entries.push({
-              path: `/blog/${encodeURIComponent(post.slug)}`,
-              lastModified: post.createdAt,
-              changeFrequency: 'monthly',
-              priority: 0.6,
-            });
-          }
-        } catch {
-          // Database unreachable — static paths + local posts still listed.
-          for (const post of getLocalPosts(baseLocale)) {
-            entries.push({
-              path: `/blog/${encodeURIComponent(post.slug)}`,
-              lastModified: post.createdAt,
-              changeFrequency: 'monthly',
-              priority: 0.6,
-            });
-          }
+        for (const page of TEMPLATE_PAGES) {
+          entries.push({
+            path: `/template/${page.slug}`,
+            changeFrequency: 'monthly',
+            priority: 0.8,
+          });
         }
+
+        // Match the blog's published-only DB + registered MDX sources.
+        // An empty locale stays out until its first article is published.
+        const { publishedBlogEntries } = await import('@/server/blog-sitemap');
+        entries.push(...(await publishedBlogEntries()));
 
         const xml = [
           '<?xml version="1.0" encoding="UTF-8"?>',

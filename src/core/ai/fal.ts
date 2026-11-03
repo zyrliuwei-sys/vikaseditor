@@ -23,6 +23,14 @@ export interface FalConfigs extends AIConfigs {
   customStorage?: boolean;
   saveFiles?: SaveFilesFunction;
   uuid?: UuidFunction;
+  timeoutMs?: number;
+}
+
+/** The response body can contain provider details; never expose it to callers. */
+export class FalRequestError extends Error {
+  constructor(public status: number) {
+    super(`AI provider request failed (${status})`);
+  }
 }
 
 /**
@@ -37,6 +45,13 @@ export class FalProvider implements AIProvider {
 
   constructor(configs: FalConfigs) {
     this.configs = configs;
+  }
+
+  private request(url: string, options: RequestInit) {
+    return fetch(url, {
+      ...options,
+      signal: AbortSignal.timeout(this.configs.timeoutMs ?? 30_000),
+    });
   }
 
   private getUuid(): string {
@@ -90,14 +105,14 @@ export class FalProvider implements AIProvider {
       apiUrl += `?fal_webhook=${callbackUrl}`;
     }
 
-    const resp = await fetch(apiUrl, {
+    const resp = await this.request(apiUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify(input),
     });
 
     if (!resp.ok) {
-      throw new Error(`request failed with status: ${resp.status}`);
+      throw new FalRequestError(resp.status);
     }
 
     const data = await resp.json();
@@ -131,10 +146,13 @@ export class FalProvider implements AIProvider {
       Authorization: `Key ${this.configs.apiKey}`,
     };
 
-    const statusResp = await fetch(statusUrl, { method: 'GET', headers });
+    const statusResp = await this.request(statusUrl, {
+      method: 'GET',
+      headers,
+    });
 
     if (!statusResp.ok) {
-      throw new Error(`request failed with status: ${statusResp.status}`);
+      throw new FalRequestError(statusResp.status);
     }
 
     const statusData = await statusResp.json();
@@ -154,13 +172,29 @@ export class FalProvider implements AIProvider {
     }
 
     const resultUrl = `${this.baseUrl}/${queryModel}/requests/${taskId}`;
-    const resultResp = await fetch(resultUrl, { method: 'GET', headers });
+    const resultResp = await this.request(resultUrl, {
+      method: 'GET',
+      headers,
+    });
 
     if (!resultResp.ok) {
-      throw new Error(`request failed with status: ${resultResp.status}`);
+      throw new FalRequestError(resultResp.status);
     }
 
     const data = await resultResp.json();
+
+    if (
+      data.error ||
+      data.has_nsfw_concepts?.some((flag: unknown) => flag === true)
+    ) {
+      return {
+        taskId,
+        taskStatus: AITaskStatus.FAILED,
+        taskInfo: {
+          errorMessage: 'The provider could not complete this generation.',
+        },
+      };
+    }
 
     let images: AIImage[] | undefined = undefined;
     let videos: AIVideo[] | undefined = undefined;

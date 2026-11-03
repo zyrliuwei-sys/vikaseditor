@@ -4,10 +4,11 @@ import { createFileRoute } from '@tanstack/react-router';
 import { signOut, useSession } from '@/core/auth/client';
 import { useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
-import { localizeHref } from '@/paraglide/runtime.js';
+import { getLocale, localizeHref } from '@/paraglide/runtime.js';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Field,
   FieldDescription,
@@ -104,14 +105,12 @@ function RedeemInvitePage() {
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <span className="self-center font-serif text-lg italic">
+        <span className="inline-flex min-h-10 items-center self-center font-serif text-lg italic">
           {envConfigs.app_name}
         </span>
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-xl">
-              {m['common.sign.redeem_title']()}
-            </CardTitle>
+            <h1 className="text-xl">{m['common.sign.redeem_title']()}</h1>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit}>
@@ -144,7 +143,7 @@ function RedeemInvitePage() {
                     <button
                       type="button"
                       onClick={handleSignOut}
-                      className="underline underline-offset-4"
+                      className="inline-flex min-h-10 items-center underline underline-offset-4"
                     >
                       {m['common.sign.sign_out_title']()}
                     </button>
@@ -160,5 +159,14 @@ function RedeemInvitePage() {
 }
 
 export const Route = createFileRoute('/(auth)/redeem-invite')({
+  loader: () => ({ locale: getLocale() }),
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${m['common.sign.redeem_title']({}, { locale: loaderData?.locale ?? 'en' })} | ${envConfigs.app_name}`,
+      },
+      PRIVATE_ROBOTS,
+    ],
+  }),
   component: RedeemInvitePage,
 });

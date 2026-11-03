@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { cn } from '@/lib/utils';
+import { jsonLd, vikasPageHead } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
 import { getLocale, localizeUrl } from '@/paraglide/runtime.js';
 import { useGuestPostCheckout } from '@/hooks/use-guest-post-checkout';
@@ -59,15 +60,40 @@ export const Route = createFileRoute('/blog/$slug')({
         ],
       };
     }
-    const canonical = localizeUrl(`${envConfigs.app_url}/blog/${post.slug}`, {
-      locale: locale as any,
-    }).href;
+    const head = vikasPageHead(
+      `/blog/${encodeURIComponent(post.slug)}`,
+      `${post.title} | ${envConfigs.app_name}`,
+      post.description,
+      locale
+    );
+    const canonical = localizeUrl(
+      new URL(`/blog/${encodeURIComponent(post.slug)}`, envConfigs.app_url),
+      { locale }
+    ).href;
     return {
-      meta: [
-        { title: `${post.title} | ${envConfigs.app_name}` },
-        { name: 'description', content: post.description },
+      ...head,
+      meta: head.meta.map((meta) =>
+        meta.property === 'og:type' ? { ...meta, content: 'article' } : meta
+      ),
+      scripts: [
+        jsonLd({
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: post.title,
+          description: post.description,
+          url: canonical,
+          datePublished: post.createdAt,
+          ...(post.image ? { image: post.image } : {}),
+          ...(post.authorName
+            ? { author: { '@type': 'Person', name: post.authorName } }
+            : {}),
+          publisher: {
+            '@type': 'Organization',
+            name: envConfigs.app_name,
+            url: envConfigs.app_url,
+          },
+        }),
       ],
-      links: [{ rel: 'canonical', href: canonical }],
     };
   },
   component: BlogPostPage,
@@ -211,7 +237,7 @@ function BlogPostPage() {
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1 px-6 py-12 md:px-8 md:py-16">
+      <main id="main-content" className="flex-1 px-6 py-12 md:px-8 md:py-16">
         {post.preview && (
           <PreviewBanner
             info={post.previewInfo}

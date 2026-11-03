@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
+import { envConfigs } from '@/config';
+import { vikasPageHead } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
 import { Footer } from '@/blocks/footer';
@@ -10,18 +12,20 @@ export const Route = createFileRoute('/guest-post')({
   loader: () => {
     const locale = getLocale();
     return {
+      locale,
       title: m['guest_posts.landing.title']({}, { locale }),
       description: m['guest_posts.landing.description']({}, { locale }),
     };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: loaderData.title },
-          { name: 'description', content: loaderData.description },
-        ]
-      : [],
-  }),
+  head: ({ loaderData }) =>
+    loaderData
+      ? vikasPageHead(
+          '/guest-post',
+          `${loaderData.title} | ${envConfigs.app_name}`,
+          loaderData.description,
+          loaderData.locale
+        )
+      : {},
   component: GuestPostPage,
 });
 
@@ -29,7 +33,7 @@ function GuestPostPage() {
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <GuestPostLanding />
       </main>
       <Footer />

@@ -4,6 +4,45 @@ Read this when a project built from this template pulls newer template code.
 Entries are newest first. Apply **every entry dated after the template version
 the project last pulled**, oldest of those first.
 
+## 2026-11-03 — Vikas homepage and studio quality refinement
+
+- The homepage now offers a direct photo upload and places the studio immediately after the template collection. Six templates appear initially; a stable expand/collapse action exposes all nine. Editorial guidance remains below the creation workflow.
+- A photo selected from the hero opens its local preview in view, even when the native file picker interrupts scrolling. Upload validation appears beside the upload control. Generation availability appears before the action; the unavailable state disables generation.
+- Mobile controls retain 44 px touch targets, the upload CTA remains 52 px, and form inputs use 16 px text. The mobile menu closes with Escape and restores focus. The generic mobile button fallback no longer overrides larger component targets.
+- Dark remains the default; the complementary light palette is available through the header or mobile menu. No database migration, provider configuration change or new environment variable is required.
+
+## 2026-11-03 — Launch audit fixes
+
+- Light and dark now have separate semantic palettes. Marketing navigation exposes the theme toggle; mobile forms, menu controls and template actions have larger touch targets. Auth pages have a semantic heading and private routes emit `noindex, nofollow`.
+- Public pages share canonical, language and social metadata; the sitemap includes both locale URLs. JSON-LD escapes HTML delimiters. Template demo blog articles are no longer registered for publication; the MDX sources are retained for reference.
+- The showcase uses six individually lazy-loaded WebP panels (the hero panel has high priority) and a separate 1200 × 630 social JPEG. Fonts load Latin subsets, theme labels no longer pull all admin translations into public pages, and Nitro emits compressed static assets.
+- Uploads require a same-origin request, enforce the actual streamed body limit, and validate raster signatures before storage. Non-browser upload clients must include the site's `Origin` header. Upload/payment failures no longer echo provider errors. Session-token responses disable caching. Auth redirects reject backslashes, control characters and localized auth loops.
+- Docker excludes **all** real environment files and uploaded files. Supply public `VITE_*` settings using build arguments and inject `AUTH_SECRET`, `CONFIG_ENCRYPTION_KEY`, database and provider credentials at runtime. No secrets are needed to build. The env loader now follows the documented `.env.{NODE_ENV}` → `.env.local` → `.env` order, while explicitly supplied process variables still win.
+- Run `pnpm install` for patched `seroval`, `minimatch` and the legacy Drizzle esbuild dependency. Overrides are mirrored in `pnpm-workspace.yaml` for pnpm 11 and `package.json` for pnpm 10 Docker builds. The low-severity deepmerge 4.3.1 advisory remains: its announced 4.3.2 version was unavailable in npm at audit time. No database migration is required.
+- See `docs/launch-audit-2026-11-03.md` for measured results and remaining launch checks.
+
+## 2026-11-03 — Vikas Editor AI content and support details
+
+- Public copy in `messages/en.json` and `messages/zh.json` now describes AI image and video creation for creators in India and worldwide. This project has no `index.json`; these message files and `src/config/index.ts` supply its brand content.
+- Both language versions of the privacy policy and terms now describe the generation workflow and link to `support@vikas-editor.net`. The public footer also includes an email support link.
+- If an existing deployment overrides `VITE_APP_DESCRIPTION`, update it to match the new image/video positioning. No database migration or new environment variable is needed.
+
+## 2026-11-03 — Vikas editorial brand and SEO pages
+
+- The public footer no longer shows the bottom copyright/ShipAny attribution row or its divider. When cookie consent is enabled, its settings button appears with the legal links.
+- Homepage copy now includes roughly 1,300 English words across style guidance, photo preparation, prompt tips and FAQs, with matching Chinese translations. The prompt example can be sent directly to the studio.
+- The public home, generation studio, credit page and legal pages now use a graphite/champagne identity, a frame-corner V mark, Archivo/DM Sans and a self-hosted Cormorant Garamond accent. Optional admin appearance presets are unchanged.
+- `/`, `/create` and `/pricing` have route-specific titles, descriptions, canonical and language alternate links. `/create` is included in the sitemap. The root no longer attaches homepage language alternates to unrelated pages.
+- No database migration or new secret is required. Run `pnpm install` to install the additional font package. Production builds must retain `VITE_APP_URL=https://vikas-editor.net`; use the active localhost URL for local development.
+
+## 2026-11-03 — Vikas Editor AI studio
+
+- The public homepage now introduces Vikas Editor AI with an original template library and a photo/video studio. `/create` opens the public studio; `/settings/studio` adds the studio to the account sidebar. `/pricing` describes generation credit costs rather than exposing the template demo subscription plans.
+- Configure **Admin → Settings → AI → Fal** and grant account credits to enable generation. The new server catalog (`src/config/generation.ts`) charges 4 credits per image and 20 per 5-second video. No model keys are shipped to the browser. No schema migration is required.
+- New `/api/generations` endpoints validate raster uploads, isolate owner history, atomically claim requests and debit credits, and refund confirmed failed tasks. `planRevoke` is an additive credits-service export for composing refunds into atomic updates. Source photos are not saved in the database; generated files remain provider-hosted and should be downloaded before their links expire.
+- A provider submission with uncertain acceptance is not automatically resubmitted or refunded. Reconcile it with Fal before compensating the account; this version has no webhook/reconciliation worker. See `docs/research/generation-integration.md`.
+- Production branding/domain defaults are `Vikas Editor AI` and `https://vikas-editor.net`. Keep local `VITE_APP_URL` on the active development port for authentication. Dark appearance uses Archivo/DM Sans and an original yellow-green identity. English and Chinese content are included.
+
 ## How to upgrade (every time)
 
 1. **Find the baseline.** The last template commit the project took. Check
@@ -45,6 +84,30 @@ existing project must act on. That covers schema, env vars, renamed or removed
 exports, permission codes, and behavior that changes for end users.
 
 ---
+
+## 2026-11-03: D1 bindings in local Vite development
+
+Local `pnpm dev` now supports `DATABASE_PROVIDER=d1`. Configure `account_id`
+and a `DB` D1 binding in `wrangler.jsonc`; setting its `remote` flag to `true`
+makes local development use that remote database via the official D1 HTTP
+API. Wrangler supplies and refreshes authentication; credentials stay in
+server memory. Requests honor the machine's HTTP proxy. Batches remain one
+request, with no automatic retries of writes. Without `remote`, Wrangler's
+local platform proxy is used instead.
+Clear `DATABASE_URL` when switching away from SQLite. Wrangler login is
+required for remote bindings. Workers production continues using its native
+binding, without bundling the development proxy.
+
+For D1 schema changes, run `pnpm db:generate`, review the SQL, then
+`pnpm exec wrangler d1 migrations apply DB --remote --config wrangler.jsonc`.
+Direct Drizzle database commands refuse D1 rather than falling back to the
+previous SQLite database. Use the Cloudflare D1 console to inspect data.
+`D1_HTTP_INTEGRATION=1 node --import tsx --test tests/d1-http.test.ts` verifies
+remote rollback and concurrent guards using a disposable table.
+
+Take the `remoteBindings: false` option in `tests/atomic.test.ts` with this
+change so the D1 tests always use an isolated local database, even when the
+application uses a remote binding.
 
 ## 2026-11-02: First-party operations dashboard
 

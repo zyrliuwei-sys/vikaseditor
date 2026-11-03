@@ -6,7 +6,9 @@ import { z } from 'zod';
 import { resetPassword } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
+import { getLocale } from '@/paraglide/runtime.js';
 import { TextField } from '@/components/form-field';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,7 +16,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import { Field, FieldDescription, FieldGroup } from '@/components/ui/field';
 
@@ -72,14 +73,17 @@ function ResetPasswordPage() {
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <Link href="/" className="self-center font-serif text-lg italic">
+        <Link
+          href="/"
+          className="inline-flex min-h-10 items-center self-center font-serif text-lg italic"
+        >
           {envConfigs.app_name}
         </Link>
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-xl">
+            <h1 className="text-xl">
               {m['common.sign.reset_password_title']()}
-            </CardTitle>
+            </h1>
             {!success && tokenChecked && token && (
               <CardDescription>
                 {m['common.sign.reset_password_description']()}
@@ -167,7 +171,7 @@ function ResetPasswordPage() {
                     <FieldDescription className="text-center">
                       <Link
                         href="/sign-in"
-                        className="underline underline-offset-4"
+                        className="inline-flex min-h-10 items-center underline underline-offset-4"
                       >
                         {m['common.sign.back_to_sign_in']()}
                       </Link>
@@ -184,5 +188,14 @@ function ResetPasswordPage() {
 }
 
 export const Route = createFileRoute('/(auth)/reset-password')({
+  loader: () => ({ locale: getLocale() }),
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${m['common.sign.reset_password_title']({}, { locale: loaderData?.locale ?? 'en' })} | ${envConfigs.app_name}`,
+      },
+      PRIVATE_ROBOTS,
+    ],
+  }),
   component: ResetPasswordPage,
 });

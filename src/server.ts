@@ -18,7 +18,13 @@ import { paraglideMiddleware } from './paraglide/server.js';
 const CF_WORKERS_MODULE = 'cloudflare:workers';
 let cfEnvPromise: Promise<void> | null = null;
 
-function ensureCloudflareEnv(): Promise<void> {
+async function ensureCloudflareEnv(): Promise<void> {
+  if (import.meta.env.DEV && envConfigs.database_provider === 'd1') {
+    const { ensureDevD1Binding } = await import('./core/db/d1-dev');
+    await ensureDevD1Binding();
+    return;
+  }
+
   if (!cfEnvPromise) {
     cfEnvPromise = import(/* @vite-ignore */ CF_WORKERS_MODULE)
       .then((mod) => {
@@ -106,6 +112,8 @@ async function handleRequest(req: Request): Promise<Response> {
   const response = withPoweredBy(
     await paraglideMiddleware(req, () => handler.fetch(req))
   );
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   // First-touch attribution: remember UTM params for 30 days so sign-up can
   // stamp them onto the user row. Never overwrite an existing cookie.
   const params = new URL(req.url).searchParams;

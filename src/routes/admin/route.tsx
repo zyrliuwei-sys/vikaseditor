@@ -14,11 +14,13 @@ import {
 
 import { matchPermission } from '@/core/auth/rbac';
 import { envConfigs } from '@/config';
+import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
 import { useUserPermissions } from '@/hooks/use-user-permissions';
 import { AppLayout } from '@/components/app-layout';
 
 export const Route = createFileRoute('/admin')({
+  head: () => ({ meta: [PRIVATE_ROBOTS] }),
   component: AdminLayout,
 });
 

@@ -3,8 +3,9 @@ import { ArrowRight } from 'lucide-react';
 
 import { Link } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { vikasPageHead } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
-import { getLocale, locales, localizeUrl } from '@/paraglide/runtime.js';
+import { getLocale } from '@/paraglide/runtime.js';
 import { Footer } from '@/blocks/footer';
 import { Header } from '@/blocks/header';
 import { BlogCard } from '@/components/blog-card';
@@ -21,28 +22,13 @@ export const Route = createFileRoute('/blog/')({
     return { locale, posts, guestPostsOpen };
   },
   head: ({ loaderData }) => {
-    const locale = loaderData?.locale;
-    const urlFor = (loc: string) =>
-      localizeUrl(`${envConfigs.app_url}/blog`, { locale: loc as any }).href;
-    return {
-      meta: [
-        {
-          title: `${m['blog.title']({}, { locale: locale as any })} | ${envConfigs.app_name}`,
-        },
-        {
-          name: 'description',
-          content: m['blog.description']({}, { locale: locale as any }),
-        },
-      ],
-      links: [
-        { rel: 'canonical', href: urlFor(locale ?? 'en') },
-        ...locales.map((loc) => ({
-          rel: 'alternate',
-          hrefLang: loc,
-          href: urlFor(loc),
-        })),
-      ],
-    };
+    const locale = loaderData?.locale ?? 'en';
+    return vikasPageHead(
+      '/blog',
+      `${m['blog.title']({}, { locale })} | ${envConfigs.app_name}`,
+      m['blog.description']({}, { locale }),
+      locale
+    );
   },
   component: BlogPage,
 });
@@ -53,7 +39,7 @@ function BlogPage() {
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1 px-4 py-16 sm:py-24">
+      <main id="main-content" className="flex-1 px-4 py-16 sm:py-24">
         <div className="mx-auto max-w-5xl">
           <div className="mb-16 text-center">
             <h1 className="font-serif text-4xl font-normal tracking-tight sm:text-5xl">

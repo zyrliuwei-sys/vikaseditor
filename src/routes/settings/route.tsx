@@ -8,10 +8,12 @@ import {
   LifeBuoy,
   PenLine,
   Receipt,
+  Sparkles,
   User,
 } from 'lucide-react';
 
 import { envConfigs } from '@/config';
+import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
 import { useGuestPostInfo } from '@/hooks/use-guest-posts';
 import { useUserFeatures } from '@/hooks/use-user-features';
@@ -20,6 +22,7 @@ import { AppLayout } from '@/components/app-layout';
 import type { NavItem } from '@/components/app-sidebar';
 
 export const Route = createFileRoute('/settings')({
+  head: () => ({ meta: [PRIVATE_ROBOTS] }),
   component: SettingsLayout,
 });
 
@@ -29,6 +32,11 @@ function SettingsLayout() {
   // Optional pages an admin switches in Settings → Users → User Features.
   const features = useUserFeatures();
   const navItems: (NavItem & { show?: boolean })[] = [
+    {
+      href: '/settings/studio',
+      label: m['vikas.nav.studio'](),
+      icon: Sparkles,
+    },
     {
       href: '/settings',
       label: m['settings.nav.overview'](),

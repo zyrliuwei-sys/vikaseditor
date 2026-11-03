@@ -59,12 +59,12 @@ export const Route = createFileRoute('/api/payment/notify/$provider')({
 
           if (provider === 'wechat') {
             return Response.json(
-              { code: 'FAIL', message: error.message || 'Webhook failed' },
+              { code: 'FAIL', message: 'Webhook failed' },
               { status: 500 }
             );
           }
 
-          return respErr(error.message || 'Webhook handling failed', {
+          return respErr('Webhook handling failed', {
             status: 500,
           });
         }

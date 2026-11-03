@@ -2,8 +2,9 @@ import type { ComponentType } from 'react';
 import { notFound, useLoaderData } from '@tanstack/react-router';
 
 import { envConfigs } from '@/config';
+import { vikasPageHead } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
-import { baseLocale, getLocale, localizeUrl } from '@/paraglide/runtime.js';
+import { baseLocale, getLocale } from '@/paraglide/runtime.js';
 
 type PageMeta = {
   title: string;
@@ -30,7 +31,11 @@ function loadPage(slug: string, locale: string): PageModule | null {
   );
 }
 
-type LoaderData = { meta: PageMeta; slug: string; locale: string };
+type LoaderData = {
+  meta: PageMeta;
+  slug: string;
+  locale: ReturnType<typeof getLocale>;
+};
 
 // Shared route options for static MDX pages. Each page gets its own
 // explicit route file (e.g. privacy-policy.tsx) so static segments
@@ -47,16 +52,14 @@ export function staticPageRouteOptions(slug: string) {
     head: ({ loaderData }: { loaderData?: LoaderData }) => {
       if (!loaderData) return {};
       const { meta, locale } = loaderData;
-      const canonical = localizeUrl(`${envConfigs.app_url}/${slug}`, {
-        locale: locale as ReturnType<typeof getLocale>,
-      }).href;
-      return {
-        meta: [
-          { title: meta.title },
-          { name: 'description', content: meta.description },
-        ],
-        links: [{ rel: 'canonical', href: canonical }],
-      };
+      return vikasPageHead(
+        `/${slug}`,
+        meta.title.includes(envConfigs.app_name)
+          ? meta.title
+          : `${meta.title} | ${envConfigs.app_name}`,
+        meta.description,
+        locale
+      );
     },
     component: StaticPage,
   };
@@ -71,7 +74,7 @@ function StaticPage() {
   const Content = page.default;
 
   return (
-    <article>
+    <article className="vikas-legal">
       <header className="border-border mb-6 border-b pb-5">
         <h1 className="text-foreground text-3xl font-semibold tracking-tight md:text-4xl">
           {meta.title}

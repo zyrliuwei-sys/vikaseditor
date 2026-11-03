@@ -8,13 +8,14 @@ build
 src/routeTree.gen.ts
 src/paraglide
 
-# env files — .env.production is created by CI and needed at build time
-# so Vite can inline VITE_* into the client bundle.
+# Secrets never enter the build context. Public VITE_* values use build args.
 .env
-.env.local
-.env.development
+.env.*
 !.env.example
-!.env.production
+public/uploads
+*.key
+*.p12
+*.pfx
 
 # local database
 data

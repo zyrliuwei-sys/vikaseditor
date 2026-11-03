@@ -42,7 +42,10 @@ async function GET({ request }: { request: Request }) {
       return respErr('No session token found');
     }
 
-    return respData({ token, cookieName });
+    return respData(
+      { token, cookieName },
+      { headers: { 'Cache-Control': 'no-store', Pragma: 'no-cache' } }
+    );
   } catch (error: any) {
     return respErr(error.message || 'Internal error');
   }

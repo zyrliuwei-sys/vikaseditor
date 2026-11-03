@@ -7,15 +7,15 @@ export const isCloudflareWorker =
   typeof globalThis !== 'undefined' && 'Cloudflare' in globalThis;
 
 /**
- * Load env files in the same priority order as Next.js:
- * .env.local > .env.{development,production} > .env
+ * Load the canonical environment file first:
+ * .env.{development,production} > .env.local > .env
  *
  * Earlier files win — if a key is already set, later files don't overwrite.
  * Useful for scripts and configs that run outside of Next.js (drizzle-kit, init scripts, etc.).
  */
 export function loadEnvFiles() {
   const nodeEnv = process.env.NODE_ENV || 'development';
-  const files = ['.env.local', `.env.${nodeEnv}`, '.env'];
+  const files = [`.env.${nodeEnv}`, '.env.local', '.env'];
 
   for (const file of files) {
     const envPath = path.resolve(file);

@@ -8,12 +8,13 @@ import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { apiPost } from '@/lib/api-client';
 import { resolveAfterAuthUrl, safeInternalPath } from '@/lib/redirect';
+import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
-import { localizeHref } from '@/paraglide/runtime.js';
+import { getLocale, localizeHref } from '@/paraglide/runtime.js';
 import { usePublicConfig } from '@/hooks/use-public-config';
 import { TextField } from '@/components/form-field';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Field,
   FieldDescription,
@@ -169,14 +170,15 @@ function SignUpPage() {
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <Link href="/" className="self-center font-serif text-lg italic">
+        <Link
+          href="/"
+          className="inline-flex min-h-10 items-center self-center font-serif text-lg italic"
+        >
           {configs.app_name || envConfigs.app_name}
         </Link>
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-xl">
-              {m['common.sign.sign_up_title']()}
-            </CardTitle>
+            <h1 className="text-xl">{m['common.sign.sign_up_title']()}</h1>
           </CardHeader>
           <CardContent>
             {configsLoaded && !hasAnyMethod ? (
@@ -330,7 +332,7 @@ function SignUpPage() {
                           {m['common.sign.already_have_account']()}{' '}
                           <Link
                             href={`/sign-in${switchQuery}`}
-                            className="underline underline-offset-4"
+                            className="inline-flex min-h-10 items-center underline underline-offset-4"
                           >
                             {m['common.sign.sign_in_title']()}
                           </Link>
@@ -349,5 +351,14 @@ function SignUpPage() {
 }
 
 export const Route = createFileRoute('/(auth)/sign-up')({
+  loader: () => ({ locale: getLocale() }),
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${m['common.sign.sign_up_title']({}, { locale: loaderData?.locale ?? 'en' })} | ${envConfigs.app_name}`,
+      },
+      PRIVATE_ROBOTS,
+    ],
+  }),
   component: SignUpPage,
 });

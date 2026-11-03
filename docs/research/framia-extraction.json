@@ -1,0 +1,1573 @@
+{
+  "headings": [
+    {
+      "text": "让灵感 成为杰作",
+      "css": {
+        "font": "500 71.5006px / 72.9306px \"Archivo Narrow\", sans-serif",
+        "fontSize": "71.5006px",
+        "letterSpacing": "-0.715006px"
+      }
+    },
+    {
+      "text": "看看大家都在\n创作什么",
+      "css": {
+        "font": "500 16px / 24px \"Google Sans Flex\", sans-serif",
+        "fontSize": "16px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "在Framia中创作",
+      "css": {
+        "font": "500 60px / 58px \"Archivo Narrow\", sans-serif",
+        "fontSize": "60px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "看看大家都在创作什么",
+      "css": {
+        "font": "500 52px / 60px \"Archivo Narrow\", sans-serif",
+        "fontSize": "52px",
+        "letterSpacing": "-0.764px"
+      }
+    },
+    {
+      "text": "将灵感变成属于你的作品",
+      "css": {
+        "font": "500 55px / 75px \"Archivo Narrow\", sans-serif",
+        "fontSize": "55px",
+        "letterSpacing": "-1px"
+      }
+    },
+    {
+      "text": "终极创作体验",
+      "css": {
+        "font": "500 50px / 49.34px \"Archivo Narrow\", sans-serif",
+        "fontSize": "50px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "智能画布 · 组合、迭代、扩展",
+      "css": {
+        "font": "500 34px / 33.15px \"Archivo Narrow\", sans-serif",
+        "fontSize": "34px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "智能体：创意与掌控兼得",
+      "css": {
+        "font": "500 34px / 33.15px \"Archivo Narrow\", sans-serif",
+        "fontSize": "34px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "由顶尖模型驱动",
+      "css": {
+        "font": "500 71.5001px / 70.0701px \"Archivo Narrow\", sans-serif",
+        "fontSize": "71.5001px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "图像",
+      "css": {
+        "font": "",
+        "fontSize": "27.2796px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "视频",
+      "css": {
+        "font": "",
+        "fontSize": "27.2796px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "音乐",
+      "css": {
+        "font": "",
+        "fontSize": "27.2796px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "配音",
+      "css": {
+        "font": "",
+        "fontSize": "27.2796px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "为规模化交付创意的团队而生",
+      "css": {
+        "font": "500 71.5001px / 69.1167px \"Archivo Narrow\", sans-serif",
+        "fontSize": "71.5001px",
+        "letterSpacing": "-2.38331px"
+      }
+    },
+    {
+      "text": "品牌与资产管理",
+      "css": {
+        "font": "",
+        "fontSize": "47.667px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "一个工作空间，全局可见",
+      "css": {
+        "font": "",
+        "fontSize": "47.667px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "用户反馈",
+      "css": {
+        "font": "500 16px / 24px \"Google Sans Flex\", sans-serif",
+        "fontSize": "16px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "预告片",
+      "css": {
+        "font": "",
+        "fontSize": "18px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "营销",
+      "css": {
+        "font": "",
+        "fontSize": "18px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "内容再利用",
+      "css": {
+        "font": "",
+        "fontSize": "18px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "智能体构建的工作流",
+      "css": {
+        "font": "",
+        "fontSize": "18px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "成本与效率提升",
+      "css": {
+        "font": "",
+        "fontSize": "18px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "灵活编辑",
+      "css": {
+        "font": "",
+        "fontSize": "18px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "品牌一致性",
+      "css": {
+        "font": "",
+        "fontSize": "18px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "易于使用",
+      "css": {
+        "font": "",
+        "fontSize": "18px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "立即试用 Framia",
+      "css": {
+        "font": "500 71.5006px / 69.1196px \"Archivo Narrow\", sans-serif",
+        "fontSize": "71.5006px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "常见\n问题",
+      "css": {
+        "font": "500 56px / 54.88px \"Archivo Narrow\", sans-serif",
+        "fontSize": "56px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "公司",
+      "css": {
+        "font": "500 17px / 25.5px \"Archivo Narrow\", sans-serif",
+        "fontSize": "17px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "图片",
+      "css": {
+        "font": "500 17px / 25.5px \"Archivo Narrow\", sans-serif",
+        "fontSize": "17px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "视频",
+      "css": {
+        "font": "500 17px / 25.5px \"Archivo Narrow\", sans-serif",
+        "fontSize": "17px",
+        "letterSpacing": "normal"
+      }
+    },
+    {
+      "text": "解锁无限创作",
+      "css": {
+        "font": "600 18px / 24px Geist, Arial, sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", \"Helvetica Neue\", Arial, sans-serif",
+        "fontSize": "18px",
+        "letterSpacing": "normal"
+      }
+    }
+  ],
+  "images": [
+    {
+      "src": "https://assets-cdn.framia.pro/framia-web/static/commercialization/2026-09/mr3706/de9f24bb26c61695ee9dad3633800206277f47ed9b72549e599f622878d7b04f.svg",
+      "alt": "",
+      "w": 20,
+      "h": 20
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/framia-web/static/home-assets/framia-logo.svg",
+      "alt": "",
+      "w": 2141,
+      "h": 498
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/a80f643bf6362a6f/landing/hero-v3/gallery/product-jar.png",
+      "alt": "",
+      "w": 480,
+      "h": 641
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/f3aa7e35df6fa7ae/landing/hero-v4/gallery/posters/marketing-ads-02.png",
+      "alt": "",
+      "w": 180,
+      "h": 320
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/07e512d082ca4474/landing/hero-v3/gallery/cinematic-astronaut.png",
+      "alt": "",
+      "w": 480,
+      "h": 641
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/9a74ce8037e84446/landing/hero-v4/gallery/posters/marketing-ads-03.png",
+      "alt": "",
+      "w": 180,
+      "h": 320
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/a16bb7f4d5839abf/landing/hero-v2/gallery/hero-20260920-06-orchid-portrait.png",
+      "alt": "",
+      "w": 480,
+      "h": 720
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/2e513c8c23bf3973/landing/hero-v3/gallery/product-fragrance.png",
+      "alt": "",
+      "w": 480,
+      "h": 641
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/b1880c5929006fd1/landing/hero-v3/gallery/posters/cinematic-12q.jpg",
+      "alt": "",
+      "w": 249,
+      "h": 334
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/static-webp/8162a614d4f0bcf52fcda13c/landing/hero-v2/gallery/posters/hero-20260912-11.webp",
+      "alt": "",
+      "w": 480,
+      "h": 637
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/2c072eed115f8f9d/landing/hero-v3/gallery/illustration-rabbit.png",
+      "alt": "",
+      "w": 480,
+      "h": 858
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/cb51892df96483c5/landing/hero-v3/gallery/fashion-design.png",
+      "alt": "",
+      "w": 480,
+      "h": 600
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/static-webp/177609b6a03170c735ef94bf/landing/hero-v2/gallery/posters/hero-20260912-03-atomic.webp",
+      "alt": "",
+      "w": 480,
+      "h": 270
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/5282865e54ee1e20/landing/hero-v3/gallery/posters/product-showcase.jpg",
+      "alt": "",
+      "w": 320,
+      "h": 569
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/f727ea60797d5ed7/landing/hero-v3/gallery/product-editorial.png",
+      "alt": "",
+      "w": 480,
+      "h": 641
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/914161d8a7c05678/landing/hero-v2/gallery/hero-20260920-13-neon-portrait.png",
+      "alt": "",
+      "w": 480,
+      "h": 641
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/097ba8984d71b621/landing/hero-v4/gallery/posters/marketing-ads-04.png",
+      "alt": "",
+      "w": 180,
+      "h": 320
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/709e2273c12c5277/landing/hero-v3/gallery/home-interior.png",
+      "alt": "",
+      "w": 480,
+      "h": 641
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/c523e3b807b4d9d3/landing/hero-v2/gallery/hero-20260920-08-neon-sneaker-c523e3b8.png",
+      "alt": "",
+      "w": 480,
+      "h": 637
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/static-webp/dc2fa04b4f0ec11e7e219d74/landing/hero-v2/gallery/posters/hero-20260912-10-motel.webp",
+      "alt": "",
+      "w": 480,
+      "h": 715
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/acf09aef1df62b67/landing/hero-v2/gallery/posters/hero-20260920-01-223.jpg",
+      "alt": "",
+      "w": 371,
+      "h": 494
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/static-webp/d73a88b3577dd89d7493e771/landing/hero-v2/gallery/hero-20260912-15-handbag-83557cc8.webp",
+      "alt": "",
+      "w": 480,
+      "h": 641
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/c5ca18341c689808/landing/hero-v4/gallery/posters/marketing-ads-01.png",
+      "alt": "",
+      "w": 180,
+      "h": 320
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/static-webp/a9fc314c357dc2fae8e3adec/landing/hero-v2/gallery/hero-20260912-04-fashion-car-8f4ccc56.webp",
+      "alt": "",
+      "w": 480,
+      "h": 641
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1080,quality=75,format=auto/upload/landing-next/7b102853a2f987fe/landing/hero-v3/gallery/posters/animation-312.jpg",
+      "alt": "",
+      "w": 480,
+      "h": 640
+    },
+    {
+      "src": "https://framia.converge.ai/landing/hero-start-arrow.svg",
+      "alt": "",
+      "w": 20,
+      "h": 20
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/eb1b92e92d48d51aa01ea5fd/landing/community-showcase/marketing-ads/background/beauty-1d83fd92.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/c2d6a480c714a3ddb1fc3ec6/landing/community-showcase/marketing-ads/background/2.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/f7ab5c8210fe0d9458b99440/landing/community-showcase/marketing-ads/background/3.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/42c48a068353d84a308a3307/landing/community-showcase/marketing-ads/background/4.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/b84c3727f4917748b6c89811/landing/community-showcase/marketing-ads/background/5.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/9f342a30f4aa7c60f6f784a1/landing/community-showcase/drama-story/background/1.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/b9f31c4826471eee69af3050/landing/community-showcase/drama-story/background/animated-tales-7638ef58.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/23acb92f95e95b8f6facf6ea/landing/community-showcase/drama-story/background/3.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/fd66f5561b2a58eafdfa7890/landing/community-showcase/cinematic-story/background/1.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/91d5e59483831a8cd8a8083c/landing/community-showcase/cinematic-story/background/3.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/34b47283faa5cc8ddd4d5e19/landing/community-showcase/cinematic-story/background/5.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/849bcb218f21a86833da3430/landing/community-showcase/explainer-avatar/background/3.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/71734ddbfad1ae63a37552d4/landing/community-showcase/explainer-avatar/background/2.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/9cbf746dab9b170058ea4156/landing/community-showcase/explainer-avatar/background/4.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/a9db7fd0999a49c4aad6b7fd/landing/community-showcase/explainer-avatar/background/5.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 1072
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/733115c77d95148a525b1fd0/landing/community-showcase/explainer-avatar/background/advertising-endorsement-686a84dd.webp",
+      "alt": "",
+      "w": 1716,
+      "h": 861
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/eb1b92e92d48d51aa01ea5fd/landing/community-showcase/marketing-ads/background/beauty-1d83fd92.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/c2d6a480c714a3ddb1fc3ec6/landing/community-showcase/marketing-ads/background/2.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/f7ab5c8210fe0d9458b99440/landing/community-showcase/marketing-ads/background/3.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/42c48a068353d84a308a3307/landing/community-showcase/marketing-ads/background/4.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/b84c3727f4917748b6c89811/landing/community-showcase/marketing-ads/background/5.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/9f342a30f4aa7c60f6f784a1/landing/community-showcase/drama-story/background/1.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/1094f60e14422cba1b8fb1e4/landing/community-showcase/drama-story/background/2.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/23acb92f95e95b8f6facf6ea/landing/community-showcase/drama-story/background/3.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/32eca08b043c1e6b10d31a76/landing/community-showcase/drama-story/background/4.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/f92cdf732f4461a40768ee80/landing/community-showcase/drama-story/background/5.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/fd66f5561b2a58eafdfa7890/landing/community-showcase/cinematic-story/background/1.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/987cdbd7b7c84844842dc515/landing/community-showcase/cinematic-story/background/2.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/91d5e59483831a8cd8a8083c/landing/community-showcase/cinematic-story/background/3.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/a06bc306dc4a19252f2cae84/landing/community-showcase/cinematic-story/background/4.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/34b47283faa5cc8ddd4d5e19/landing/community-showcase/cinematic-story/background/5.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/849bcb218f21a86833da3430/landing/community-showcase/explainer-avatar/background/3.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/71734ddbfad1ae63a37552d4/landing/community-showcase/explainer-avatar/background/2.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/9cbf746dab9b170058ea4156/landing/community-showcase/explainer-avatar/background/4.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/a9db7fd0999a49c4aad6b7fd/landing/community-showcase/explainer-avatar/background/5.webp",
+      "alt": "",
+      "w": 240,
+      "h": 150
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/733115c77d95148a525b1fd0/landing/community-showcase/explainer-avatar/background/advertising-endorsement-686a84dd.webp",
+      "alt": "",
+      "w": 240,
+      "h": 120
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/fc6a6851e3adee5b/landing/workflow-inspiration/arrow.svg",
+      "alt": "",
+      "w": 20,
+      "h": 20
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/4f2ed6c7f233efd2d2619c52/landing/workflow-inspiration/glasses-9d582a97.webp",
+      "alt": "",
+      "w": 294,
+      "h": 164
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/1acd950091e921eb449e3195/landing/workflow-inspiration/music-play-13d3274b.webp",
+      "alt": "",
+      "w": 294,
+      "h": 392
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/12a043ec27e032978b467f60/landing/workflow-inspiration/trendy-outfits-0dceb248.webp",
+      "alt": "",
+      "w": 294,
+      "h": 310
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/cdn-cgi/image/width=640,quality=75,format=auto/upload/static-webp/b907a2442163988971647943/landing/workflow-inspiration/shoes-58c41076.webp",
+      "alt": "",
+      "w": 294,
+      "h": 163
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "ElevenLabs: 自然语音",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Minimax Speech: 多语言 TTS",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Midjourney v8.2: 艺术化视觉",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Suno v6: 最新音乐生成",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Sora 2: 电影级质量",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Flux Max: 极致质量",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Qwen Image: 多模态生成",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Kling 3.0: 旗舰高清视频生成",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Hailuo 2.3: 创意视频",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Seedream 5: 高保真合成",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Nano Banana Pro: 高级图像生成",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Vidu Q2: 快速渲染",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "Bioscope 品牌工具包设置，展示徽标、颜色与字体",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "由品牌工具包生成的 Bioscope 品牌服装",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "应用于服装、平面和产品图片的 Bioscope 品牌工具包",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/framia-web/static/home-assets/framia-logo.svg",
+      "alt": "",
+      "w": 2141,
+      "h": 498
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/framia-web/static/commercialization/2026-09/mr3706/e45122e69e887b72ed6b4125021982cb2f1b252e6918d80c9cc9806eeb036ba7.png",
+      "alt": "装饰插图",
+      "w": 272,
+      "h": 153
+    },
+    {
+      "src": "https://t.co/1/i/adsct?bci=4&dv=Asia%2FShanghai%26zh%2Cen-US%2Cen%26Google%20Inc.%26MacIntel%26127%261728%261117%2616%2630%261728%26992%260%26na%262&eci=3&event=%7B%7D&event_id=f12dee8f-ffc1-4a5c-8ebf-6e973c39ec2f&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=6710c757-8722-418c-b0cb-c069a1733cd8&tw_document_href=https%3A%2F%2Fframia.converge.ai%2Fzh-CN%2F&tw_engaged_ms=0&tw_iframe_status=0&tw_pid_src=1&tw_session_count=1&tw_session_id=1793663977331-297549149&twpid=tw.1793663977331.441023884578877057&txn_id=ra68w&type=javascript&version=2.4.12",
+      "alt": "",
+      "w": 1,
+      "h": 1
+    },
+    {
+      "src": "https://analytics.twitter.com/1/i/adsct?bci=4&dv=Asia%2FShanghai%26zh%2Cen-US%2Cen%26Google%20Inc.%26MacIntel%26127%261728%261117%2616%2630%261728%26992%260%26na%262&eci=3&event=%7B%7D&event_id=f12dee8f-ffc1-4a5c-8ebf-6e973c39ec2f&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=6710c757-8722-418c-b0cb-c069a1733cd8&tw_document_href=https%3A%2F%2Fframia.converge.ai%2Fzh-CN%2F&tw_engaged_ms=0&tw_iframe_status=0&tw_pid_src=1&tw_session_count=1&tw_session_id=1793663977331-297549149&twpid=tw.1793663977331.441023884578877057&txn_id=ra68w&type=javascript&version=2.4.12",
+      "alt": "",
+      "w": 1,
+      "h": 1
+    },
+    {
+      "src": "https://t.co/1/i/adsct?bci=2&dv=Asia%2FShanghai%26zh%2Cen-US%2Cen%26Google%20Inc.%26MacIntel%26127%261728%261117%2616%2630%261728%26992%260%26na%262&eci=4&event=%7B%7D&event_id=1c8ce014-ec78-42dd-b6c8-9c5514cd6261&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=6710c757-8722-418c-b0cb-c069a1733cd8&tw_ch_fvl=Not%3AA-Brand%2F8.0.0.0%2CChromium%2F156.0.8078.74%2CGoogle%20Chrome%2F156.0.8078.74&tw_ch_pv=26.4.1&tw_document_href=https%3A%2F%2Fframia.converge.ai%2Fzh-CN%2F&tw_engaged_ms=0&tw_iframe_status=0&tw_pid_src=1&tw_session_count=1&tw_session_id=1793663977331-297549149&tw_session_start=1&twpid=tw.1793663977331.441023884578877057&txn_id=tw-ra68w-rcbyk&type=javascript&version=2.4.12",
+      "alt": "",
+      "w": 1,
+      "h": 1
+    },
+    {
+      "src": "https://analytics.twitter.com/1/i/adsct?bci=2&dv=Asia%2FShanghai%26zh%2Cen-US%2Cen%26Google%20Inc.%26MacIntel%26127%261728%261117%2616%2630%261728%26992%260%26na%262&eci=4&event=%7B%7D&event_id=1c8ce014-ec78-42dd-b6c8-9c5514cd6261&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=6710c757-8722-418c-b0cb-c069a1733cd8&tw_ch_fvl=Not%3AA-Brand%2F8.0.0.0%2CChromium%2F156.0.8078.74%2CGoogle%20Chrome%2F156.0.8078.74&tw_ch_pv=26.4.1&tw_document_href=https%3A%2F%2Fframia.converge.ai%2Fzh-CN%2F&tw_engaged_ms=0&tw_iframe_status=0&tw_pid_src=1&tw_session_count=1&tw_session_id=1793663977331-297549149&tw_session_start=1&twpid=tw.1793663977331.441023884578877057&txn_id=tw-ra68w-rcbyk&type=javascript&version=2.4.12",
+      "alt": "",
+      "w": 1,
+      "h": 1
+    },
+    {
+      "src": "https://bat.bing.com/action/0?ti=343225032&tm=gtm002&Ver=2&mid=815a74d4-5fb5-4902-baea-e8a6c166cfb4&bo=1&sid=780de8c0d71911f1b141fb92e5dea22c&vid=780dcd00d71911f1aeb0edbdc57b034c&vids=1&msclkid=N&gtm_tag_source=1&pi=918639831&lg=zh&sw=1728&sh=1117&sc=30&tl=Framia%20%7C%20AI%20%E8%A7%86%E9%A2%91%E4%B8%8E%E8%AE%BE%E8%AE%A1%E5%88%9B%E6%84%8F%E5%B7%A5%E4%BD%9C%E5%AE%A4&kw=AI%20%E8%A7%86%E9%A2%91%E7%94%9F%E6%88%90%E5%99%A8,%20AI%20%E5%9B%BE%E5%83%8F%E7%94%9F%E6%88%90%E5%99%A8,%20%E8%A7%92%E8%89%B2%E4%B8%80%E8%87%B4%E6%80%A7,%20%E7%89%A9%E4%BD%93%E4%B8%80%E8%87%B4%E6%80%A7,%20%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%20AI%20%E8%A7%86%E9%A2%91%E7%94%9F%E6%88%90%E5%99%A8,%20AI%20%E7%94%9F%E6%88%90%E8%A7%86%E9%A2%91,%20%E8%A7%86%E9%A2%91%20AI%20%E7%94%9F%E6%88%90%E5%99%A8,%20AI%20YouTube%20%E8%A7%86%E9%A2%91%E7%BC%96%E8%BE%91%E5%99%A8,%20AI%20YouTube%20Shorts%20%E5%88%B6%E4%BD%9C%E5%B7%A5%E5%85%B7,%20AI%20TikTok%20%E8%A7%86%E9%A2%91%E7%BC%96%E8%BE%91%E5%99%A8,%20AI%20%E8%A7%A3%E8%AF%B4%E8%A7%86%E9%A2%91%E5%88%B6%E4%BD%9C%E5%B7%A5%E5%85%B7,%20AI%20%E5%AE%A3%E4%BC%A0%E8%A7%86%E9%A2%91%E5%88%B6%E4%BD%9C%E5%B7%A5%E5%85%B7,%20AI%20%E8%AE%BE%E8%AE%A1%E6%99%BA%E8%83%BD%E4%BD%93,%20%E8%87%AA%E5%8A%A8%E8%AE%BE%E8%AE%A1%E6%99%BA%E8%83%BD%E4%BD%93,%20AI%20%E5%88%9B%E6%84%8F%E5%BA%94%E7%94%A8,%20AI%20%E5%88%9B%E6%84%8F%E6%99%BA%E8%83%BD%E4%BD%93&p=https%3A%2F%2Fframia.converge.ai%2Fzh-CN%2F&r=&lt=9261&evt=pageLoad&sv=2&cdb=AQAS&rn=167427",
+      "alt": "",
+      "w": 0,
+      "h": 0
+    },
+    {
+      "src": "https://t.co/i/adsct?bci=4&cv=100%261&dv=Asia%2FShanghai%26zh%2Cen-US%2Cen%26Google%20Inc.%26MacIntel%26127%261728%261117%2616%2630%261728%26992%260%26na%262&eci=2&event_id=91aa7bee-319d-4ac2-ab65-5b844a93a4a1&events=%5B%5B%22auto_long_site_dwell%22%2C%7B%7D%5D%5D&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=6710c757-8722-418c-b0cb-c069a1733cd8&tw_ch_fvl=Not%3AA-Brand%2F8.0.0.0%2CChromium%2F156.0.8078.74%2CGoogle%20Chrome%2F156.0.8078.74&tw_ch_pv=26.4.1&tw_document_href=https%3A%2F%2Fframia.converge.ai%2Fzh-CN%2F&tw_engaged_ms=0&tw_iframe_status=0&tw_pid_src=1&tw_session_count=1&tw_session_id=1793663977331-297549149&twpid=tw.1793663977331.441023884578877057&txn_id=ra68w&type=javascript&version=2.4.12",
+      "alt": "",
+      "w": 1,
+      "h": 1
+    },
+    {
+      "src": "https://analytics.twitter.com/i/adsct?bci=4&cv=100%261&dv=Asia%2FShanghai%26zh%2Cen-US%2Cen%26Google%20Inc.%26MacIntel%26127%261728%261117%2616%2630%261728%26992%260%26na%262&eci=2&event_id=91aa7bee-319d-4ac2-ab65-5b844a93a4a1&events=%5B%5B%22auto_long_site_dwell%22%2C%7B%7D%5D%5D&integration=advertiser&p_id=Twitter&p_user_id=0&pl_id=6710c757-8722-418c-b0cb-c069a1733cd8&tw_ch_fvl=Not%3AA-Brand%2F8.0.0.0%2CChromium%2F156.0.8078.74%2CGoogle%20Chrome%2F156.0.8078.74&tw_ch_pv=26.4.1&tw_document_href=https%3A%2F%2Fframia.converge.ai%2Fzh-CN%2F&tw_engaged_ms=0&tw_iframe_status=0&tw_pid_src=1&tw_session_count=1&tw_session_id=1793663977331-297549149&twpid=tw.1793663977331.441023884578877057&txn_id=ra68w&type=javascript&version=2.4.12",
+      "alt": "",
+      "w": 1,
+      "h": 1
+    }
+  ],
+  "videos": [
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/79f8ad99548e9476/landing/hero-v4/gallery/marketing-ads-02.webm",
+      "poster": ""
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/7a260bd452fb58a4/landing/hero-v4/gallery/marketing-ads-03.webm",
+      "poster": ""
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/ba29a880e55549a1/landing/hero-v3/gallery/cinematic-12q.webm",
+      "poster": ""
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/ac52f99248bb31b0/landing/hero-v2/gallery/hero-20260912-11.webm",
+      "poster": ""
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/4e72eaf47bfbf1a8/landing/hero-v2/gallery/hero-20260912-03-atomic.webm",
+      "poster": ""
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/240bd4efbfb7ef2e/landing/hero-v3/gallery/product-showcase.webm",
+      "poster": ""
+    },
+    {
+      "src": "",
+      "poster": ""
+    },
+    {
+      "src": "",
+      "poster": ""
+    },
+    {
+      "src": "",
+      "poster": ""
+    },
+    {
+      "src": "",
+      "poster": ""
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/ca91c1351592ff93/landing/hero-v3/gallery/animation-312.webm",
+      "poster": ""
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/72264e84cd456674/landing/community-showcase/drama-story/background/costume-1f2e3f08.webm",
+      "poster": "https://assets-cdn.framia.pro/cdn-cgi/image/width=720,quality=75,format=auto/upload/static-webp/aa614d76884a54a466a547ed/landing/community-showcase/drama-story/background/costume-1f2e3f08.webp"
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/ae997ec645d41049/landing/community-showcase/drama-story/background/fantasy-20260914.webm",
+      "poster": "https://assets-cdn.framia.pro/cdn-cgi/image/width=720,quality=75,format=auto/upload/static-webp/c4e0a7751f7aaa0499eca38b/landing/community-showcase/drama-story/background/fantasy-20260914.webp"
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/da7a131e6ac06c79/landing/community-showcase/cinematic-story/background/sci-fi-3d65eac1.webm",
+      "poster": "https://assets-cdn.framia.pro/cdn-cgi/image/width=720,quality=75,format=auto/upload/static-webp/a286844383832cd5f3e3d365/landing/community-showcase/cinematic-story/background/sci-fi-3d65eac1.webp"
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/dac6eaa6df6820a4/landing/community-showcase/cinematic-story/background/mystery-20260914.webm",
+      "poster": "https://assets-cdn.framia.pro/cdn-cgi/image/width=720,quality=75,format=auto/upload/static-webp/27b0af87128c4bd58384d6ff/landing/community-showcase/cinematic-story/background/mystery-20260914.webp"
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/72264e84cd456674/landing/community-showcase/drama-story/background/costume-1f2e3f08.webm",
+      "poster": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/aa614d76884a54a466a547ed/landing/community-showcase/drama-story/background/costume-1f2e3f08.webp"
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/ae997ec645d41049/landing/community-showcase/drama-story/background/fantasy-20260914.webm",
+      "poster": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/c4e0a7751f7aaa0499eca38b/landing/community-showcase/drama-story/background/fantasy-20260914.webp"
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/da7a131e6ac06c79/landing/community-showcase/cinematic-story/background/sci-fi-3d65eac1.webm",
+      "poster": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/a286844383832cd5f3e3d365/landing/community-showcase/cinematic-story/background/sci-fi-3d65eac1.webp"
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/dac6eaa6df6820a4/landing/community-showcase/cinematic-story/background/mystery-20260914.webm",
+      "poster": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/27b0af87128c4bd58384d6ff/landing/community-showcase/cinematic-story/background/mystery-20260914.webp"
+    },
+    {
+      "src": "https://assets-cdn.framia.pro/upload/landing-next/4dc15fbb49027bd2/landing/create-with-framia/creative-showreel-20260913.webm",
+      "poster": "https://assets-cdn.framia.pro/cdn-cgi/image/width=1600,quality=75,format=auto/upload/static-webp/7aa3768c40c2caa3dd835c6d/landing/create-with-framia/creative-showreel-20260913.webp"
+    },
+    {
+      "src": "",
+      "poster": ""
+    },
+    {
+      "src": "",
+      "poster": ""
+    },
+    {
+      "src": "",
+      "poster": ""
+    },
+    {
+      "src": "",
+      "poster": ""
+    }
+  ],
+  "styles": [
+    {
+      "tag": "BODY",
+      "text": "限时5折万圣节特卖：Seedance 2.5 限时5折 — $0.06/秒。Nano Banana 2.1 现已上线万圣节特卖：Seedance 2.5 限时5",
+      "class": "",
+      "font": "16px / 24px Geist, Arial, sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", \"Helvetica Neue\", Arial, sans-serif",
+      "color": "rgb(250, 250, 250)",
+      "bg": "rgb(10, 10, 11)",
+      "radius": "0px",
+      "padding": "0px",
+      "position": "static"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "了解更多",
+      "class": "promotion-banner-module__yox2WW__action",
+      "font": "13px / 18px \"Google Sans Flex\", sans-serif",
+      "color": "rgb(10, 10, 10)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "999px",
+      "padding": "4px 20px",
+      "position": "static"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "class": "promotion-banner-module__yox2WW__close",
+      "font": "500 14px / 20px \"Google Sans Flex\", sans-serif",
+      "color": "rgb(10, 10, 10)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "4px",
+      "padding": "0px",
+      "position": "absolute"
+    },
+    {
+      "tag": "HEADER",
+      "text": "功能应用资源价格企业加入 Discord登录免费开始",
+      "class": "index-module__4TiXQq__header index-module__4TiXQq__darkBg index-module__4TiXQq__studioVariant index-module__4TiXQq__contentNavigation",
+      "font": "16px / 24px \"Archivo Narrow\", sans-serif",
+      "color": "rgb(10, 10, 10)",
+      "bg": "rgba(3, 5, 4, 0.06)",
+      "radius": "0px",
+      "padding": "12px 0px",
+      "position": "fixed"
+    },
+    {
+      "tag": "NAV",
+      "text": "功能应用资源价格企业",
+      "class": "index-module__4TiXQq__nav",
+      "font": "16px / 24px \"Archivo Narrow\", sans-serif",
+      "color": "rgb(10, 10, 10)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "padding": "0px",
+      "position": "absolute"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "资源",
+      "class": "index-module__4TiXQq__navLink",
+      "font": "500 14px / 20px \"Archivo Narrow\", sans-serif",
+      "color": "rgba(255, 255, 255, 0.7)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "padding": "0px",
+      "position": "relative"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "登录",
+      "class": "index-module__4TiXQq__loginBtn index-module__4TiXQq__desktopLoginBtn",
+      "font": "500 14px / 14px \"Archivo Narrow\", sans-serif",
+      "color": "rgba(255, 255, 255, 0.72)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "padding": "6px 0px",
+      "position": "static"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "免费开始",
+      "class": "index-module__4TiXQq__ctaBtn ",
+      "font": "600 16px / 16px \"Archivo Narrow\", sans-serif",
+      "color": "rgb(0, 0, 0)",
+      "bg": "rgb(212, 255, 94)",
+      "radius": "6px",
+      "padding": "10px 14px 10px 16px",
+      "position": "static"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "class": "index-module__4TiXQq__mobileMenuBtn",
+      "font": "16px / 24px \"Archivo Narrow\", sans-serif",
+      "color": "rgba(255, 255, 255, 0.85)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "8px",
+      "padding": "0px",
+      "position": "relative"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "免费开始",
+      "class": "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all enabled:cursor-pointer disabled:!cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground enabled:hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3 index-module__JW7iOG__mobileCta",
+      "font": "500 14px / 20px \"Google Sans Flex\", sans-serif",
+      "color": "rgb(250, 250, 250)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "8px",
+      "padding": "0px",
+      "position": "static"
+    },
+    {
+      "tag": "FORM",
+      "text": "立即开始",
+      "class": "index-module__JW7iOG__promptButton",
+      "font": "16px / 24px \"Google Sans Flex\", sans-serif",
+      "color": "rgb(2, 62, 48)",
+      "bg": "rgb(31, 31, 31)",
+      "radius": "12px",
+      "padding": "12px 12px 12px 20px",
+      "position": "relative"
+    },
+    {
+      "tag": "INPUT",
+      "text": "",
+      "class": "index-module__JW7iOG__promptInput",
+      "font": "16px / 21px \"Google Sans Flex\", Geist, Arial, sans-serif, sans-serif",
+      "color": "rgb(255, 255, 255)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "padding": "0px",
+      "position": "static"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "立即开始",
+      "class": "index-module__JW7iOG__promptSubmit",
+      "font": "600 20px / 24px \"Archivo Narrow\", sans-serif",
+      "color": "rgb(0, 0, 0)",
+      "bg": "rgb(212, 255, 94)",
+      "radius": "6px",
+      "padding": "10px 20px",
+      "position": "static"
+    },
+    {
+      "tag": "HEADER",
+      "text": "由顶尖模型驱动汇聚顶尖 AI 模型，一个订阅即可拥有。",
+      "class": "index-module__c8RR4q__header",
+      "font": "16px / 24px \"Google Sans Flex\", sans-serif",
+      "color": "rgb(255, 255, 255)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "padding": "0px",
+      "position": "absolute"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "回到顶部",
+      "class": "site-footer-module__fD3J0a__backToTop",
+      "font": "12px / 18px \"Google Sans Flex\", sans-serif",
+      "color": "rgba(255, 255, 255, 0.72)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "padding": "0px",
+      "position": "static"
+    },
+    {
+      "tag": "NAV",
+      "text": "功能应用资源博客应用场景与行业AI 模型价格企业免费开始登录",
+      "class": "index-module__4TiXQq__mobileDrawer ",
+      "font": "16px / 24px \"Archivo Narrow\", sans-serif",
+      "color": "rgb(255, 255, 255)",
+      "bg": "rgb(17, 17, 17)",
+      "radius": "0px",
+      "padding": "0px",
+      "position": "fixed"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "class": "index-module__4TiXQq__mobileDrawerClose",
+      "font": "16px / 24px \"Archivo Narrow\", sans-serif",
+      "color": "rgba(255, 255, 255, 0.47)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "9999px",
+      "padding": "0px",
+      "position": "static"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "免费开始",
+      "class": "index-module__4TiXQq__mobileDrawerCta",
+      "font": "600 16px / 16px \"Archivo Narrow\", sans-serif",
+      "color": "rgb(0, 0, 0)",
+      "bg": "rgb(212, 255, 94)",
+      "radius": "6px",
+      "padding": "12px 24px",
+      "position": "static"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "登录",
+      "class": "index-module__4TiXQq__mobileDrawerLogin",
+      "font": "500 16px / 16px \"Archivo Narrow\", sans-serif",
+      "color": "rgb(255, 255, 255)",
+      "bg": "rgba(255, 255, 255, 0.04)",
+      "radius": "6px",
+      "padding": "12px 24px",
+      "position": "static"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "注册并领取",
+      "class": "signup-card-module__gmK5oq__action",
+      "font": "600 14px / 20px Geist, Arial, sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", \"Helvetica Neue\", Arial, sans-serif",
+      "color": "rgb(10, 10, 10)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "100px",
+      "padding": "8px 16px",
+      "position": "static"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "class": "signup-card-module__gmK5oq__close",
+      "font": "16px / 24px Geist, Arial, sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", \"Helvetica Neue\", Arial, sans-serif",
+      "color": "rgb(250, 250, 250)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "9999px",
+      "padding": "0px",
+      "position": "absolute"
+    }
+  ],
+  "sections": [
+    {
+      "class": "index-module__JW7iOG__hero",
+      "title": "让灵感 成为杰作"
+    },
+    {
+      "class": "index-module__gWPm2a__section",
+      "title": "看看大家都在\n创作什么"
+    },
+    {
+      "class": "ultimate-creative-experience-module__rZbJAq__section",
+      "title": "终极创作体验"
+    },
+    {
+      "class": "index-module__c8RR4q__section",
+      "title": "由顶尖模型驱动"
+    },
+    {
+      "class": "index-module__c8RR4q__directoryCategory"
+    },
+    {
+      "class": "index-module__c8RR4q__directoryCategory"
+    },
+    {
+      "class": "index-module__c8RR4q__directoryCategory"
+    },
+    {
+      "class": "index-module__c8RR4q__directoryCategory"
+    },
+    {
+      "class": "index-module__4dbHpG__container",
+      "title": "为规模化交付创意的团队而生"
+    },
+    {
+      "class": "brand-workspace-showcase-module__OnpcyW__section",
+      "title": "品牌与资产管理"
+    },
+    {
+      "class": "feedback-showcase-module__WZzXNq__section",
+      "title": "用户反馈"
+    },
+    {
+      "class": "relative left-1/2 grid w-screen -translate-x-1/2 justify-items-center overflow-clip bg-[#000000] text-white",
+      "title": "立即试用 Framia"
+    },
+    {
+      "class": "index-module__XUhMkq__section",
+      "title": "常见\n问题"
+    },
+    {
+      "class": ""
+    },
+    {
+      "class": "signup-card-module__gmK5oq__card",
+      "title": "解锁无限创作"
+    }
+  ],
+  "rootClass": "framia-fonts dark"
+}

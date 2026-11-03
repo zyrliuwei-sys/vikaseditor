@@ -126,8 +126,7 @@ async function POST({ request }: { request: Request }) {
 
     return respData({ checkout_url: checkout.checkoutInfo.checkoutUrl });
   } catch (error: any) {
-    console.error('checkout error:', error);
-    return respErr(error.message || 'Checkout failed');
+    return respErr('Checkout failed. Please try again later.', { status: 502 });
   }
 }
 

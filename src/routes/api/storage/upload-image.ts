@@ -8,6 +8,11 @@ import { getStorage } from '@/modules/storage/service';
 import { md5 } from '@/lib/hash';
 import { enforceMinIntervalRateLimit } from '@/lib/rate-limit';
 import { respData, respErr } from '@/lib/resp';
+import {
+  isRasterImage,
+  readUploadForm,
+  UploadValidationError,
+} from '@/lib/upload-validation';
 
 // Raster formats only. SVG can carry script and would run on whatever origin
 // serves it, so it is not accepted from users.
@@ -42,6 +47,9 @@ async function POST({ request }: { request: Request }) {
   if (limited) return limited;
 
   try {
+    const origin = request.headers.get('origin');
+    if (!origin || origin !== new URL(request.url).origin)
+      return respErr('Same-origin request required', { status: 403 });
     const auth = getAuth();
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session?.user) return respErr('Unauthorized');
@@ -54,14 +62,14 @@ async function POST({ request }: { request: Request }) {
     });
     if (userLimited) return userLimited;
 
-    // Refuse oversized bodies before buffering them, when the size is declared.
-    const declared = Number(request.headers.get('content-length') || 0);
-    if (declared > MAX_REQUEST_BYTES + 64 * 1024) {
-      return respErr('Upload is larger than 20MB in total');
-    }
-
-    const formData = await request.formData();
-    const files = formData.getAll('files') as File[];
+    const formData = await readUploadForm(
+      request,
+      MAX_REQUEST_BYTES + 64 * 1024
+    );
+    const entries = formData.getAll('files');
+    if (entries.some((entry) => typeof entry === 'string'))
+      return respErr('Upload entries must be files', { status: 400 });
+    const files = entries as File[];
     if (!files.length) return respErr('No files provided');
     if (files.length > MAX_FILES_PER_REQUEST) {
       return respErr(`At most ${MAX_FILES_PER_REQUEST} files per upload`);
@@ -91,6 +99,11 @@ async function POST({ request }: { request: Request }) {
 
       const arrayBuffer = await file.arrayBuffer();
       const body = new Uint8Array(arrayBuffer);
+
+      if (!isRasterImage(body, file.type))
+        return respErr('File contents do not match a supported image type', {
+          status: 400,
+        });
 
       const digest = md5(body);
       // R2Provider prepends its own uploadPath (default `uploads`), so the object
@@ -148,7 +161,7 @@ async function POST({ request }: { request: Request }) {
       });
 
       if (!result.success || !result.url) {
-        return respErr(result.error || 'Upload failed');
+        return respErr('Upload failed', { status: 502 });
       }
 
       uploadResults.push({
@@ -163,9 +176,10 @@ async function POST({ request }: { request: Request }) {
       urls: uploadResults.map((r) => r.url),
       results: uploadResults,
     });
-  } catch (e: any) {
-    console.error('upload image failed:', e);
-    return respErr(e?.message || 'upload image failed');
+  } catch (e: unknown) {
+    if (e instanceof UploadValidationError)
+      return respErr(e.message, { status: 400 });
+    return respErr('Upload failed. Please try again later.', { status: 500 });
   }
 }
 

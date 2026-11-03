@@ -1,6 +1,5 @@
 import { useRouter, useRouterState } from '@tanstack/react-router';
 
-import { tDynamic } from '@/core/i18n/dynamic';
 import {
   appearanceStyle,
   COLOR_MODES,
@@ -18,7 +17,51 @@ import {
   type ThemeId,
 } from '@/config/appearance';
 import { deleteCookie, setCookie } from '@/lib/cookie';
+import { m } from '@/paraglide/messages.js';
 import type { AppearanceOption } from '@/components/appearance-options';
+
+const themesLabels = {
+  site_default: m['common.themes.site_default'],
+  forest: m['common.themes.forest'],
+  ocean: m['common.themes.ocean'],
+  violet: m['common.themes.violet'],
+  sunset: m['common.themes.sunset'],
+  rose: m['common.themes.rose'],
+  slate: m['common.themes.slate'],
+  classic: m['common.themes.classic'],
+};
+
+const fontsLabels = {
+  inter: m['common.fonts.inter'],
+  system: m['common.fonts.system'],
+  rounded: m['common.fonts.rounded'],
+  serif: m['common.fonts.serif'],
+};
+
+const sidebar_variantsLabels = {
+  inset: m['common.sidebar_variants.inset'],
+  floating: m['common.sidebar_variants.floating'],
+  sidebar: m['common.sidebar_variants.sidebar'],
+};
+
+const sidebar_collapsiblesLabels = {
+  offcanvas: m['common.sidebar_collapsibles.offcanvas'],
+  icon: m['common.sidebar_collapsibles.icon'],
+};
+
+const font_sizesLabels = {
+  sm: m['common.font_sizes.sm'],
+  md: m['common.font_sizes.md'],
+  lg: m['common.font_sizes.lg'],
+};
+
+const color_modesLabels = {
+  system: m['common.color_modes.system'],
+  light: m['common.color_modes.light'],
+  dark: m['common.color_modes.dark'],
+};
+
+export const themeLabel = (id: ThemeId) => themesLabels[id]();
 
 // Appearance (theme, font, size, sidebar), resolved server-side by the root
 // loader so SSR renders the right <html> attributes with no flash.
@@ -98,32 +141,32 @@ export function appearanceOptions(key: AppearanceKey): AppearanceOption[] {
   if (key === 'theme') {
     return THEMES.map((t) => ({
       id: t.id,
-      label: tDynamic(`common.themes.${t.id}`),
+      label: themesLabels[t.id](),
       swatch: t.swatch,
     }));
   }
   if (key === 'font') {
     return FONTS.map((f) => ({
       id: f.id,
-      label: tDynamic(`common.fonts.${f.id}`),
+      label: fontsLabels[f.id](),
       fontFamily: f.stack,
     }));
   }
   if (key === 'sidebarVariant') {
     return SIDEBAR_VARIANTS.map((v) => ({
       id: v.id,
-      label: tDynamic(`common.sidebar_variants.${v.id}`),
+      label: sidebar_variantsLabels[v.id](),
     }));
   }
   if (key === 'sidebarCollapsible') {
     return SIDEBAR_COLLAPSIBLES.map((v) => ({
       id: v.id,
-      label: tDynamic(`common.sidebar_collapsibles.${v.id}`),
+      label: sidebar_collapsiblesLabels[v.id](),
     }));
   }
   return FONT_SIZES.map((f) => ({
     id: f.id,
-    label: tDynamic(`common.font_sizes.${f.id}`),
+    label: font_sizesLabels[f.id](),
   }));
 }
 
@@ -131,6 +174,6 @@ export function appearanceOptions(key: AppearanceKey): AppearanceOption[] {
 export function colorModeOptions(): AppearanceOption[] {
   return COLOR_MODES.map((c) => ({
     id: c.id,
-    label: tDynamic(`common.color_modes.${c.id}`),
+    label: color_modesLabels[c.id](),
   }));
 }

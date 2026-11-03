@@ -6,8 +6,13 @@ import { toast } from 'sonner';
 import { authClient, useSession } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { PRIVATE_ROBOTS } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
-import { deLocalizeHref, localizeHref } from '@/paraglide/runtime.js';
+import {
+  deLocalizeHref,
+  getLocale,
+  localizeHref,
+} from '@/paraglide/runtime.js';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,7 +20,6 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -231,14 +235,17 @@ function VerifyEmailPage() {
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <Link href="/" className="self-center font-serif text-lg italic">
+        <Link
+          href="/"
+          className="inline-flex min-h-10 items-center self-center font-serif text-lg italic"
+        >
           {envConfigs.app_name}
         </Link>
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg md:text-xl">
+            <h1 className="text-lg md:text-xl">
               {m['common.sign.verify_email_page_title']()}
-            </CardTitle>
+            </h1>
             <CardDescription className="text-xs md:text-sm">
               {m['common.sign.verify_email_page_description']()}
               {email ? ` ${email}` : ''}
@@ -299,5 +306,14 @@ function VerifyEmailPage() {
 }
 
 export const Route = createFileRoute('/(auth)/verify-email')({
+  loader: () => ({ locale: getLocale() }),
+  head: ({ loaderData }) => ({
+    meta: [
+      {
+        title: `${m['common.sign.verify_email_page_title']({}, { locale: loaderData?.locale ?? 'en' })} | ${envConfigs.app_name}`,
+      },
+      PRIVATE_ROBOTS,
+    ],
+  }),
   component: VerifyEmailPage,
 });

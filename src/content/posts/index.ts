@@ -11,10 +11,8 @@ import { baseLocale } from '@/paraglide/runtime.js';
  * fetched through the server functions in ./server.ts and merged with the
  * local posts via the pure helpers below.
  */
-export const BLOG_POST_SLUGS = [
-  'what-is-shipany',
-  'blocks-vs-components',
-] as const;
+// Template articles stay in source as examples; publish only product content here.
+export const BLOG_POST_SLUGS: readonly string[] = [];
 
 export type BlogPostMeta = {
   title: string;

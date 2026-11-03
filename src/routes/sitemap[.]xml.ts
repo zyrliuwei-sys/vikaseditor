@@ -7,7 +7,9 @@ import { getLocalPosts, mergePosts } from '@/content/posts';
 const STATIC_PATHS = [
   '',
   '/pricing',
+  '/create',
   '/blog',
+  '/guest-post',
   '/privacy-policy',
   '/terms-of-service',
 ];
@@ -20,28 +22,48 @@ type Entry = {
 };
 
 function urlFor(path: string, locale: string): string {
-  return localizeUrl(`${envConfigs.app_url}${path || '/'}`, {
+  return localizeUrl(new URL(path || '/', envConfigs.app_url), {
     locale: locale as (typeof locales)[number],
   }).href;
 }
 
+function xmlEscape(value: string): string {
+  return value.replace(
+    /[<>&"']/g,
+    (char) =>
+      ({
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+        '"': '&quot;',
+        "'": '&apos;',
+      })[char]!
+  );
+}
+
 function entryXml(e: Entry): string {
-  const alternates = locales
+  const alternates = [...locales, 'x-default']
     .map(
       (loc) =>
-        `    <xhtml:link rel="alternate" hreflang="${loc}" href="${urlFor(e.path, loc)}"/>`
+        `    <xhtml:link rel="alternate" hreflang="${loc}" href="${xmlEscape(urlFor(e.path, loc === 'x-default' ? baseLocale : loc))}"/>`
     )
     .join('\n');
-  return [
-    '  <url>',
-    `    <loc>${urlFor(e.path, baseLocale)}</loc>`,
-    alternates,
-    e.lastModified ? `    <lastmod>${e.lastModified}</lastmod>` : null,
-    `    <changefreq>${e.changeFrequency}</changefreq>`,
-    `    <priority>${e.priority}</priority>`,
-    '  </url>',
-  ]
-    .filter(Boolean)
+  return locales
+    .map((locale) =>
+      [
+        '  <url>',
+        `    <loc>${xmlEscape(urlFor(e.path, locale))}</loc>`,
+        alternates,
+        e.lastModified
+          ? `    <lastmod>${xmlEscape(e.lastModified)}</lastmod>`
+          : null,
+        `    <changefreq>${e.changeFrequency}</changefreq>`,
+        `    <priority>${e.priority}</priority>`,
+        '  </url>',
+      ]
+        .filter(Boolean)
+        .join('\n')
+    )
     .join('\n');
 }
 
@@ -70,7 +92,7 @@ export const Route = createFileRoute('/sitemap.xml')({
           const posts = mergePosts(dbPosts, getLocalPosts(baseLocale));
           for (const post of posts) {
             entries.push({
-              path: `/blog/${post.slug}`,
+              path: `/blog/${encodeURIComponent(post.slug)}`,
               lastModified: post.createdAt,
               changeFrequency: 'monthly',
               priority: 0.6,
@@ -80,7 +102,7 @@ export const Route = createFileRoute('/sitemap.xml')({
           // Database unreachable — static paths + local posts still listed.
           for (const post of getLocalPosts(baseLocale)) {
             entries.push({
-              path: `/blog/${post.slug}`,
+              path: `/blog/${encodeURIComponent(post.slug)}`,
               lastModified: post.createdAt,
               changeFrequency: 'monthly',
               priority: 0.6,

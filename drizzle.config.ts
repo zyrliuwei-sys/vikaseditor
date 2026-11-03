@@ -6,6 +6,22 @@ loadEnvFiles();
 
 const provider = process.env.DATABASE_PROVIDER || 'sqlite';
 
+// D1 uses Wrangler bindings rather than a SQLite file URL. Refuse database
+// commands here so switching to D1 cannot silently modify the old local.db.
+// `generate` remains available: D1 shares the SQLite schema dialect.
+if (
+  provider === 'd1' &&
+  process.argv.some((arg) =>
+    ['push', 'migrate', 'studio', 'pull', 'introspect'].includes(arg)
+  )
+) {
+  throw new Error(
+    'D1 schema changes: run pnpm db:generate, review the SQL, then ' +
+      'pnpm exec wrangler d1 migrations apply DB --remote --config wrangler.jsonc. ' +
+      'Use the Cloudflare D1 console to inspect data.'
+  );
+}
+
 const dialectMap: Record<string, 'sqlite' | 'postgresql' | 'mysql' | 'turso'> =
   {
     sqlite: 'sqlite',

@@ -29,8 +29,15 @@ FROM deps AS builder
 
 WORKDIR /app
 
-# NODE_ENV=production so loadEnvFiles() in vite.config.ts reads .env.production
+# Only public settings enter the build. Inject server secrets at runtime.
 ENV NODE_ENV=production
+ARG VITE_APP_URL=https://vikas-editor.net
+ARG VITE_APP_NAME="Vikas Editor AI"
+ARG VITE_APP_DESCRIPTION="Create AI images and videos for creators in India and around the world."
+ARG VITE_APP_LOGO=/logo.svg
+ARG VITE_DEFAULT_LOCALE=en
+ARG VITE_RELEASE=
+ENV VITE_APP_URL=${VITE_APP_URL} VITE_APP_NAME=${VITE_APP_NAME} VITE_APP_DESCRIPTION=${VITE_APP_DESCRIPTION} VITE_APP_LOGO=${VITE_APP_LOGO} VITE_DEFAULT_LOCALE=${VITE_DEFAULT_LOCALE} VITE_RELEASE=${VITE_RELEASE}
 
 COPY . .
 RUN pnpm build

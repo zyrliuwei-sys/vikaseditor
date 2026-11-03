@@ -1,69 +1,58 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { envConfigs } from '@/config';
+import { jsonLd, vikasPageHead } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
-import { getLocale, locales, localizeUrl } from '@/paraglide/runtime.js';
-import { Blog } from '@/blocks/blog';
-import { CTA } from '@/blocks/cta';
-import { FAQ } from '@/blocks/faq';
-import { Features } from '@/blocks/features';
+import { getLocale } from '@/paraglide/runtime.js';
 import { Footer } from '@/blocks/footer';
 import { Header } from '@/blocks/header';
-import { Hero } from '@/blocks/hero';
-import { Pricing } from '@/blocks/pricing';
-import { SupportWidget } from '@/blocks/support-widget';
-import { getBlogPostsFn } from '@/content/posts/server';
+import { VikasHome } from '@/blocks/vikas/home';
 
-/**
- * Default landing page — demo content. Rewrite this file (and the blocks in
- * src/blocks/) for your project. The primitives in src/components/ stay.
- * See /quick-start or /clone-website to automate the rewrite.
- */
 function HomePage() {
-  const { posts } = Route.useLoaderData();
-
   return (
-    <div className="bg-background text-foreground flex min-h-screen flex-col">
+    <div className="vikas-site">
       <Header />
-      <main>
-        <Hero />
-        <Features />
-        <Pricing />
-        <FAQ />
-        <Blog posts={posts} />
-        <CTA />
+      <main id="main-content">
+        <VikasHome />
       </main>
       <Footer />
-      <SupportWidget />
     </div>
   );
 }
-
 export const Route = createFileRoute('/')({
-  loader: async () => {
-    const locale = getLocale();
-    const posts = await getBlogPostsFn({ data: { locale, limit: 3 } });
-    return { locale, posts };
-  },
+  loader: () => ({ locale: getLocale() }),
   head: ({ loaderData }) => {
     const locale = loaderData?.locale ?? 'en';
-    const urlFor = (loc: string) =>
-      localizeUrl(`${envConfigs.app_url}/`, { locale: loc as any }).href;
+    const head = vikasPageHead(
+      '/',
+      m['common.metadata.title']({}, { locale }),
+      m['common.metadata.description']({}, { locale }),
+      locale
+    );
     return {
-      meta: [
+      ...head,
+      links: [
+        ...head.links,
         {
-          name: 'description',
-          content: m['landing.hero.subheadline']({}, { locale: locale as any }),
+          rel: 'preload',
+          as: 'image',
+          href: '/imgs/vikas/portrait-1.webp',
+          fetchPriority: 'high',
         },
       ],
-      links: [
-        { rel: 'canonical', href: urlFor(locale) },
-        ...locales.map((loc) => ({
-          rel: 'alternate',
-          hrefLang: loc,
-          href: urlFor(loc),
-        })),
-        { rel: 'alternate', hrefLang: 'x-default', href: urlFor('en') },
+      scripts: [
+        jsonLd({
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: envConfigs.app_name,
+          url: envConfigs.app_url,
+          inLanguage: locale,
+          publisher: {
+            '@type': 'Organization',
+            name: envConfigs.app_name,
+            url: envConfigs.app_url,
+          },
+        }),
       ],
     };
   },

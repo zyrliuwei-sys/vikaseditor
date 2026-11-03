@@ -37,7 +37,7 @@ export function SiteUserMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="focus-visible:ring-ring rounded-full outline-none focus-visible:ring-2">
+      <DropdownMenuTrigger className="focus-visible:ring-ring flex min-h-11 min-w-11 items-center justify-center rounded-full outline-none focus-visible:ring-2">
         <Avatar className="size-9">
           <AvatarImage src={image || undefined} alt={name} />
           <AvatarFallback className="text-xs">

@@ -79,7 +79,7 @@ export const COLOR_MODES = [
 ] as const;
 export type ColorModeId = (typeof COLOR_MODES)[number]['id'];
 export const COLOR_MODE_CONFIG_KEY = 'app_color_mode';
-export const DEFAULT_COLOR_MODE: ColorModeId = 'system';
+export const DEFAULT_COLOR_MODE: ColorModeId = 'dark';
 
 export function isColorMode(value: unknown): value is ColorModeId {
   return typeof value === 'string' && COLOR_MODES.some((m) => m.id === value);

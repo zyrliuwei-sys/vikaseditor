@@ -1,3 +1,11 @@
 allowBuilds:
   esbuild: false
   workerd: false
+
+# pnpm 11 reads overrides here; keep package.json in sync for pnpm 10 Docker builds.
+overrides:
+  'seroval': '1.6.11'
+  'seroval-plugins': '1.6.8'
+  'next': '-'
+  'minimatch': '11.0.1'
+  '@esbuild-kit/core-utils>esbuild': '0.25.12'

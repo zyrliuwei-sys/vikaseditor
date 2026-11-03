@@ -3,7 +3,12 @@ import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
 import { db } from '@/core/db';
 import { atomic, AtomicGuardError, guard } from '@/core/db/atomic';
 import { aiTask } from '@/config/db/schema';
-import { planConsume, planRevoke } from '@/modules/credits/service';
+import {
+  imageTrialAvailable,
+  planConsume,
+  planImageTrial,
+  planRevoke,
+} from '@/modules/credits/service';
 
 const SCENE = 'vikas_studio';
 const ACTIVE = ['pending', 'processing'];
@@ -86,13 +91,19 @@ export async function createGeneration(params: {
   for (let attempt = 0; attempt < 3; attempt++) {
     const existing = await findGeneration(params.id, params.userId);
     if (existing) return matchingTask(existing, params.fingerprint);
-    const plan = await planConsume({
-      userId: params.userId,
-      credits: params.credits,
-      scene: SCENE,
-      description: `AI ${params.mediaType} generation`,
-      metadata: JSON.stringify({ taskId: params.id }),
-    });
+    const freeImage =
+      params.mediaType === 'image' &&
+      (await imageTrialAvailable(params.userId, params.credits));
+    const plan = freeImage
+      ? planImageTrial(params.userId, params.credits, params.id)
+      : await planConsume({
+          userId: params.userId,
+          credits: params.credits,
+          scene: SCENE,
+          description: `AI ${params.mediaType} generation`,
+          metadata: JSON.stringify({ taskId: params.id }),
+          paidOnly: true,
+        });
     if (!plan) {
       // A concurrent duplicate may have spent the last credits while we read.
       const concurrent = await findGeneration(params.id, params.userId);
@@ -106,12 +117,13 @@ export async function createGeneration(params: {
       id: params.id,
       userId: params.userId,
       mediaType: params.mediaType,
-      provider: 'fal',
+      provider: 'evolink',
       model: params.model,
       prompt: params.prompt,
       options: JSON.stringify({
         fingerprint: params.fingerprint,
         aspectRatio: params.aspectRatio,
+        funding: freeImage ? 'image_trial' : 'paid',
       }),
       status: 'pending',
       scene: SCENE,

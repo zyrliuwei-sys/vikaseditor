@@ -43,120 +43,85 @@ export type PricingProduct = {
   maxLinks?: number;
 };
 
-/**
- * Default demo catalog. Replace with your real products when launching.
- * Keys MUST match what the pricing UI sends as product_id.
- */
+/** Vikas v1: 100 credits = USD 1. No bonus credits that dilute the 8× rate. */
 export const pricingCatalog: Record<string, PricingProduct> = {
-  starter_monthly: {
-    productId: 'starter_monthly',
-    productName: 'Starter',
+  vikas_starter_once: {
+    productId: 'vikas_starter_once',
+    productName: 'Vikas Starter',
     planName: 'Starter',
-    description: 'Starter Monthly',
-    type: PaymentType.SUBSCRIPTION,
+    description: 'Vikas Starter — 900 credits',
+    type: PaymentType.ONE_TIME,
     priceInCents: 900,
     currency: 'usd',
-    credits: 5000,
+    credits: 900,
+    creditsValidDays: 0,
+  },
+  vikas_creator_once: {
+    productId: 'vikas_creator_once',
+    productName: 'Vikas Creator',
+    planName: 'Creator',
+    description: 'Vikas Creator — 2,900 credits',
+    type: PaymentType.ONE_TIME,
+    priceInCents: 2900,
+    currency: 'usd',
+    credits: 2900,
+    creditsValidDays: 0,
+  },
+  vikas_studio_once: {
+    productId: 'vikas_studio_once',
+    productName: 'Vikas Studio',
+    planName: 'Studio',
+    description: 'Vikas Studio — 7,900 credits',
+    type: PaymentType.ONE_TIME,
+    priceInCents: 7900,
+    currency: 'usd',
+    credits: 7900,
+    creditsValidDays: 0,
+  },
+  vikas_starter_monthly: {
+    productId: 'vikas_starter_monthly',
+    productName: 'Vikas Starter',
+    planName: 'Starter',
+    description: 'Vikas Starter — 1,900 credits/month',
+    type: PaymentType.SUBSCRIPTION,
+    priceInCents: 1900,
+    currency: 'usd',
+    credits: 1900,
+    creditsValidDays: 31,
     plan: {
       name: 'Starter',
       interval: PaymentInterval.MONTH,
       intervalCount: 1,
     },
   },
-  pro_monthly: {
-    productId: 'pro_monthly',
-    productName: 'Pro',
-    planName: 'Pro',
-    description: 'Pro Monthly',
+  vikas_creator_monthly: {
+    productId: 'vikas_creator_monthly',
+    productName: 'Vikas Creator',
+    planName: 'Creator',
+    description: 'Vikas Creator — 4,900 credits/month',
     type: PaymentType.SUBSCRIPTION,
-    priceInCents: 2900,
+    priceInCents: 4900,
     currency: 'usd',
-    credits: 50000,
-    plan: { name: 'Pro', interval: PaymentInterval.MONTH, intervalCount: 1 },
-  },
-  enterprise_monthly: {
-    productId: 'enterprise_monthly',
-    productName: 'Enterprise',
-    planName: 'Enterprise',
-    description: 'Enterprise Monthly',
-    type: PaymentType.SUBSCRIPTION,
-    priceInCents: 9900,
-    currency: 'usd',
-    credits: 500000,
+    credits: 4900,
+    creditsValidDays: 31,
     plan: {
-      name: 'Enterprise',
+      name: 'Creator',
       interval: PaymentInterval.MONTH,
       intervalCount: 1,
     },
   },
-  starter_yearly: {
-    productId: 'starter_yearly',
-    productName: 'Starter',
-    planName: 'Starter',
-    description: 'Starter Yearly',
+  vikas_studio_monthly: {
+    productId: 'vikas_studio_monthly',
+    productName: 'Vikas Studio',
+    planName: 'Studio',
+    description: 'Vikas Studio — 9,900 credits/month',
     type: PaymentType.SUBSCRIPTION,
-    priceInCents: 8600,
+    priceInCents: 9900,
     currency: 'usd',
-    credits: 60000,
-    plan: { name: 'Starter', interval: PaymentInterval.YEAR, intervalCount: 1 },
+    credits: 9900,
+    creditsValidDays: 31,
+    plan: { name: 'Studio', interval: PaymentInterval.MONTH, intervalCount: 1 },
   },
-  pro_yearly: {
-    productId: 'pro_yearly',
-    productName: 'Pro',
-    planName: 'Pro',
-    description: 'Pro Yearly',
-    type: PaymentType.SUBSCRIPTION,
-    priceInCents: 27800,
-    currency: 'usd',
-    credits: 600000,
-    plan: { name: 'Pro', interval: PaymentInterval.YEAR, intervalCount: 1 },
-  },
-  enterprise_yearly: {
-    productId: 'enterprise_yearly',
-    productName: 'Enterprise',
-    planName: 'Enterprise',
-    description: 'Enterprise Yearly',
-    type: PaymentType.SUBSCRIPTION,
-    priceInCents: 95000,
-    currency: 'usd',
-    credits: 6000000,
-    plan: {
-      name: 'Enterprise',
-      interval: PaymentInterval.YEAR,
-      intervalCount: 1,
-    },
-  },
-  starter_lifetime: {
-    productId: 'starter_lifetime',
-    productName: 'Starter',
-    planName: 'Starter Lifetime',
-    description: 'Starter Lifetime',
-    type: PaymentType.ONE_TIME,
-    priceInCents: 14900,
-    currency: 'usd',
-    credits: 100000,
-  },
-  pro_lifetime: {
-    productId: 'pro_lifetime',
-    productName: 'Pro',
-    planName: 'Pro Lifetime',
-    description: 'Pro Lifetime',
-    type: PaymentType.ONE_TIME,
-    priceInCents: 49900,
-    currency: 'usd',
-    credits: 1000000,
-  },
-  enterprise_lifetime: {
-    productId: 'enterprise_lifetime',
-    productName: 'Enterprise',
-    planName: 'Enterprise Lifetime',
-    description: 'Enterprise Lifetime',
-    type: PaymentType.ONE_TIME,
-    priceInCents: 199900,
-    currency: 'usd',
-    credits: 10000000,
-  },
-
   // Guest posts (see src/modules/guest-posts). Published permanently, every
   // external link rendered rel="sponsored nofollow".
   guest_post_standard: {
@@ -189,7 +154,9 @@ export const pricingCatalog: Record<string, PricingProduct> = {
 
 export function getPricingProduct(productId: string): PricingProduct | null {
   if (!productId) return null;
-  return pricingCatalog[productId] ?? null;
+  return Object.hasOwn(pricingCatalog, productId)
+    ? pricingCatalog[productId]
+    : null;
 }
 
 export function listPricingProducts(): PricingProduct[] {

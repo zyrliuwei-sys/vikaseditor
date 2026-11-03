@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
+  GenerationAccess,
   GenerationCapabilities,
   GenerationResult,
   MediaMode,
@@ -101,6 +102,13 @@ export function VikasStudio({
     staleTime: 60_000,
     retry: 1,
   });
+  const access = useQuery({
+    queryKey: ['vikas-generation-access', session?.user.id],
+    queryFn: () => apiGet<GenerationAccess>('/api/generations/access'),
+    enabled: Boolean(session?.user),
+    staleTime: 0,
+    retry: 1,
+  });
   const history = useQuery({
     queryKey: ['vikas-generation-history', session?.user.id],
     queryFn: () => apiGet<GenerationResult[]>('/api/generations'),
@@ -127,11 +135,14 @@ export function VikasStudio({
       setOutputTab('preview');
       setMediaError(false);
       // An ambiguous submission must retain its key so a retry cannot spend twice.
-      if (!result.error) requestIdRef.current = null;
+      if (!isWorking(result) || !result.error) requestIdRef.current = null;
       void queryClient.invalidateQueries({
         queryKey: ['vikas-generation-history'],
       });
       void queryClient.invalidateQueries({ queryKey: ['user-credits'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['vikas-generation-access'],
+      });
     },
   });
   const task = useQuery({
@@ -158,8 +169,16 @@ export function VikasStudio({
   const selectedTemplate = templates.find((item) => item.id === templateId);
   const credits =
     mode === 'video'
-      ? (capabilities.data?.videoCredits ?? 20)
-      : (capabilities.data?.imageCredits ?? 4);
+      ? (capabilities.data?.videoCredits ?? 796)
+      : (capabilities.data?.imageCredits ?? 51);
+  const freeImage =
+    mode === 'image' && access.data?.freeImageAvailable === true;
+  const needsPayment = Boolean(
+    session?.user &&
+    access.data &&
+    !freeImage &&
+    access.data.paidCredits < credits
+  );
   const configured = capabilities.data?.configured === true;
   const resultUrl =
     result?.url && /^https?:\/\//i.test(result.url) ? result.url : undefined;
@@ -214,6 +233,10 @@ export function VikasStudio({
       }
       if (!configured) {
         setError(m['vikas.studio.configuration_hint']());
+        return;
+      }
+      if (!access.data || needsPayment) {
+        setError(m['vikas.studio.credits_error']());
         return;
       }
       if (mode === 'video' && !photo) {
@@ -278,6 +301,9 @@ export function VikasStudio({
         queryKey: ['vikas-generation-history'],
       });
       void queryClient.invalidateQueries({ queryKey: ['user-credits'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['vikas-generation-access'],
+      });
     }
   }, [result?.id, result?.status, queryClient]);
 
@@ -621,11 +647,30 @@ export function VikasStudio({
               <span>{m['vikas.studio.generation_cost']()}</span>
               <strong>
                 <Sparkles size={14} />
-                {m['vikas.studio.credit_count']({ count: credits })}
+                {freeImage
+                  ? m['vikas.pricing.free_short']()
+                  : m['vikas.studio.credit_count']({ count: credits })}
               </strong>
             </div>
           </div>
 
+          {session?.user && access.data && (
+            <p className="vs-footer-note">
+              {freeImage
+                ? m['vikas.studio.free_hint']()
+                : m['vikas.studio.paid_balance']({
+                    count: access.data.paidCredits,
+                  })}
+            </p>
+          )}
+          {access.isError && (
+            <p className="vs-error" role="alert">
+              {m['vikas.studio.balance_error']()}{' '}
+              <button type="button" onClick={() => void access.refetch()}>
+                {m['vikas.studio.retry']()}
+              </button>
+            </p>
+          )}
           {capabilities.isSuccess && !configured && !working ? (
             <div className="vs-service-notice" role="status">
               <Info size={17} />
@@ -642,6 +687,31 @@ export function VikasStudio({
               <span>{m['vikas.studio.sign_in_generate']()}</span>
               <ArrowRight size={18} />
             </Link>
+          ) : needsPayment && !working ? (
+            <div className="vs-paywall" role="status">
+              <p>
+                {mode === 'video'
+                  ? m['vikas.studio.video_paywall']()
+                  : m['vikas.studio.image_paywall']()}
+              </p>
+              <Link
+                href="/pricing"
+                target="_blank"
+                rel="noopener"
+                className="vs-generate"
+              >
+                <span>{m['vikas.studio.buy_credits']()}</span>
+                <ArrowRight size={18} />
+              </Link>
+              <button
+                type="button"
+                className="vs-copy"
+                disabled={access.isFetching}
+                onClick={() => void access.refetch()}
+              >
+                {m['vikas.studio.refresh_balance']()}
+              </button>
+            </div>
           ) : (
             <form.Subscribe selector={(state) => state.isSubmitting}>
               {(isSubmitting) => (
@@ -649,7 +719,11 @@ export function VikasStudio({
                   type="submit"
                   className="vs-generate"
                   disabled={
-                    working || isSubmitting || sessionPending || !configured
+                    working ||
+                    isSubmitting ||
+                    sessionPending ||
+                    !configured ||
+                    !access.data
                   }
                 >
                   <span>
@@ -785,14 +859,9 @@ export function VikasStudio({
                   <div className="vs-result-caption">
                     <span>
                       <Check size={15} />
-                      {m['vikas.studio.result_ready']()}
+                      {m['vikas.studio.download_expiry']()}
                     </span>
-                    <a
-                      href={resultUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download
-                    >
+                    <a href={`/api/generations/${result.id}/download`} download>
                       <ArrowDownToLine size={15} />
                       {m['vikas.studio.download']()}
                     </a>

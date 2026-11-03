@@ -62,6 +62,13 @@ export function parseGenerationInput(value: unknown): GenerationInput {
     );
   if (parsed.data.mediaType === 'video' && !parsed.data.image)
     throw new GenerationInputError('Upload a photo to create a video.');
+  if (
+    parsed.data.mediaType === 'video' &&
+    (parsed.data.prompt.match(/\p{Script=Han}/gu)?.length ?? 0) > 500
+  )
+    throw new GenerationInputError(
+      'Video prompts support at most 500 Chinese characters.'
+    );
   if (parsed.data.image) validateGenerationImage(parsed.data.image);
   return parsed.data;
 }
@@ -141,35 +148,19 @@ export function generationProviderInput(input: GenerationInput) {
       options: {
         image_url: input.image,
         duration: GENERATION_CATALOG.video.duration,
-        enable_safety_checker: true,
+        quality: GENERATION_CATALOG.video.quality,
+        aspect_ratio: 'adaptive',
+        generate_audio: true,
+        content_filter: true,
       },
     };
-  if (input.image)
-    return {
-      model: GENERATION_CATALOG.image.editModel,
-      credits: GENERATION_CATALOG.image.credits,
-      options: {
-        image_url: input.image,
-        aspect_ratio: input.aspectRatio,
-        num_images: 1,
-        output_format: 'jpeg',
-        safety_tolerance: '2',
-      },
-    };
-  const sizes = {
-    '1:1': 'square_hd',
-    '3:4': 'portrait_4_3',
-    '9:16': 'portrait_16_9',
-    '16:9': 'landscape_16_9',
-  } as const;
   return {
     model: GENERATION_CATALOG.image.textModel,
     credits: GENERATION_CATALOG.image.credits,
     options: {
-      image_size: sizes[input.aspectRatio],
-      num_images: 1,
-      output_format: 'jpeg',
-      enable_safety_checker: true,
+      ...(input.image ? { image_url: input.image } : {}),
+      size: input.aspectRatio,
+      quality: GENERATION_CATALOG.image.quality,
     },
   };
 }

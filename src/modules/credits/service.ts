@@ -19,7 +19,7 @@ import {
   guard,
   type AtomicStep,
 } from '@/core/db/atomic';
-import { credit } from '@/config/db/schema';
+import { credit, order } from '@/config/db/schema';
 import { getSnowId, getUuid } from '@/lib/hash';
 
 // --- Enums ---
@@ -76,6 +76,85 @@ function validCreditConditions(userId: string) {
     gt(credit.remainingCredits, 0),
     or(isNull(credit.expiresAt), gt(credit.expiresAt, now))
   );
+}
+
+function paidCreditCondition() {
+  return sql`exists (select 1 from ${order} where ${order.orderNo} = ${credit.orderNo} and ${order.userId} = ${credit.userId} and ${order.status} = 'paid')`;
+}
+
+export async function getPaidBalance(userId: string): Promise<number> {
+  const [result] = await db()
+    .select({ total: sum(credit.remainingCredits) })
+    .from(credit)
+    .where(and(validCreditConditions(userId), paidCreditCondition()));
+  return Number(result?.total || 0);
+}
+
+export const imageTrialId = (userId: string) => `image_trial_${userId}`;
+
+export async function imageTrialAvailable(userId: string, amount: number) {
+  const [row] = await db()
+    .select()
+    .from(credit)
+    .where(eq(credit.id, imageTrialId(userId)))
+    .limit(1);
+  return (
+    !row ||
+    (row.status === CreditStatus.ACTIVE && row.remainingCredits >= amount)
+  );
+}
+
+/** The unique grant and relative debit share the task's atomic batch. A failed
+ * generation uses normal planRevoke to return this image-only entitlement. */
+export function planImageTrial(userId: string, amount: number, taskId: string) {
+  const id = imageTrialId(userId);
+  const consumedCredit: NewCredit = {
+    id: getUuid(),
+    userId,
+    transactionNo: getSnowId(),
+    transactionType: 'consume',
+    transactionScene: 'image_trial',
+    status: 'active',
+    credits: -amount,
+    remainingCredits: 0,
+    consumedDetail: JSON.stringify([
+      { creditId: id, transactionNo: id, creditsConsumed: amount },
+    ]),
+    metadata: JSON.stringify({ taskId }),
+    description: 'First image free',
+  };
+  return {
+    consumedCredit,
+    steps: (q: any): AtomicStep[] => [
+      q
+        .insert(credit)
+        .values({
+          id,
+          userId,
+          transactionNo: id,
+          transactionType: 'grant',
+          transactionScene: 'image_trial',
+          credits: amount,
+          remainingCredits: amount,
+          status: 'active',
+          description: 'One free image',
+        })
+        .onConflictDoNothing(),
+      guard({
+        table: credit,
+        column: 'userId',
+        where: eq(credit.id, id),
+        require: eq(credit.status, 'active'),
+        message: 'Free image already used',
+      }),
+      q
+        .update(credit)
+        .set({ remainingCredits: sql`${credit.remainingCredits} - ${amount}` })
+        .where(eq(credit.id, id)),
+      ...grantsStayNonNegative([id]),
+      q.insert(credit).values(consumedCredit),
+    ],
+  };
 }
 
 // --- Balance ---
@@ -155,6 +234,7 @@ export async function planConsume(params: {
   scene?: string;
   description?: string;
   metadata?: string;
+  paidOnly?: boolean;
 }): Promise<{
   consumedCredit: NewCredit;
   steps: (q: any) => AtomicStep[];
@@ -174,7 +254,14 @@ export async function planConsume(params: {
   const grants: (typeof credit.$inferSelect)[] = await db()
     .select()
     .from(credit)
-    .where(validCreditConditions(userId))
+    .where(
+      and(
+        validCreditConditions(userId),
+        params.paidOnly ? paidCreditCondition() : undefined,
+        // A welcome image is never a general-purpose credit balance.
+        sql`coalesce(${credit.transactionScene}, '') <> 'image_trial'`
+      )
+    )
     .orderBy(asc(credit.expiresAt))
     .limit(10_000);
 
@@ -218,6 +305,17 @@ export async function planConsume(params: {
   return {
     consumedCredit,
     steps: (q) => [
+      ...(params.paidOnly
+        ? consumedItems.map((item) =>
+            guard({
+              table: credit,
+              column: 'userId',
+              where: eq(credit.id, item.creditId),
+              require: paidCreditCondition(),
+              message: 'Payment is no longer available',
+            })
+          )
+        : []),
       ...consumedItems.map((item) =>
         q
           .update(credit)

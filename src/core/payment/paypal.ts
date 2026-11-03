@@ -146,13 +146,15 @@ export class PayPalProvider implements PaymentProvider {
     const result = await this.makeRequest(
       '/v2/checkout/orders',
       'POST',
-      payload
+      payload,
+      { 'PayPal-Request-Id': `order_${order.orderNo}` }
     );
 
     const approvalUrl = result.links?.find(
       (link: any) => link.rel === 'approve'
     )?.href;
 
+    if (!approvalUrl) throw new Error('PayPal approval URL is missing');
     return {
       provider: this.name,
       checkoutParams: payload,
@@ -186,7 +188,8 @@ export class PayPalProvider implements PaymentProvider {
     const productResponse = await this.makeRequest(
       '/v1/catalogs/products',
       'POST',
-      productPayload
+      productPayload,
+      { 'PayPal-Request-Id': `product_${order.orderNo}` }
     );
 
     // Create a billing plan
@@ -242,7 +245,8 @@ export class PayPalProvider implements PaymentProvider {
     const planResponse = await this.makeRequest(
       '/v1/billing/plans',
       'POST',
-      planPayload
+      planPayload,
+      { 'PayPal-Request-Id': `plan_${order.orderNo}` }
     );
 
     // Create subscription
@@ -279,13 +283,15 @@ export class PayPalProvider implements PaymentProvider {
     const subscriptionResponse = await this.makeRequest(
       '/v1/billing/subscriptions',
       'POST',
-      subscriptionPayload
+      subscriptionPayload,
+      { 'PayPal-Request-Id': `subscription_${order.orderNo}` }
     );
 
     const approvalUrl = subscriptionResponse.links?.find(
       (link: any) => link.rel === 'approve'
     )?.href;
 
+    if (!approvalUrl) throw new Error('PayPal approval URL is missing');
     return {
       provider: this.name,
       checkoutParams: subscriptionPayload,
@@ -306,93 +312,55 @@ export class PayPalProvider implements PaymentProvider {
   }: {
     sessionId: string;
   }): Promise<PaymentSession> {
-    try {
-      if (!sessionId) {
-        throw new Error('sessionId is required');
-      }
-
-      await this.ensureAccessToken();
-
-      // Try to get as order first
-      try {
-        let orderResult = await this.makeRequest(
-          `/v2/checkout/orders/${sessionId}`,
-          'GET'
-        );
-
-        // If order status is APPROVED, auto-capture the payment
-        // APPROVED means user has authorized but payment not yet captured
-        if (orderResult.status === 'APPROVED') {
-          console.log(
-            'PayPal order is APPROVED, auto-capturing payment...',
-            sessionId
-          );
-          orderResult = await this.makeRequest(
-            `/v2/checkout/orders/${sessionId}/capture`,
-            'POST'
-          );
-          console.log(
-            'PayPal payment captured, new status:',
-            orderResult.status
-          );
-        }
-
-        return await this.buildPaymentSessionFromOrder(orderResult);
-      } catch (orderError: any) {
-        // If not found as order, try as subscription
-        if (
-          orderError.message?.includes('RESOURCE_NOT_FOUND') ||
-          orderError.message?.includes('INVALID_RESOURCE_ID')
-        ) {
-          let subscriptionResult = await this.makeRequest(
-            `/v1/billing/subscriptions/${sessionId}`,
-            'GET'
-          );
-
-          // If subscription status is APPROVED, wait for it to become ACTIVE
-          // PayPal automatically activates subscription after user approval
-          if (subscriptionResult.status === 'APPROVED') {
-            console.log(
-              'PayPal subscription is APPROVED, waiting for activation...',
-              sessionId
-            );
-
-            // Poll for up to 10 seconds (5 attempts, 2 seconds apart)
-            for (let i = 0; i < 5; i++) {
-              await new Promise((resolve) => setTimeout(resolve, 2000));
-              subscriptionResult = await this.makeRequest(
-                `/v1/billing/subscriptions/${sessionId}`,
-                'GET'
-              );
-              console.log(
-                `PayPal subscription poll ${i + 1}/5, status:`,
-                subscriptionResult.status
-              );
-
-              if (subscriptionResult.status === 'ACTIVE') {
-                console.log('PayPal subscription activated successfully');
-                break;
-              }
+    if (!/^[A-Za-z0-9-]+$/.test(sessionId))
+      throw new Error('Invalid PayPal session');
+    await this.ensureAccessToken();
+    if (sessionId.startsWith('I-')) {
+      const subscription = await this.makeRequest(
+        `/v1/billing/subscriptions/${sessionId}`,
+        'GET'
+      );
+      // Approval/activation is not evidence of money received. Read an actual
+      // completed transaction so callback and webhook use the same sale ID.
+      const start = new Date(
+        subscription.start_time || subscription.create_time
+      );
+      const end = new Date();
+      const since = new Date(
+        Math.max(start.getTime(), end.getTime() - 179 * 86400000)
+      );
+      const history = await this.makeRequest(
+        `/v1/billing/subscriptions/${sessionId}/transactions?start_time=${encodeURIComponent(since.toISOString())}&end_time=${encodeURIComponent(end.toISOString())}`,
+        'GET'
+      );
+      const transaction = history.transactions
+        ?.filter((t: any) => t.status === 'COMPLETED')
+        .sort((a: any, b: any) => Date.parse(a.time) - Date.parse(b.time))[0];
+      return this.buildPaymentSessionFromSubscription(
+        subscription,
+        transaction
+          ? {
+              id: transaction.id,
+              status: transaction.status,
+              amount: transaction.amount_with_breakdown?.gross_amount,
+              create_time: transaction.time,
             }
-
-            // If still APPROVED after polling, treat it as success
-            // PayPal will activate it shortly
-            if (subscriptionResult.status === 'APPROVED') {
-              console.log(
-                'PayPal subscription still APPROVED after polling, treating as success'
-              );
-            }
-          }
-
-          return await this.buildPaymentSessionFromSubscription(
-            subscriptionResult
-          );
-        }
-        throw orderError;
-      }
-    } catch (error) {
-      throw error;
+          : undefined
+      );
     }
+    let order = await this.makeRequest(
+      `/v2/checkout/orders/${sessionId}`,
+      'GET'
+    );
+    if (order.status === 'APPROVED') {
+      order = await this.makeRequest(
+        `/v2/checkout/orders/${sessionId}/capture`,
+        'POST',
+        {},
+        { 'PayPal-Request-Id': `capture_${sessionId}` }
+      );
+    }
+    return this.buildPaymentSessionFromOrder(order);
   }
 
   /**
@@ -433,6 +401,7 @@ export class PayPalProvider implements PaymentProvider {
 
       const hasSignatureHeaders = !!(
         authAlgo &&
+        certUrl &&
         transmissionId &&
         transmissionSig &&
         transmissionTime
@@ -476,9 +445,9 @@ export class PayPalProvider implements PaymentProvider {
       // Build payment session based on event type
       if (eventType === PaymentEventType.CHECKOUT_SUCCESS) {
         // Order completed/approved
-        paymentSession = await this.buildPaymentSessionFromOrder(
-          event.resource
-        );
+        paymentSession = await this.getPaymentSession({
+          sessionId: event.resource.id,
+        });
       } else if (eventType === PaymentEventType.PAYMENT_SUCCESS) {
         // Payment captured or subscription payment
         if (
@@ -729,18 +698,24 @@ export class PayPalProvider implements PaymentProvider {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: 'grant_type=client_credentials',
+      redirect: 'error',
+      signal: AbortSignal.timeout(15_000),
     });
 
     const data = await response.json();
 
-    if (data.error) {
+    if (
+      !response.ok ||
+      typeof data.access_token !== 'string' ||
+      !Number.isFinite(data.expires_in)
+    ) {
       throw new Error(
-        `PayPal authentication failed: ${data.error_description}`
+        `PayPal authentication failed (HTTP ${response.status}).`
       );
     }
 
     this.accessToken = data.access_token;
-    this.tokenExpiry = Date.now() + data.expires_in * 1000;
+    this.tokenExpiry = Date.now() + Math.max(0, data.expires_in - 60) * 1000;
   }
 
   private async makeRequest(
@@ -759,6 +734,8 @@ export class PayPalProvider implements PaymentProvider {
     const config: RequestInit = {
       method,
       headers,
+      redirect: 'error',
+      signal: AbortSignal.timeout(20_000),
     };
 
     if (data) {
@@ -773,17 +750,7 @@ export class PayPalProvider implements PaymentProvider {
     }
 
     if (!response.ok) {
-      const result = await response.json();
-      let errorMessage = result.name || result.error || 'Unknown error';
-      if (result.details) {
-        errorMessage += `: ${result.details
-          .map((detail: any) => detail.issue || detail.description)
-          .join(', ')}`;
-      }
-      if (result.message) {
-        errorMessage += `: ${result.message}`;
-      }
-      throw new Error(`PayPal request failed: ${errorMessage}`);
+      throw new Error(`PayPal request failed (HTTP ${response.status}).`);
     }
 
     return await response.json();
@@ -957,9 +924,12 @@ export class PayPalProvider implements PaymentProvider {
 
     const result: PaymentSession = {
       provider: this.name,
-      paymentStatus: this.mapPayPalStatus(order.status),
+      paymentStatus:
+        order.status === 'COMPLETED' && capture?.status === 'COMPLETED'
+          ? PaymentStatus.SUCCESS
+          : PaymentStatus.PROCESSING,
       paymentInfo: {
-        transactionId: order.id,
+        transactionId: capture?.id || order.id,
         discountCode: '', // PayPal doesn't have promotion codes like Stripe
         discountAmount: Math.round(discountValue * 100), // Convert to cents
         discountCurrency: discountCurrency || paymentCurrency,
@@ -978,7 +948,7 @@ export class PayPalProvider implements PaymentProvider {
         invoiceId: capture?.id,
       },
       paymentResult: order,
-      metadata: metadata,
+      metadata: { ...metadata, checkoutSessionId: order.id },
     };
 
     return result;
@@ -988,71 +958,17 @@ export class PayPalProvider implements PaymentProvider {
   private async buildPaymentSessionFromCapture(
     capture: any
   ): Promise<PaymentSession> {
-    // Get breakdown info from seller_receivable_breakdown
-    const breakdown = capture.seller_receivable_breakdown;
-
-    // Get discount from breakdown (if any)
-    const discountValue = breakdown?.discount?.value
-      ? parseFloat(breakdown.discount.value)
-      : 0;
-    const discountCurrency =
-      breakdown?.discount?.currency_code || capture.amount?.currency_code || '';
-
-    // Get payment amount
-    const paymentValue = capture.amount?.value
-      ? parseFloat(capture.amount.value)
-      : 0;
-    const paymentCurrency = capture.amount?.currency_code || '';
-
-    // Parse metadata from custom_id (set during order creation)
-    let metadata: any = {};
-    if (capture.custom_id) {
-      try {
-        metadata = JSON.parse(capture.custom_id);
-      } catch {
-        metadata = { custom_id: capture.custom_id };
-      }
-    }
-
-    // Try to get order_id from supplementary_data for fetching full order info
     const orderId = capture.supplementary_data?.related_ids?.order_id;
-    if (orderId && !metadata.order_no) {
-      try {
-        const order = await this.makeRequest(
-          `/v2/checkout/orders/${orderId}`,
-          'GET'
-        );
-        const purchaseUnit = order.purchase_units?.[0];
-        if (purchaseUnit?.custom_id) {
-          try {
-            metadata = JSON.parse(purchaseUnit.custom_id);
-          } catch {
-            metadata = { custom_id: purchaseUnit.custom_id };
-          }
-        }
-      } catch (e) {
-        console.log('Failed to fetch order for metadata:', e);
-      }
-    }
-
-    const result: PaymentSession = {
-      provider: this.name,
-      paymentStatus: this.mapPayPalStatus(capture.status),
-      paymentInfo: {
-        transactionId: capture.id,
-        discountCode: '',
-        discountAmount: Math.round(discountValue * 100), // Convert to cents
-        discountCurrency: discountCurrency,
-        paymentAmount: Math.round(paymentValue * 100), // Convert to cents
-        paymentCurrency: paymentCurrency,
-        paidAt: capture.create_time ? new Date(capture.create_time) : undefined,
-        invoiceId: capture.id,
-      },
-      paymentResult: capture,
-      metadata: metadata,
-    };
-
-    return result;
+    if (typeof orderId !== 'string' || !/^[A-Za-z0-9-]+$/.test(orderId))
+      throw new Error('PayPal capture is missing its order');
+    const order = await this.makeRequest(
+      `/v2/checkout/orders/${orderId}`,
+      'GET'
+    );
+    const session = await this.buildPaymentSessionFromOrder(order);
+    if (session.paymentStatus !== PaymentStatus.SUCCESS)
+      throw new Error('PayPal capture is not settled yet');
+    return session;
   }
 
   // Build payment session from subscription
@@ -1094,10 +1010,11 @@ export class PayPalProvider implements PaymentProvider {
         breakdown?.discount?.currency_code ||
         saleEvent.amount?.currency_code ||
         '';
-      paymentAmount = saleEvent.amount?.value
-        ? Math.round(parseFloat(saleEvent.amount.value) * 100)
-        : 0;
-      paymentCurrency = saleEvent.amount?.currency_code || '';
+      paymentAmount = Math.round(
+        Number(saleEvent.amount?.value ?? saleEvent.amount?.total ?? 0) * 100
+      );
+      paymentCurrency =
+        saleEvent.amount?.currency_code || saleEvent.amount?.currency || '';
       paidAt = saleEvent.create_time
         ? new Date(saleEvent.create_time)
         : undefined;
@@ -1111,12 +1028,15 @@ export class PayPalProvider implements PaymentProvider {
       paidAt = lastPayment.time ? new Date(lastPayment.time) : undefined;
     }
 
-    // For subscriptions, APPROVED means user has authorized, treat as SUCCESS
-    // PayPal will automatically activate the subscription
     const subscriptionPaymentStatus =
-      subscription.status === 'APPROVED' || subscription.status === 'ACTIVE'
+      saleEvent &&
+      String(saleEvent.status || saleEvent.state).toUpperCase() ===
+        'COMPLETED' &&
+      paymentAmount > 0 &&
+      paidAt &&
+      Number.isFinite(paidAt.getTime())
         ? PaymentStatus.SUCCESS
-        : this.mapPayPalStatus(subscription.status);
+        : PaymentStatus.PROCESSING;
 
     const result: PaymentSession = {
       provider: this.name,
@@ -1143,9 +1063,12 @@ export class PayPalProvider implements PaymentProvider {
       },
       paymentResult: saleEvent || subscription,
       subscriptionId: subscription.id,
-      subscriptionInfo: await this.buildSubscriptionInfo(subscription),
+      subscriptionInfo: await this.buildSubscriptionInfo(
+        subscription,
+        saleEvent?.create_time
+      ),
       subscriptionResult: subscription,
-      metadata: metadata,
+      metadata: { ...metadata, checkoutSessionId: subscription.id },
     };
 
     return result;
@@ -1153,7 +1076,8 @@ export class PayPalProvider implements PaymentProvider {
 
   // Build subscription info from subscription
   private async buildSubscriptionInfo(
-    subscription: any
+    subscription: any,
+    paymentTime?: string
   ): Promise<SubscriptionInfo> {
     const billingInfo = subscription.billing_info;
 
@@ -1181,14 +1105,21 @@ export class PayPalProvider implements PaymentProvider {
     const intervalCount = billingCycle?.frequency?.interval_count || 1;
 
     // Calculate currentPeriodStart
-    const currentPeriodStart = billingInfo?.last_payment?.time
-      ? new Date(billingInfo.last_payment.time)
-      : new Date(subscription.start_time || subscription.create_time);
+    const currentPeriodStart =
+      paymentTime || billingInfo?.last_payment?.time
+        ? new Date(paymentTime || billingInfo.last_payment.time)
+        : new Date(subscription.start_time || subscription.create_time);
 
     // Calculate currentPeriodEnd
     // Prefer PayPal's next_billing_time, fallback to calculated value based on interval
     let currentPeriodEnd: Date;
-    if (billingInfo?.next_billing_time) {
+    const isLatestPayment =
+      !paymentTime ||
+      Math.abs(
+        Date.parse(paymentTime) -
+          Date.parse(billingInfo?.last_payment?.time || '')
+      ) < 60_000;
+    if (isLatestPayment && billingInfo?.next_billing_time) {
       currentPeriodEnd = new Date(billingInfo.next_billing_time);
     } else {
       // Calculate based on interval from currentPeriodStart
@@ -1203,15 +1134,24 @@ export class PayPalProvider implements PaymentProvider {
           );
           break;
         case PaymentInterval.MONTH:
-          currentPeriodEnd.setMonth(
-            currentPeriodEnd.getMonth() + intervalCount
+        case PaymentInterval.YEAR: {
+          // Jan 31 renews in February, rather than rolling over into March.
+          const day = currentPeriodEnd.getUTCDate();
+          currentPeriodEnd.setUTCDate(1);
+          currentPeriodEnd.setUTCMonth(
+            currentPeriodEnd.getUTCMonth() +
+              intervalCount * (interval === PaymentInterval.YEAR ? 12 : 1)
           );
+          const lastDay = new Date(
+            Date.UTC(
+              currentPeriodEnd.getUTCFullYear(),
+              currentPeriodEnd.getUTCMonth() + 1,
+              0
+            )
+          ).getUTCDate();
+          currentPeriodEnd.setUTCDate(Math.min(day, lastDay));
           break;
-        case PaymentInterval.YEAR:
-          currentPeriodEnd.setFullYear(
-            currentPeriodEnd.getFullYear() + intervalCount
-          );
-          break;
+        }
         default:
           currentPeriodEnd.setMonth(currentPeriodEnd.getMonth() + 1);
       }
@@ -1223,9 +1163,11 @@ export class PayPalProvider implements PaymentProvider {
       planId: subscription.plan_id,
       description: planDetails?.name || subscription.plan_id,
       amount: billingCycle?.pricing_scheme?.fixed_price?.value
-        ? parseFloat(billingCycle.pricing_scheme.fixed_price.value) * 100
+        ? Math.round(
+            parseFloat(billingCycle.pricing_scheme.fixed_price.value) * 100
+          )
         : billingInfo?.last_payment?.amount?.value
-          ? parseFloat(billingInfo.last_payment.amount.value) * 100
+          ? Math.round(parseFloat(billingInfo.last_payment.amount.value) * 100)
           : 0,
       currency:
         billingCycle?.pricing_scheme?.fixed_price?.currency_code ||

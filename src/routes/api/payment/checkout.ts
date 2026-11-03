@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { resolveCharge } from '@/server/payment/charge';
+import { studioPaymentProvider } from '@/server/payment/storefront';
 
 import { getAuth } from '@/core/auth';
 import { getPricingProduct } from '@/config/pricing';
@@ -26,6 +27,9 @@ function safeSameOriginPath(
 }
 
 async function POST({ request }: { request: Request }) {
+  const origin = request.headers.get('origin');
+  if (origin && origin !== new URL(request.url).origin)
+    return respErr('Cross-origin checkout is not allowed.', { status: 403 });
   const limited = enforceMinIntervalRateLimit(request, {
     intervalMs: 1000,
     keyPrefix: 'checkout',
@@ -69,9 +73,18 @@ async function POST({ request }: { request: Request }) {
     // Catalog price for the chosen provider (CNY providers, admin test
     // amounts): see resolveCharge.
     const configs = await getAllConfigs();
+    const studioProvider = product.productId.startsWith('vikas_')
+      ? studioPaymentProvider(configs)
+      : undefined;
+    if (studioProvider === null)
+      return respErr(
+        'Purchases are not available yet. No payment has been taken.',
+        { status: 503 }
+      );
+    const selectedProvider = studioProvider || payment_provider;
     const charge = await resolveCharge({
       product,
-      paymentProvider: payment_provider,
+      paymentProvider: selectedProvider,
       userId: session.user.id,
       configs,
     });
@@ -121,7 +134,7 @@ async function POST({ request }: { request: Request }) {
             }
           : undefined,
       },
-      provider: payment_provider,
+      provider: selectedProvider,
     });
 
     return respData({ checkout_url: checkout.checkoutInfo.checkoutUrl });

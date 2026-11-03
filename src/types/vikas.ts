@@ -26,6 +26,11 @@ export interface GenerationCapabilities {
   videoCredits: number;
 }
 
+export interface GenerationAccess {
+  paidCredits: number;
+  freeImageAvailable: boolean;
+}
+
 export interface GenerationResult {
   id: string;
   status: 'pending' | 'processing' | 'success' | 'failed' | 'canceled';

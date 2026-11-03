@@ -25,6 +25,30 @@ execFileSync(
   ],
   { stdio: 'pipe', env: process.env }
 );
+let disposeD1: (() => Promise<void>) | undefined;
+if (process.env.ATOMIC_D1 === '1') {
+  // Copy the pushed SQLite schema into a throwaway local D1, then point the
+  // app's D1 driver at it the way src/server.ts does on Workers.
+  const { createClient } = await import('@libsql/client');
+  const sqlite = createClient({ url: process.env.DATABASE_URL! });
+  const ddl = (
+    await sqlite.execute(
+      "select sql from sqlite_master where sql is not null and name not like 'sqlite_%' and name not like '__drizzle%' order by type = 'index'"
+    )
+  ).rows.map((r) => String(r.sql));
+  sqlite.close();
+  const { getPlatformProxy } = await import('wrangler');
+  const proxy = await getPlatformProxy<{ DB: any }>({
+    configPath: 'wrangler.jsonc',
+    // Never use the live database, even when development shares remote D1.
+    remoteBindings: false,
+    persist: { path: join(directory, 'd1') },
+  });
+  for (const statement of ddl) await proxy.env.DB.prepare(statement).run();
+  (globalThis as any).__CF_ENV__ = proxy.env;
+  process.env.DATABASE_PROVIDER = 'd1';
+  disposeD1 = proxy.dispose;
+}
 const { db } = await import('../src/core/db');
 const { atomic, setAtomicModeForTests } = await import('../src/core/db/atomic');
 const schema = await import('../src/config/db/schema');
@@ -37,7 +61,13 @@ const {
   markGenerationUncertain,
   generationResponse,
 } = await import('../src/modules/ai-tasks/generations');
-const { planRevoke } = await import('../src/modules/credits/service');
+const {
+  planRevoke,
+  imageTrialId,
+  imageTrialAvailable,
+  getPaidBalance,
+  planConsume,
+} = await import('../src/modules/credits/service');
 const {
   parseGenerationInput,
   readGenerationInput,
@@ -57,11 +87,36 @@ const base = {
   aspectRatio: '3:4' as const,
 };
 let count = 0;
-async function account(credits = 20) {
+async function account(credits = 255, usedTrial = true) {
   const id = `generation-user-${count++}`;
   await db()
     .insert(schema.user)
     .values({ id, email: `${id}@example.test`, name: 'Test creator' });
+  await db()
+    .insert(schema.order)
+    .values({
+      id: `order-${id}`,
+      orderNo: `order-${id}`,
+      userId: id,
+      status: 'paid',
+      amount: credits,
+      currency: 'usd',
+      paymentProvider: 'test',
+      checkoutInfo: '{}',
+    });
+  if (usedTrial)
+    await db()
+      .insert(schema.credit)
+      .values({
+        id: imageTrialId(id),
+        userId: id,
+        transactionNo: imageTrialId(id),
+        transactionType: 'grant',
+        transactionScene: 'image_trial',
+        credits: 51,
+        remainingCredits: 0,
+        status: 'active',
+      });
   await db()
     .insert(schema.credit)
     .values({
@@ -69,7 +124,8 @@ async function account(credits = 20) {
       userId: id,
       transactionNo: `grant-${id}`,
       transactionType: 'grant',
-      transactionScene: 'gift',
+      transactionScene: 'payment',
+      orderNo: `order-${id}`,
       credits,
       remainingCredits: credits,
       status: 'active',
@@ -103,6 +159,7 @@ async function taskParams(userId: string, requestId = crypto.randomUUID()) {
 before(() => setAtomicModeForTests('batch'));
 after(async () => {
   setAtomicModeForTests(undefined);
+  await disposeD1?.();
   await rm(directory, { recursive: true, force: true });
 });
 
@@ -128,9 +185,9 @@ test('only bounded raster data URLs and known request fields are accepted', asyn
   const video = generationProviderInput(
     parseGenerationInput({ ...base, image: photo, mediaType: 'video' })
   );
-  assert.equal(video.credits, 20);
-  assert.equal(video.options.duration, '5');
-  assert.equal('aspect_ratio' in video.options, false);
+  assert.equal(video.credits, 796);
+  assert.equal(video.options.duration, 5);
+  assert.equal(video.options.aspect_ratio, 'adaptive');
 });
 
 test('request streaming limit applies even without content-length', async () => {
@@ -143,7 +200,7 @@ test('request streaming limit applies even without content-length', async () => 
 });
 
 test('a duplicate request claims one provider submission and one debit under concurrency', async () => {
-  const user = await account(4);
+  const user = await account(51);
   const params = await taskParams(user);
   let submissions = 0;
   const results = await Promise.all(
@@ -168,7 +225,7 @@ test('a duplicate request claims one provider submission and one debit under con
 });
 
 test('separate concurrent requests cannot overdraw the same last credits', async () => {
-  const user = await account(4);
+  const user = await account(51);
   const a = await taskParams(user),
     b = await taskParams(user);
   const results = await Promise.allSettled([
@@ -194,7 +251,7 @@ test('the idempotency key is scoped to owner and rejects a different payload', a
   const one = await generationIdentity(user, base),
     two = await generationIdentity(other, base);
   assert.notEqual(one.id, two.id);
-  assert.equal(await balance(user), 16);
+  assert.equal(await balance(user), 204);
 });
 
 test('provider id persists separately and never loses the consumption reference', async () => {
@@ -216,7 +273,7 @@ test('concurrent failure settlement restores credits exactly once and terminal s
       finishGeneration(task, { status: 'failed', error: 'Provider failed' })
     )
   );
-  assert.equal(await balance(user), 20);
+  assert.equal(await balance(user), 255);
   assert.equal((await findGeneration(task.id, user))!.status, 'failed');
   await finishGeneration(task, {
     status: 'success',
@@ -237,7 +294,7 @@ test('racing success and failure settle together with the correct final balance'
     finishGeneration(task, { status: 'failed', error: 'Failure' }),
   ]);
   const saved = (await findGeneration(task.id, user))!;
-  assert.equal(await balance(user), saved.status === 'success' ? 16 : 20);
+  assert.equal(await balance(user), saved.status === 'success' ? 204 : 255);
 });
 
 test('a failure later in a refund batch rolls back the task and restored grant', async () => {
@@ -255,7 +312,7 @@ test('a failure later in a refund batch rolls back the task and restored grant',
       q.insert(schema.aiTask).values({ ...task }),
     ])
   );
-  assert.equal(await balance(user), 16);
+  assert.equal(await balance(user), 204);
   assert.equal((await findGeneration(task.id, user))!.status, 'pending');
 });
 
@@ -267,7 +324,7 @@ test('ambiguous submissions keep their unique claim and do not pretend to fail o
   assert.equal(uncertain.status, 'processing');
   assert.match(generationResponse(uncertain).error!, /uncertain/);
   assert.equal((await createGeneration(params)).created, false);
-  assert.equal(await balance(user), 16);
+  assert.equal(await balance(user), 204);
 });
 
 test('Fal errors expose only status and preserve transient polling failures', async () => {
@@ -322,4 +379,84 @@ test('Fal errors expose only status and preserve transient polling failures', as
   } finally {
     globalThis.fetch = savedFetch;
   }
+});
+
+test('a new account gets exactly one free image across concurrent distinct requests', async () => {
+  const user = await account(0, false);
+  const params = await Promise.all(
+    Array.from({ length: 12 }, () => taskParams(user))
+  );
+  const results = await Promise.allSettled(params.map(createGeneration));
+  assert.equal(results.filter((r) => r.status === 'fulfilled').length, 1);
+  assert.equal(await imageTrialAvailable(user, 51), false);
+  assert.equal(await getPaidBalance(user), 0);
+  assert.equal((await listGenerations(user)).length, 1);
+  await assert.rejects(
+    createGeneration(await taskParams(user)),
+    /Not enough credits/
+  );
+});
+
+test('trial is image-only, gifts cannot fund videos, and failed free images refund once', async () => {
+  const user = await account(5000, false);
+  await db()
+    .update(schema.credit)
+    .set({ orderNo: '', transactionScene: 'gift' })
+    .where(eq(schema.credit.id, `grant-${user}`));
+  const video = {
+    ...(await taskParams(user)),
+    mediaType: 'video' as const,
+    model: 'seedance-2.0-image-to-video',
+    credits: 796,
+  };
+  await assert.rejects(createGeneration(video), /Not enough credits/);
+  assert.equal(await imageTrialAvailable(user, 51), true);
+  const { task } = await createGeneration(await taskParams(user));
+  assert.equal(JSON.parse(task.options!).funding, 'image_trial');
+  await Promise.all(
+    Array.from({ length: 8 }, () =>
+      finishGeneration(task, { status: 'failed', error: 'test failure' })
+    )
+  );
+  assert.equal(await imageTrialAvailable(user, 51), true);
+  const retry = await createGeneration(await taskParams(user));
+  await finishGeneration(retry.task, {
+    status: 'success',
+    url: 'https://files.evolink.ai/result.png',
+  });
+  await assert.rejects(
+    createGeneration(await taskParams(user)),
+    /Not enough credits/
+  );
+  assert.equal(await getPaidBalance(user), 0);
+});
+
+test('paid credits enable video and cannot be spent twice concurrently', async () => {
+  const user = await account(796, false);
+  const params = await Promise.all([taskParams(user), taskParams(user)]);
+  const results = await Promise.allSettled(
+    params.map((p) =>
+      createGeneration({ ...p, mediaType: 'video', credits: 796 })
+    )
+  );
+  assert.equal(results.filter((r) => r.status === 'fulfilled').length, 1);
+  assert.equal(await getPaidBalance(user), 0);
+  assert.equal(await imageTrialAvailable(user, 51), true);
+});
+
+test('a paid-only debit aborts atomically when its payment begins refunding', async () => {
+  const user = await account(1000);
+  const plan = await planConsume({
+    userId: user,
+    credits: 796,
+    paidOnly: true,
+  });
+  assert.ok(plan);
+  await db()
+    .update(schema.order)
+    .set({ status: 'refunding' })
+    .where(eq(schema.order.orderNo, `order-${user}`));
+  await assert.rejects(atomic(plan.steps));
+  assert.equal(await balance(user), 1000);
+  assert.equal(await getPaidBalance(user), 0);
 });

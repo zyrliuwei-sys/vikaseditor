@@ -983,6 +983,7 @@ html[lang='zh'] .vikas-hero h1 > span {
   max-width: 700px;
 }
 .vikas-credits-page h1 {
+  text-wrap: balance;
   font-size: clamp(38px, 4.5vw, 64px);
   line-height: 1.12;
   letter-spacing: -2.5px;
@@ -1000,6 +1001,153 @@ html[lang='zh'] .vikas-hero h1 > span {
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   margin: 44px 0;
+}
+.vikas-pricing-trial {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 22px 26px;
+  margin: 32px 0;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+.vikas-pricing-trial > span {
+  font-family: var(--font-display);
+  font-size: 23px;
+}
+.vikas-pricing-trial a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  font-size: 13px;
+}
+.vikas-billing-tabs {
+  display: flex;
+  width: fit-content;
+  padding: 5px;
+  gap: 5px;
+  border: 1px solid var(--border);
+  margin: 42px auto 14px;
+}
+.vikas-billing-tabs button {
+  padding: 12px 24px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+.vikas-billing-tabs button[aria-pressed='true'] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.vikas-pricing-rate {
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin-bottom: 28px;
+}
+.vikas-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.vikas-plan-card {
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.vikas-plan-card.is-featured {
+  border-color: var(--primary);
+  box-shadow: inset 0 3px var(--primary);
+}
+.vikas-plan-top {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.vikas-plan-top h2 {
+  font-size: 24px;
+  font-weight: 500;
+}
+.vikas-plan-top > span {
+  font-size: 10px;
+  padding: 5px 9px;
+  color: var(--primary);
+  border: 1px solid var(--border);
+}
+.vikas-plan-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 28px 0 10px;
+}
+.vikas-plan-price strong {
+  font-family: var(--font-editorial);
+  font-size: 56px;
+  font-weight: 400;
+  line-height: 1;
+}
+.vikas-plan-price span {
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.vikas-plan-credits {
+  color: var(--primary);
+  font-size: 17px;
+  font-weight: 500;
+}
+.vikas-plan-card ul {
+  display: grid;
+  gap: 14px;
+  padding: 26px 0;
+  margin-bottom: auto;
+}
+.vikas-plan-card li {
+  display: flex;
+  gap: 9px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.vikas-plan-card li svg {
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.vikas-plan-card .vikas-button {
+  width: 100%;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+.vikas-plan-card button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.vikas-pricing-terms {
+  max-width: 850px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 24px auto 0;
+  text-align: center;
+}
+@media (max-width: 850px) {
+  .vikas-plan-grid {
+    grid-template-columns: 1fr;
+  }
+  .vikas-plan-card {
+    padding: 26px;
+  }
+  .vikas-plan-card ul {
+    padding-bottom: 16px;
+  }
 }
 .vikas-credit-card {
   display: grid;

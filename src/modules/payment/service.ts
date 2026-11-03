@@ -6,6 +6,7 @@ import {
   AlipayProvider,
   CreemProvider,
   PaymentManager,
+  PayPalProvider,
   StripeProvider,
   WechatPayProvider,
 } from '@/core/payment';
@@ -69,6 +70,11 @@ async function getPaymentManager(): Promise<PaymentManager> {
   // Rebuild manager if provider configs changed
   const hash = JSON.stringify([
     c('stripe_secret_key') || c('stripe_api_key'),
+    c('paypal_enabled'),
+    c('paypal_client_id'),
+    c('paypal_client_secret'),
+    c('paypal_webhook_id'),
+    c('paypal_environment'),
     c('creem_enabled'),
     c('creem_api_key'),
     c('alipay_app_id'),
@@ -79,6 +85,23 @@ async function getPaymentManager(): Promise<PaymentManager> {
 
   manager = new PaymentManager();
   managerConfigHash = hash;
+
+  if (
+    c('paypal_enabled') === 'true' &&
+    c('paypal_client_id') &&
+    c('paypal_client_secret')
+  ) {
+    manager.addProvider(
+      new PayPalProvider({
+        clientId: c('paypal_client_id'),
+        clientSecret: c('paypal_client_secret'),
+        webhookId: c('paypal_webhook_id'),
+        environment:
+          c('paypal_environment') === 'sandbox' ? 'sandbox' : 'production',
+      }),
+      c('default_payment_provider') === 'paypal'
+    );
+  }
 
   const stripeKey = c('stripe_secret_key') || c('stripe_api_key');
   if (stripeKey) {
@@ -198,6 +221,7 @@ export async function createCheckout(params: {
       ...paymentOrder,
       productId: resolvedProductId,
       orderNo,
+      metadata: { ...paymentOrder.metadata, order_no: orderNo },
       successUrl: callbackSuccessUrl,
       cancelUrl:
         paymentOrder.cancelUrl || `${appUrl}/settings/billing?canceled=1`,
@@ -282,7 +306,12 @@ export async function handleWebhook(params: {
   if (eventType === 'checkout.success') {
     await handleCheckoutSuccess(session, params.provider);
   } else if (eventType === 'payment.success') {
-    if (
+    if (params.provider === 'paypal' && session.subscriptionId) {
+      // Initial and recurring sales can arrive before the browser callback.
+      // Both paths deduplicate using the actual PayPal transaction ID.
+      await handleCheckoutSuccess(session, params.provider);
+      await handleSubscriptionRenewal(session, params.provider);
+    } else if (
       session.paymentInfo?.subscriptionCycleType ===
       SubscriptionCycleType.RENEWAL
     ) {
@@ -307,6 +336,8 @@ async function handleCheckoutSuccess(session: any, provider: string) {
   // (which equals our orderNo and the value we stored in paymentSessionId).
   const result = session.paymentResult || {};
   const sessionId: string =
+    (provider === 'paypal' &&
+      (session.metadata?.checkoutSessionId || session.subscriptionId)) ||
     result.id ||
     result.object?.id ||
     result.out_trade_no ||
@@ -318,7 +349,13 @@ async function handleCheckoutSuccess(session: any, provider: string) {
   const [existingOrder] = await db()
     .select()
     .from(order)
-    .where(and(eq(order.paymentSessionId, sessionId), isNull(order.deletedAt)))
+    .where(
+      and(
+        eq(order.paymentSessionId, sessionId),
+        eq(order.paymentProvider, provider),
+        isNull(order.deletedAt)
+      )
+    )
     .limit(1);
 
   if (!existingOrder) return;
@@ -347,6 +384,16 @@ export async function settleCheckoutOrder(
   const subscriptionInfo = session.subscriptionInfo;
 
   if (session.paymentStatus === PaymentStatus.SUCCESS) {
+    if (
+      provider === 'paypal' &&
+      (existingOrder.paymentProvider !== 'paypal' ||
+        paymentInfo?.paymentAmount !== existingOrder.amount ||
+        paymentInfo?.paymentCurrency?.toLowerCase() !==
+          existingOrder.currency.toLowerCase())
+    )
+      throw new Error(
+        'PayPal payment amount or currency does not match the order'
+      );
     // CNY providers charge exactly the order amount (no coupons or tax on
     // their side), so any mismatch means the notification belongs to some
     // other trade — refuse to settle rather than grant on the wrong payment.
@@ -524,6 +571,16 @@ export async function handleSubscriptionRenewal(
   if (session.paymentStatus !== PaymentStatus.SUCCESS) return;
 
   const paymentInfo = session.paymentInfo;
+
+  if (
+    provider === 'paypal' &&
+    (paymentInfo?.paymentAmount !== existingSub.amount ||
+      paymentInfo?.paymentCurrency?.toLowerCase() !==
+        existingSub.currency.toLowerCase())
+  )
+    throw new Error(
+      'PayPal renewal amount or currency does not match the subscription'
+    );
 
   // Idempotency: drop duplicate renewals for the same provider transaction.
   if (paymentInfo?.transactionId) {

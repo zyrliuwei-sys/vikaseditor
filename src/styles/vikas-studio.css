@@ -830,3 +830,16 @@
     transition: none !important;
   }
 }
+.vs-paywall {
+  display: grid;
+  gap: 12px;
+}
+.vs-paywall > p {
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.vs-paywall > button {
+  justify-self: center;
+  min-height: 36px;
+}

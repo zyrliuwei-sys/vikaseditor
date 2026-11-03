@@ -186,7 +186,7 @@ test('submission deduplicates URLs, removes fragments, and stops after HTTP 202'
       assert.equal(body.host, 'indexnow.example.com');
       assert.equal(body.keyLocation, `${origin}/${key}.txt`);
       assert.deepEqual(body.urlList, [`${origin}/page`]);
-      assert.equal(options?.redirect, 'error');
+      assert.equal(options?.redirect, 'manual');
       assert.ok(options?.signal);
       return new Response('', { status: 202 });
     }

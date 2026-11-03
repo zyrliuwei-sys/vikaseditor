@@ -82,7 +82,7 @@ before(async () => {
   globalThis.fetch = async (input, init) => {
     const url = new URL(String(input));
     assert.equal(url.hostname, 'api-m.sandbox.paypal.com');
-    assert.equal(init?.redirect, 'error');
+    assert.equal(init?.redirect, 'manual');
     assert.ok(init?.signal);
     const method = init?.method || 'GET';
     const body =

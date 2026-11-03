@@ -36,6 +36,7 @@ async function POST({ request }: { request: Request }) {
   });
   if (limited) return limited;
 
+  let stage = 'session';
   try {
     const auth = getAuth();
     const session = await auth.api.getSession({ headers: request.headers });
@@ -72,6 +73,7 @@ async function POST({ request }: { request: Request }) {
 
     // Catalog price for the chosen provider (CNY providers, admin test
     // amounts): see resolveCharge.
+    stage = 'configuration';
     const configs = await getAllConfigs();
     const studioProvider = product.productId.startsWith('vikas_')
       ? studioPaymentProvider(configs)
@@ -82,6 +84,7 @@ async function POST({ request }: { request: Request }) {
         { status: 503 }
       );
     const selectedProvider = studioProvider || payment_provider;
+    stage = 'price';
     const charge = await resolveCharge({
       product,
       paymentProvider: selectedProvider,
@@ -108,6 +111,7 @@ async function POST({ request }: { request: Request }) {
     const successUrl = `${baseUrl}/api/payment/callback?redirect=${encodeURIComponent(finalRedirect)}`;
     const cancelUrl = `${baseUrl}${localizedPath('/pricing', locale)}`;
 
+    stage = 'provider';
     const checkout = await createCheckout({
       userId: session.user.id,
       userEmail: session.user.email,
@@ -139,6 +143,19 @@ async function POST({ request }: { request: Request }) {
 
     return respData({ checkout_url: checkout.checkoutInfo.checkoutUrl });
   } catch (error: any) {
+    // Keep diagnostics server-side and omit messages/bodies: database errors
+    // can embed bound customer data and provider responses can contain tokens.
+    console.error('[payment.checkout] failed', {
+      stage,
+      type: error instanceof Error ? error.name : 'UnknownError',
+      frames:
+        error instanceof Error
+          ? error.stack
+              ?.split('\n')
+              .filter((line) => /^\s+at /.test(line))
+              .slice(0, 5)
+          : undefined,
+    });
     return respErr('Checkout failed. Please try again later.', { status: 502 });
   }
 }

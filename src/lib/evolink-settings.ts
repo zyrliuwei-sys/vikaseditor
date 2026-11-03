@@ -37,7 +37,7 @@ export async function testEvoLinkConnection(
     const response = await fetch(new URL('/v1/credits', base), {
       method: 'GET',
       headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
-      redirect: 'error',
+      redirect: 'manual',
       signal: AbortSignal.timeout(10_000),
     });
     if (!response.ok) {

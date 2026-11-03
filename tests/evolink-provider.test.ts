@@ -63,7 +63,7 @@ test('EvoLink uploads a reference before generation and maps unified task output
     assert.equal(payload.image_url, undefined);
     assert.equal(payload.content_filter, true);
     assert.equal(
-      calls.every((c) => c.init?.redirect === 'error'),
+      calls.every((c) => c.init?.redirect === 'manual'),
       true
     );
     const result = await provider.query({

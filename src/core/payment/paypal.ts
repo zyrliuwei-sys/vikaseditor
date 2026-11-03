@@ -698,14 +698,20 @@ export class PayPalProvider implements PaymentProvider {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: 'grant_type=client_credentials',
-      redirect: 'error',
+      // Workers rejects redirect: 'error' before sending the request. Manual
+      // plus the status check below also prevents forwarding credentials.
+      redirect: 'manual',
       signal: AbortSignal.timeout(15_000),
     });
 
+    if (!response.ok) {
+      throw new Error(
+        `PayPal authentication failed (HTTP ${response.status}).`
+      );
+    }
     const data = await response.json();
 
     if (
-      !response.ok ||
       typeof data.access_token !== 'string' ||
       !Number.isFinite(data.expires_in)
     ) {
@@ -734,7 +740,7 @@ export class PayPalProvider implements PaymentProvider {
     const config: RequestInit = {
       method,
       headers,
-      redirect: 'error',
+      redirect: 'manual',
       signal: AbortSignal.timeout(20_000),
     };
 

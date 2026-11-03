@@ -13,7 +13,8 @@
     "VITE_APP_URL": "https://vikas-editor.net",
     "VITE_APP_NAME": "Vikas Editor AI",
     "VITE_APP_LOGO": "/logo.svg",
-    "VITE_DEFAULT_LOCALE": "en"
+    "VITE_DEFAULT_LOCALE": "en",
+    "PLAUSIBLE_SCRIPT_HOSTS": "stats.cadcraft.org"
   },
   "d1_databases": [
     {

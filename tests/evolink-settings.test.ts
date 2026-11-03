@@ -90,7 +90,7 @@ test('connection test is a read-only authenticated credits request, including ze
     assert.equal(request.url, 'https://api.evolink.ai/v1/credits');
     assert.equal(request.init?.method, 'GET');
     assert.equal(request.init?.body, undefined);
-    assert.equal(request.init?.redirect, 'error');
+    assert.equal(request.init?.redirect, 'manual');
     assert.ok(request.init?.signal instanceof AbortSignal);
     assert.equal(
       new Headers(request.init?.headers).get('Authorization'),

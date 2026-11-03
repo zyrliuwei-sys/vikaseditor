@@ -4,6 +4,17 @@ Read this when a project built from this template pulls newer template code.
 Entries are newest first. Apply **every entry dated after the template version
 the project last pulled**, oldest of those first.
 
+## 2026-11-03 — Cloudflare PayPal checkout compatibility
+
+- PayPal OAuth and API requests now use `redirect: 'manual'` and reject non-success responses. Workers does not support `redirect: 'error'`; it threw before contacting PayPal and caused every checkout to return 502. The same incompatible option was corrected in EvoLink generation/configuration/downloads and IndexNow submission. Redirects still never forward credentials or bypass host checks.
+- Checkout failures now log only their stage, error type and stack frames on the server, without customer data, keys or provider response bodies. Existing PayPal credentials and database schema need no changes; redeploy the Worker.
+- `tests/paypal-workers.test.ts` runs one-time/monthly checkout and redirect-rejection cases in actual workerd, with intercepted outbound requests and no live payments. Keep this alongside the D1 settlement/concurrency tests.
+
+## 2026-11-03 — Self-hosted Plausible host configuration
+
+- This project's Cloudflare runtime and `deploy/cloudflare.json` now allow `stats.cadcraft.org` through `PLAUSIBLE_SCRIPT_HOSTS`. The admin Analytics form can save this self-hosted script URL, and future deployments retain the host allowlist.
+- Keep the host check enabled. Other projects must explicitly configure their own trusted Plausible host; do not allow arbitrary script URLs through database settings. No schema or application-code change is required.
+
 ## 2026-11-03 — EvoLink generation and Vikas pricing v1
 
 - The studio now uses EvoLink (`evolink_api_key` and the existing official-host setting) for Nano Banana 2 / `gemini-3.1-flash-image-preview` at 1K and Seedance 2.0 image-to-video at 720p, 5 seconds with audio. Reference images use EvoLink’s temporary upload API. Existing Fal tasks can still be polled. Download links are temporary; the authenticated download endpoint verifies ownership and allows only known provider hosts.

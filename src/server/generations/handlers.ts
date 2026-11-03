@@ -289,7 +289,7 @@ export async function generationDownload({
         : null;
     if (!url) return fail('Download not found.', 404);
     const response = await fetch(url, {
-      redirect: 'error',
+      redirect: 'manual',
       signal: AbortSignal.timeout(30_000),
     });
     const mime =

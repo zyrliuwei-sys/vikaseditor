@@ -59,7 +59,7 @@ export class EvoLinkProvider implements AIProvider {
             : {}),
         },
         body,
-        redirect: 'error',
+        redirect: 'manual',
         signal: AbortSignal.timeout(this.configs.timeoutMs ?? 30_000),
       });
       if (!response.ok) throw new EvoLinkRequestError(response.status, phase);

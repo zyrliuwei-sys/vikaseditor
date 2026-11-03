@@ -141,7 +141,7 @@ export async function submitUrls(
         method: 'POST',
         headers: { 'Content-Type': 'application/json; charset=utf-8' },
         body,
-        redirect: 'error',
+        redirect: 'manual',
         signal: AbortSignal.timeout(10_000),
       });
       status = response.status;

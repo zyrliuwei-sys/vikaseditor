@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
+import { TEMPLATE_PAGES } from '@/config/template-pages';
 import { vikasPageHead } from '@/lib/vikas-seo';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
@@ -11,6 +12,10 @@ export const Route = createFileRoute('/create')({
   validateSearch: (search: Record<string, unknown>) => ({
     ...(search.mode === 'video' || search.mode === 'image'
       ? { mode: search.mode }
+      : {}),
+    ...(typeof search.template === 'string' &&
+    TEMPLATE_PAGES.some((item) => item.id === search.template)
+      ? { template: search.template }
       : {}),
   }),
   loader: () => ({ locale: getLocale() }),
@@ -26,14 +31,18 @@ export const Route = createFileRoute('/create')({
   component: CreatePage,
 });
 function CreatePage() {
-  const { mode } = Route.useSearch();
+  const { mode, template } = Route.useSearch();
   const navigate = Route.useNavigate();
   return (
     <div className="vikas-site">
       <Header />
       <main id="main-content">
+        <p className="vikas-entry-notice">
+          {m['vikas.template_page.availability']()}
+        </p>
         <VikasCreate
           mode={mode === 'video' ? 'video' : 'image'}
+          templateId={template}
           onModeChange={(nextMode) => {
             void navigate({
               to: nextMode === 'video' ? '/create/video' : '/create/image',

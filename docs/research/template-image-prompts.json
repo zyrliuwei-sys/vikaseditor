@@ -1,0 +1,66 @@
+{
+  "generator": "Built-in image_gen",
+  "purpose": "Static editorial style references; not outputs of the website's generation feature.",
+  "assets": [
+    {
+      "name": "golden-hour-2",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian man in his thirties in a black leather jacket, old Mumbai street at golden hour, warm amber side lighting, medium portrait showing jacket and weathered buildings, subtle 35mm film texture, natural proportions, not a celebrity. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/golden-hour-2.webp"
+    },
+    {
+      "name": "golden-hour-3",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian woman in her late twenties wearing a black leather jacket, cinematic portrait in an old Mumbai lane at sunset, soft amber rim light and rich shadows, looking over her shoulder, natural skin, subtle film grain, not a celebrity. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/golden-hour-3.webp"
+    },
+    {
+      "name": "emerald-saree-2",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian woman in an emerald green silk saree with understated gold jewelry, an elegant three-quarter editorial portrait beside tropical palms, soft golden side light, realistic silk and skin texture, tasteful fully clothed fashion photography. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/emerald-saree-2.webp"
+    },
+    {
+      "name": "emerald-saree-3",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian woman in her thirties, emerald green silk saree with delicate gold details, garden veranda with lush green foliage, waist-up fashion portrait, warm backlight, shallow depth of field, quiet natural expression, realistic skin. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/emerald-saree-3.webp"
+    },
+    {
+      "name": "midnight-city-2",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian man wearing a tailored charcoal suit beside a vintage black sports car on a rainy Mumbai street at night, full upper-body cinematic portrait, teal neon reflections and wet pavement, realistic rain and skin, no visible brands. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/midnight-city-2.webp"
+    },
+    {
+      "name": "midnight-city-3",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian woman in a tailored dark suit beside a parked vintage black sports car, rainy urban street at night, blue-teal light on wet pavement, cinematic three-quarter portrait, natural face and hands, no visible brands. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/midnight-city-3.webp"
+    },
+    {
+      "name": "diwali-glow-2",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian woman in an elegant crimson red saree with gold details, holding a small brass tray of glowing clay diyas, marigold garlands and warm candle bokeh, waist-up portrait, Diwali home celebration, natural hands and skin, soft cinematic amber light. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/diwali-glow-2.webp"
+    },
+    {
+      "name": "diwali-glow-3",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian woman in her thirties in a red silk saree with fine gold border, quietly smiling in a courtyard decorated with marigolds, holding one small diya at chest height, warm festival lights, authentic tasteful Diwali portrait, realistic fingers and skin. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/diwali-glow-3.webp"
+    },
+    {
+      "name": "sunset-together-2",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian couple in cream and sand linen clothes, candid waist-up editorial photograph on a quiet beach at golden hour, relaxed close pose with gentle smiles, sunlit faces and soft ocean waves, natural hands, realistic skin, subtle 35mm grain. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/sunset-together-2.webp"
+    },
+    {
+      "name": "sunset-together-3",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian couple in their thirties, cream linen shirt and sand-coloured linen dress, sitting shoulder to shoulder on a quiet beach, warm golden-hour rim light, understated affectionate pose, ocean waves softly blurred, realistic editorial photograph. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/sunset-together-3.webp"
+    },
+    {
+      "name": "pink-editorial-2",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian woman wearing black sunglasses and a pink tailored blazer, warm pink studio backdrop, sculptural side lighting, bold fashion editorial waist-up framing, realistic fabric and skin, fully clothed premium magazine photograph without lettering. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/pink-editorial-2.webp"
+    },
+    {
+      "name": "pink-editorial-3",
+      "prompt": "Create one square 1024x1024 photorealistic editorial reference image for an AI photo editing template page. Fictional adult Indian man in a pink tailored jacket and black sunglasses, monochrome dusty pink studio background, close portrait with strong sculptural lighting and clean shadow, natural skin texture, contemporary fashion editorial, fully clothed. One complete image, no collage, no grid, no text, no logo, no watermark. This is a clearly fictional adult subject. Detailed, considered composition.",
+      "output": "public/imgs/vikas/templates/pink-editorial-3.webp"
+    }
+  ]
+}

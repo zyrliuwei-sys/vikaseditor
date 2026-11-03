@@ -1821,3 +1821,33 @@ html[lang='zh'] .vikas-hero h1 > span {
   min-width: 44px;
   justify-content: center;
 }
+.vikas-template-index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: 28px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+
+.vikas-template-index a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.vikas-template-index a:hover {
+  color: var(--primary);
+}
+
+.vikas-entry-notice {
+  width: min(1280px, calc(100% - 40px));
+  margin: 24px auto 0;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.7;
+}

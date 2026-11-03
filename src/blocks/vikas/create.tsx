@@ -6,12 +6,18 @@ import { getVikasTemplates } from '@/blocks/vikas/templates';
 
 export function VikasCreate({
   mode = 'image',
+  templateId,
   onModeChange,
 }: {
   mode?: MediaMode;
+  templateId?: string;
   onModeChange?: (mode: MediaMode) => void;
 }) {
   const templates = getVikasTemplates();
+  const template =
+    templates.find(
+      (item) => item.id === templateId && item.mediaType === mode
+    ) ?? templates.find((item) => item.mediaType === mode)!;
   return (
     <div className="vikas-create-page">
       <div className="vikas-create-heading">
@@ -30,8 +36,8 @@ export function VikasCreate({
         templates={templates}
         selection={{
           mode,
-          templateId: mode === 'video' ? 'cinematic-push' : 'golden-hour',
-          revision: mode === 'video' ? 1 : 0,
+          templateId: template.id,
+          revision: templates.findIndex((item) => item.id === template.id),
         }}
       />
     </div>

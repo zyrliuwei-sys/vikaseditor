@@ -10,6 +10,7 @@ the project last pulled**, oldest of those first.
 - Form validation, image uploads, dialogs, error pages and all nine template prompts now have Chinese copy. Credit and subscription links say “Credit guide” because this project’s pricing page explains usage costs rather than selling plans.
 - Image/video controls on `/create` update the URL; header navigation selects the requested mode. Loading failures show a retry action rather than an empty balance/history, and a closed guest-post feature no longer offers new submissions or payment.
 - Saved dark mode hydrates without a text mismatch. Optional footer badge failures no longer take down the root page. Email-verification callbacks use the shared same-origin and auth-loop validation.
+- Template detail actions preserve the selected template and its image/video mode in the workspace; unknown template query values safely fall back to the default style.
 - Development D1 now accepts `DATABASE_D1_REMOTE=true` (shared remote data) or `false` (local D1), independently of the Wrangler file that deployment regenerates. Empty preserves the binding’s original behavior. This project’s ignored `.env.development` opts into the shared remote database. No schema migration or permission-code change is required.
 
 ## 2026-11-03 — GitHub to Cloudflare Workers deployment

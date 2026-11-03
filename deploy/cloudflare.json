@@ -1,0 +1,25 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "vikaseditor",
+  "account_id": "d7c3d8fa2229ed65b03fd28fc8659989",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "routes": [{ "pattern": "vikas-editor.net", "custom_domain": true }],
+  "vars": {
+    "DATABASE_PROVIDER": "d1",
+    "VITE_APP_URL": "https://vikas-editor.net",
+    "VITE_APP_NAME": "Vikas Editor AI",
+    "VITE_APP_LOGO": "/logo.svg",
+    "VITE_DEFAULT_LOCALE": "en"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "vikaseditor",
+      "database_id": "9442d84a-2eaf-4337-9e50-e82ad970b10d",
+      "migrations_dir": "drizzle"
+    }
+  ]
+}

@@ -3,14 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.15.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "vite dev --port 3000",
     "prebuild": "node scripts/db-setup.mjs",
     "build": "vite build",
     "start": "node .output/server/index.mjs",
-    "precf:build": "node scripts/db-setup.mjs",
-    "cf:build": "NITRO_PRESET=cloudflare_module vite build",
-    "cf:deploy": "sh -c 'set -a && [ -f .env.production ] && . ./.env.production; set +a && pnpm cf:build && exec wrangler deploy'",
+    "cf:build": "node scripts/cloudflare-deploy.mjs --build-only",
+    "cf:deploy": "node scripts/cloudflare-deploy.mjs",
+    "cf:migrate": "wrangler d1 migrations apply DB --remote --config wrangler.jsonc",
     "postinstall": "mkdir -p data && (test -f src/config/db/schema.ts || node scripts/db-setup.mjs)",
     "db:setup": "node scripts/db-setup.mjs",
     "db:push": "tsx scripts/with-env.ts drizzle-kit push --config=drizzle.config.ts",

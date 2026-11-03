@@ -4,6 +4,12 @@ Read this when a project built from this template pulls newer template code.
 Entries are newest first. Apply **every entry dated after the template version
 the project last pulled**, oldest of those first.
 
+## 2026-11-03 — GitHub to Cloudflare Workers deployment
+
+- `deploy/cloudflare.json` is the public production configuration for `vikaseditor`, its existing D1 binding, and `https://vikas-editor.net`. `pnpm cf:build` and `pnpm cf:deploy` materialize the ignored root `wrangler.jsonc` and use these same values at build time and runtime. Node 22 or newer is required. Cloud builds do not need a local `.env.production`.
+- Keep `AUTH_SECRET` and `CONFIG_ENCRYPTION_KEY` in Cloudflare Worker Secrets; never commit them or rotate the encryption key during routine deployments. Cloudflare Builds runs `pnpm run cf:deploy` for pushes to `main`.
+- Drizzle migration history is now committed. The existing baseline is already applied to production. For future schema changes, generate and review SQL before applying `pnpm cf:migrate`; ordinary code deployments do not modify the database schema.
+
 ## 2026-11-03 — Vikas homepage and studio quality refinement
 
 - The homepage now offers a direct photo upload and places the studio immediately after the template collection. Six templates appear initially; a stable expand/collapse action exposes all nine. Editorial guidance remains below the creation workflow.

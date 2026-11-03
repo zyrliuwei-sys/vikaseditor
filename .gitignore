@@ -58,7 +58,7 @@ yarn-error.log*
 
 # database
 /data/
-/drizzle/
+# Commit reviewed Drizzle migrations so deployments share schema history.
 src/config/db/schema.ts
 
 # npm (project uses pnpm)

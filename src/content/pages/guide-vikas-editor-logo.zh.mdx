@@ -1,0 +1,121 @@
+import {
+  GuideDownload,
+  GuideFigure,
+  GuideTable,
+} from '../../components/vikas/guide-elements';
+
+export const meta = {
+  title: 'Vikas Editor Logo 指南：下载 SVG、选择格式与正确使用',
+  description:
+    '下载 vikas-editor.net 使用的原始 Logo，了解 SVG、PNG 与 JPEG 的区别，以及标志留白、背景搭配和水印辨识方法。',
+  updated_at: '2026-11-05',
+  kind: 'guide',
+  category: '02 / 品牌标志',
+  minutes: 5,
+  image: '/imgs/guides/logo-sheet.svg',
+  image_alt:
+    '炭灰色背景上的 Vikas Editor AI V 字标志和完整域名 vikas-editor.net',
+  image_caption:
+    '这是 vikas-editor.net 使用的标志，不代表其他同名网站或个人创作者。',
+  toc: [
+    { id: 'which-logo', label: '先确认需要哪个标志' },
+    { id: 'download', label: '下载原始文件' },
+    { id: 'choose-a-format', label: '选择文件格式' },
+    { id: 'place-the-logo', label: '留白与摆放' },
+    { id: 'logo-or-watermark', label: 'Logo 与水印的区别' },
+    { id: 'questions', label: '常见问题' },
+  ],
+};
+
+搜索 **Vikas Editor Logo** 时，你可能是在找网站图标、创作者签名、视频叠加素材，或者自己账号的标志。这些需求对应不同文件。本指南提供 [Vikas Editor AI 首页](/)实际使用的原始标志，适合在介绍 **vikas-editor.net** 的教程、评测或链接旁准确展示。
+
+<h2 id="which-logo">{'先确认具体网站或创作者'}</h2>
+
+只凭名称或一个字母 V，无法确认图片属于谁。先核对你要介绍的页面地址。如果介绍的是本站，应使用带暖金色 V 与角框的炭灰方形标志；如果介绍另一位创作者，请到其本人页面获取相应素材与说明。
+
+[Vikasheditor 工具选择指南](/guides/vikasheditor)说明了相近名称之间的区别。若要撰写本站修图教程，可以将标志与 [Vikas Editor 入门指南](/guides/vikas-editor)一起引用，让读者能进入正确的功能页面。
+
+尽量不要直接保存搜索结果里的小缩略图。它可能经过压缩、裁切，或属于另一个搜索结果。使用被介绍网站的源文件，更便于核对，也能保留干净的边缘。
+
+<h2 id="download">{'下载本站原始 Logo'}</h2>
+
+<GuideDownload
+  href="/logo.svg"
+  filename="vikas-editor-ai-logo.svg"
+  label="下载 Vikas Editor AI SVG"
+/>
+
+文件与本站导航栏使用的标志相同，采用 **64 × 64 的 view box**，包含炭灰色圆角方形底板和金色线条。底板属于标志本身，因此它不是一枚悬浮在完全透明画布上的金色 V。
+
+介绍本服务时，建议同时写明“Vikas Editor AI”，并链接到 [vikas-editor.net](/)。说明文字放在标志外，不要通过改图让读者误以为其他产品、个人账号或课程由本站运营。合作或其他使用问题，可联系 [support@vikas-editor.net](mailto:support@vikas-editor.net)。
+
+<h2 id="choose-a-format">{'SVG、PNG 与 JPEG 怎样选？'}</h2>
+
+<GuideTable
+  columns={['格式', '适用场景', '需要检查']}
+  rows={[
+    [
+      'SVG',
+      '网站、可缩放源文件、支持矢量的排版工具。',
+      '保留原比例，并确认目标工具支持 SVG。',
+    ],
+    [
+      'PNG',
+      '需要像素图片的幻灯片、封面或视频编辑器。',
+      '导出足够大的副本。PNG 支持透明，但原标志的炭灰底板依然属于设计。',
+    ],
+    [
+      'JPEG',
+      '已经安排好纯色或照片背景的完整画面。',
+      '不保留透明通道，不适合用作标志主文件。',
+    ],
+  ]}
+/>
+
+<GuideFigure
+  src="/imgs/guides/logo-formats.svg"
+  alt="文件格式对照图：SVG 是可缩放源文件，PNG 支持透明像素，JPEG 使用固定背景"
+  caption="保留下载的 SVG 主文件，根据目标应用需要另行导出副本。"
+/>
+
+如果编辑器无法导入 SVG，可以先在矢量工具中打开，再导出 PNG。保持方形画布并锁定宽高比例。用于较小的屏幕位置时，512 × 512 像素可作为起点；标志在画面中占用更大区域时，应导出更大尺寸。直接放大小 PNG 不能恢复原来的边缘细节。
+
+把扩展名从 `.svg` 改成 `.png` 不会转换格式。请使用真正的导出操作，检查导出的图片，并单独保存原始 SVG，以便以后制作其他尺寸。
+
+<h2 id="place-the-logo">{'为标志保留清楚的阅读空间'}</h2>
+
+保持原始比例，不要把方形挤成宽长矩形，也不要裁掉角框。实际排版时，可以在四周留出约为**标志宽度四分之一**的空白。下图是留白示意，并不是替代原标志的下载文件。
+
+<GuideFigure
+  src="/imgs/guides/logo-clear-space.svg"
+  alt="Logo 留白示意图：标志四周保留约等于自身宽度四分之一的空间"
+  caption="建议留白可以减少标题、边框和其他标志对主体的干扰。"
+/>
+
+制作教程封面时，避免让 Logo 压住人物面部或主标题。浅色背景上，炭灰底板已经提供对比；深色背景上，则应让标志轮廓与周围内容有足够区分。最后缩小到真实显示尺寸，尤其在手机上查看，确认细线和 V 字仍能辨认。
+
+如果网页链接只有一张 Logo，应提供类似“Vikas Editor AI 首页”的可访问名称。如果同一链接已经包含相同文字，旁边的 Logo 可以使用空替代文本，避免读屏重复朗读。当标志本身是文章讨论的对象时，则需要描述它的外观。
+
+<h2 id="logo-or-watermark">{'Logo、水印与创作者签名不是同一种东西'}</h2>
+
+网站 Logo 用来识别服务；水印是放在图片或视频中的视觉元素；创作者签名说明作品的制作或发布者。下载网站标志，并不能移除现有照片里的水印或签名。
+
+若目标是制作没有额外文字的画面，可以从有使用权限的原图开始，在提示词里说明不要添加字样。仍应检查结果，因为描述不能保证文字处理完全准确。[提示词指南](/guides/vikas-editor-prompt)讲的是如何表达创作要求，不提供移除他人署名的方法。
+
+<h2 id="questions">{'常见 Logo 问题'}</h2>
+
+### 这是 Editing By Vikas 的官方标志吗？
+
+不是。这是独立网站 vikas-editor.net 的标志。介绍其他服务或创作者时，应使用对方来源明确的素材。
+
+### 这里有透明 PNG 下载吗？
+
+本页提供原始 SVG，可以在兼容编辑器中导出 PNG。炭灰底板是设计的一部分，导出不会自动将它变成透明区域。
+
+### 能把它当作我自己频道的 Logo 吗？
+
+自己的账号应使用独立设计，让观众清楚知道作品来自谁。本标志用于准确识别本站服务，不应替代其他账号的身份。
+
+### Logo 应该链接到哪里？
+
+通常链接到 [Vikas Editor 首页](/)。教程也可以直接链接到[图片工作台](/create/image)或[入门指南](/guides/vikas-editor)，但链接文字应明确说明目的地。

@@ -7,6 +7,7 @@ import {
   VikasStyleGuide,
 } from '@/blocks/vikas/editorial';
 import { VikasGallery } from '@/blocks/vikas/gallery';
+import { VikasGuides } from '@/blocks/vikas/guides';
 import { VikasHero } from '@/blocks/vikas/hero';
 import {
   VikasFAQ,
@@ -73,6 +74,7 @@ export function VikasHome() {
       <VikasIntroduction />
       <VikasStyleGuide />
       <VikasPromptGuide onUse={(prompt) => create('image', prompt)} />
+      <VikasGuides />
       <VikasFAQ />
     </>
   );

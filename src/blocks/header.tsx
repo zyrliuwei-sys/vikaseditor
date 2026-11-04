@@ -7,6 +7,7 @@ import { m } from '@/paraglide/messages.js';
 import { VikasNavigation } from '@/components/vikas/navigation';
 
 import '@/styles/vikas.css';
+import '@/styles/vikas-guides.css';
 
 export function Header() {
   const { data: session } = useSession();

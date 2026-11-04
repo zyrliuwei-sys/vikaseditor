@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Menu, X } from 'lucide-react';
 
 import { Link } from '@/core/i18n/navigation';
+import { showLocaleSwitcher } from '@/config/locale';
 import { LocaleSelector } from '@/components/locale-selector';
 import { SiteUserMenu } from '@/components/site-user-menu';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -73,9 +74,11 @@ export function VikasNavigation({
                 darkLabel={copy.darkTheme}
               />
             </div>
-            <div className="vikas-language">
-              <LocaleSelector label={copy.language} />
-            </div>
+            {showLocaleSwitcher && (
+              <div className="vikas-language">
+                <LocaleSelector label={copy.language} />
+              </div>
+            )}
             {user ? (
               <SiteUserMenu
                 name={user.name}

@@ -1,0 +1,198 @@
+import {
+  GuideFigure,
+  GuidePrompt,
+  GuideTable,
+} from '../../components/vikas/guide-elements';
+import { GUIDE_PROMPTS } from '../guide-prompts';
+
+export const meta = {
+  title: 'Vikas Editor Prompt Guide: 6 Original Copy-and-Adapt Recipes',
+  description:
+    'Copy six original Vikas Editor photo prompts, learn the five-part prompt structure and fix common problems with faces, lighting, outfits and composition.',
+  updated_at: '2026-11-05',
+  kind: 'guide',
+  category: '04 / THE PROMPT WORKSHOP',
+  minutes: 9,
+  image: '/imgs/vikas/templates/midnight-city-2.webp',
+  image_alt:
+    'AI night portrait illustration with cinematic city lighting and a softly blurred background',
+  image_caption:
+    'Night-city direction: describe where the light comes from, not just that the scene should be cinematic. AI illustration, not a result from the recipes below.',
+  toc: [
+    { id: 'what-is-a-prompt', label: 'What a prompt does' },
+    { id: 'prompt-structure', label: 'The five-part structure' },
+    { id: 'six-prompts', label: 'Six original recipes' },
+    { id: 'adapt-and-run', label: 'Adapt & generate' },
+    { id: 'fix-the-result', label: 'Fix a result' },
+    { id: 'questions', label: 'Common questions' },
+  ],
+};
+
+A useful **Vikas Editor prompt** is an editable brief, not a magic phrase. It tells the model who or what is in the picture, what should remain recognizable and which scene you want to create. The six recipes below are original examples for this guide. Copy one, adapt it to your reference photo and use it in the [image studio](/create/image).
+
+If you are new to the workspace, begin with the [Vikas Editor starting guide](/guides/vikas-editor). You can also browse the [homepage templates](/#templates) to choose a visual direction before writing.
+
+<h2 id="what-is-a-prompt">{'What does a photo-editing prompt do?'}</h2>
+
+A prompt describes the intended change. A reference photo supplies visual information that the words cannot fully capture. “Keep my face recognizable” tells the model what matters, but it does not lock every pixel or guarantee an identical face. A clear source photo and a manageable request are still important.
+
+Distinguish three tasks. **Text-to-image** describes a new scene without a source. **Image editing** asks the model to use an uploaded picture as a reference. **Image-to-video** adds motion to a still image. The recipes here are for image editing. For video, use a separate motion instruction in the [video studio](/create/video).
+
+<h2 id="prompt-structure">{'Build a prompt from five specific parts'}</h2>
+
+1. **Subject:** name the person or object in the reference image. For two people, explicitly say both should remain recognizable.
+2. **Keep:** list the few details that matter most, such as face, hairstyle, expression and proportions.
+3. **Change:** choose a scene, garment or background. Start with one main change instead of a list of unrelated effects.
+4. **Light:** describe direction, softness and colour. “Warm light from the left” is more concrete than “amazing lighting.”
+5. **Compose:** say head-and-shoulders, waist-up or full length; mention empty space or unwanted lettering when relevant.
+
+<GuideFigure
+  src="/imgs/guides/prompt-blueprint.svg"
+  alt="Five-part prompt diagram: subject, details to keep, intended change, light and composition"
+  caption="Write a brief a photographer could understand. Add detail only when it resolves a real ambiguity."
+/>
+
+You do not need to include every possible camera term. Contradictory instructions—such as a close-up face, full-body pose and distant subject in the same image—make the brief harder to interpret. Choose the framing before adding polish.
+
+<h2 id="six-prompts">{'Six original Vikas Editor prompt recipes'}</h2>
+
+These are starting briefs, not guarantees or measured before-and-after demonstrations. Each recipe is under the studio's 2,000-character prompt limit. Use a photo you have permission to edit and adapt the clothing and setting to the subject.
+
+### 1. Golden-hour city portrait
+
+A useful first edit when you want one recognizable person and a warm outdoor scene. Start with a clearly visible face and avoid changing the camera angle dramatically.
+
+<GuidePrompt
+  prompt={GUIDE_PROMPTS.golden}
+  copyLabel="Copy golden-hour prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+Compare the mood with the [Golden Hour Hero template](/template/golden-hour-hero). To make the setting more personal, replace the weathered wall with a location you know and keep the lighting sentence consistent.
+
+### 2. Restrained midnight-city portrait
+
+Keep the face readable against a night background. The awning, one coloured light and a warm background reflection establish the scene without requiring heavy fog or an exaggerated glow.
+
+<GuidePrompt
+  prompt={GUIDE_PROMPTS.midnight}
+  copyLabel="Copy midnight-city prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+If the result is too dark, first strengthen the instruction about light on the face. Adding more neon colours can make that problem worse.
+
+### 3. Emerald saree editorial
+
+This recipe specifies a garment, a restrained accessory choice and a garden setting. Change the fabric or colour if it does not fit your intention; keep the instruction about natural folds.
+
+<GuidePrompt
+  prompt={GUIDE_PROMPTS.saree}
+  copyLabel="Copy emerald-saree prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+For more visual context, open the [Emerald Saree template](/template/emerald-saree). A single coherent wardrobe direction is easier to evaluate than several competing styles.
+
+### 4. Quiet festive portrait
+
+A few lamps and flowers can suggest a celebration without filling every part of the image. Keep enough light on the person, rather than making the background decoration the brightest subject.
+
+<GuidePrompt
+  prompt={GUIDE_PROMPTS.festive}
+  copyLabel="Copy festive portrait prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+<GuideFigure
+  src="/imgs/vikas/templates/diwali-glow-3.webp"
+  width={1024}
+  height={1024}
+  alt="AI festive portrait illustration with warm lamp light, red clothing and courtyard decorations"
+  caption="Festive visual reference: warm light, a restrained palette and space around the subject. AI illustration, not a direct test of the recipe."
+/>
+
+### 5. Simple studio headshot
+
+For a clear portrait, simplify the scene rather than adding more production effects. The background and clothing should help the face remain the main point of attention.
+
+<GuidePrompt
+  prompt={GUIDE_PROMPTS.studio}
+  copyLabel="Copy studio headshot prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+Check the final likeness before using a generated headshot professionally. Keep an unedited photograph for any context that requires a factual representation.
+
+### 6. Sunset portrait of two adults
+
+Use a source photo that shows both people clearly. This studio accepts one reference image per generation, so begin with a picture containing both people rather than expecting two separate uploads to be combined.
+
+<GuidePrompt
+  prompt={GUIDE_PROMPTS.couple}
+  copyLabel="Copy sunset couple prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+Inspect each face independently. If one person changed more than the other, return to the source photo and simplify the pose. The [Sunset Together template](/template/sunset-together) offers a related visual direction.
+
+<h2 id="adapt-and-run">{'Copy, adapt and generate'}</h2>
+
+Copy your chosen recipe, open the [image studio](/create/image), upload a JPG, PNG or WebP photo up to 5 MB, and paste the text into the prompt field. Replace details that do not apply. Choose an aspect ratio suitable for the intended placement and check the displayed cost before generating.
+
+Copying a recipe is free. This site includes one free image per account; further images and all videos use purchased credits. Current packages are on the [pricing page](/pricing). The examples do not promise a fixed completion time or an identical result across tools.
+
+<h2 id="fix-the-result">{'Revise the cause of a problem'}</h2>
+
+<GuideTable
+  columns={['Problem', 'Try this revision', 'Avoid']}
+  rows={[
+    [
+      'The face drifted',
+      'Restart from the original and request a similar viewpoint with fewer scene changes.',
+      'Repeatedly using an already altered face as the new source.',
+    ],
+    [
+      'Hands look distorted',
+      'Choose a source with clear hands or simplify the pose and crop.',
+      'Adding many props, gestures and overlapping fingers.',
+    ],
+    [
+      'Light looks inconsistent',
+      'Specify one main light direction and a restrained background.',
+      'Mixing noon sunlight, midnight darkness and multiple dominant lights.',
+    ],
+    [
+      'Random words appeared',
+      'Remove signs and ask for an uncluttered background without lettering.',
+      'Assuming a no-text request guarantees perfect removal.',
+    ],
+    [
+      'The composition feels crowded',
+      'Reduce background objects and name a clear framing.',
+      'Adding more stylistic adjectives without changing the layout.',
+    ],
+  ]}
+/>
+
+Change one major variable per attempt and keep a note of the prompt. That makes the next decision clearer: you can tell whether a new light direction helped, instead of changing the location, outfit and crop all at once.
+
+<h2 id="questions">{'Prompt questions'}</h2>
+
+### Can I use these prompts in another image tool?
+
+They are plain-language briefs you can adapt to a compatible image-editing tool. Controls, limits and results differ. Check that the tool accepts a reference image if you want the photo used.
+
+### Should I write “8K” or “100% same face”?
+
+Those phrases do not set the actual output resolution or guarantee identity. Choose the available quality controls and describe the concrete details you want preserved.
+
+### How do I return to templates?
+
+Open the [Vikas Editor homepage](/#templates). To identify this site's branding, read the [logo guide](/guides/vikas-editor-logo); for similarly named resources, read [Vikasheditor](/guides/vikasheditor). Prompt or account questions can go to [support@vikas-editor.net](mailto:support@vikas-editor.net).

@@ -4,6 +4,17 @@ Read this when a project built from this template pulls newer template code.
 Entries are newest first. Apply **every entry dated after the template version
 the project last pulled**, oldest of those first.
 
+## 2026-11-05 — Illustrated editing guides
+
+- Four original guides now live at `/guides/vikas-editor`, `/guides/vikas-editor-logo`, `/guides/vikasheditor` and `/guides/vikas-editor-prompt`, with matching `/zh` translations. Each article has three illustrations, a contents menu, contextual homepage links and related guides. The homepage and footer link to the guide collection.
+- Guide routes include localized canonical/hreflang, article social metadata, Article/BreadcrumbList JSON-LD and sitemap entries. The static-page factory accepts route-specific MDX modules; existing legal/info pages keep their original layout.
+- The logo guide downloads the existing `/logo.svg`; the prompt guide copies six original recipes. No new dependency, database migration, provider setting or environment variable is required. Deploy the updated build to publish these pages; see `docs/research/seo-guides-2026-11-05.md` for research and verification.
+
+## 2026-11-05 — Hide language switching
+
+- Language controls are hidden in desktop/mobile navigation, shared footers and account menus. English remains the default; existing Chinese URLs and translations remain available.
+- To restore the controls, set `showLocaleSwitcher` to `true` in `src/config/locale/index.ts`. No database or environment changes are required.
+
 ## 2026-11-03 — Cloudflare PayPal checkout compatibility
 
 - PayPal OAuth and API requests now use `redirect: 'manual'` and reject non-success responses. Workers does not support `redirect: 'error'`; it threw before contacting PayPal and caused every checkout to return 502. The same incompatible option was corrected in EvoLink generation/configuration/downloads and IndexNow submission. Redirects still never forward credentials or bypass host checks.

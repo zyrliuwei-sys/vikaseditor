@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { envConfigs } from '@/config';
+import { GUIDE_SLUGS, guidePath } from '@/config/guides';
 import { baseLocale } from '@/paraglide/runtime.js';
 import { getLocalPosts, mergePosts } from '@/content/posts';
 
@@ -42,6 +43,13 @@ export const Route = createFileRoute('/llms.txt')({
           '',
           ...STATIC_PAGES.map(
             (p) => `- [${p.title}](${app_url}${p.path}): ${p.description}`
+          ),
+          '',
+          '## Editing guides',
+          '',
+          ...GUIDE_SLUGS.map(
+            (slug) =>
+              `- [${slug.replaceAll('-', ' ')}](${app_url}${guidePath(slug)}): Original illustrated guide from ${app_name}`
           ),
         ];
 

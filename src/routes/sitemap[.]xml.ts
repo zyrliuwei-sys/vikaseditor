@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { envConfigs } from '@/config';
+import { GUIDE_DATE, GUIDE_SLUGS, guidePath } from '@/config/guides';
 import { TEMPLATE_PAGES } from '@/config/template-pages';
 import { baseLocale, locales, localizeUrl } from '@/paraglide/runtime.js';
 
@@ -89,6 +90,13 @@ export const Route = createFileRoute('/sitemap.xml')({
             priority: 0.8,
           });
         }
+        for (const slug of GUIDE_SLUGS)
+          entries.push({
+            path: guidePath(slug),
+            lastModified: GUIDE_DATE,
+            changeFrequency: 'monthly',
+            priority: 0.8,
+          });
 
         // Match the blog's published-only DB + registered MDX sources.
         // An empty locale stays out until its first article is published.

@@ -23,6 +23,7 @@ export function Footer() {
       links: [
         { href: '/#templates', label: m['vikas.nav.templates']() },
         { href: '/#how-it-works', label: m['vikas.nav.how']() },
+        { href: '/#guides', label: m['vikas.guides.eyebrow']() },
         { href: '/pricing', label: m['vikas.footer.credits']() },
       ],
     },

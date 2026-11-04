@@ -5,3 +5,6 @@ export const localeNames: Record<string, string> = {
   en: 'English',
   zh: '中文',
 };
+
+// Keep translated URLs available while English is the only promoted language.
+export const showLocaleSwitcher = false;

@@ -1,6 +1,6 @@
 import { Check, ChevronDown, Globe, Languages } from 'lucide-react';
 
-import { localeNames } from '@/config/locale';
+import { localeNames, showLocaleSwitcher } from '@/config/locale';
 import { cn } from '@/lib/utils';
 import { getLocale, locales, setLocale } from '@/paraglide/runtime.js';
 import {
@@ -19,6 +19,8 @@ export function LocaleSelector({
   className?: string;
   label?: string;
 }) {
+  if (!showLocaleSwitcher) return null;
+
   const locale = getLocale();
 
   function handleSwitch(newLocale: string) {

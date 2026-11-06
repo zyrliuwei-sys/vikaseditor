@@ -3,20 +3,51 @@ import { eq } from 'drizzle-orm';
 
 import { getAuth } from '@/core/auth';
 import { db } from '@/core/db';
-import { envConfigs } from '@/config';
 import { user } from '@/config/db/schema';
+import { MAX_PROFILE_BODY_BYTES, validAvatarDataUrl } from '@/lib/avatar';
+import { enforceMinIntervalRateLimit } from '@/lib/rate-limit';
 import { respData, respErr } from '@/lib/resp';
 
 async function PATCH({ request }: { request: Request }) {
   try {
+    if (request.headers.get('origin') !== new URL(request.url).origin)
+      return respErr('Same-origin request required', { status: 403 });
+    const limited = enforceMinIntervalRateLimit(request, {
+      intervalMs: 1000,
+      keyPrefix: 'profile',
+    });
+    if (limited) return limited;
     const auth = getAuth();
     const session = await auth.api.getSession({ headers: request.headers });
 
     if (!session?.user) {
-      return respErr('Unauthorized');
+      return respErr('Unauthorized', { status: 401 });
     }
-
-    const body = await request.json().catch(() => ({}));
+    const userLimited = enforceMinIntervalRateLimit(request, {
+      intervalMs: 1000,
+      keyPrefix: 'profile-user',
+      extraKey: session.user.id,
+    });
+    if (userLimited) return userLimited;
+    if (!request.headers.get('content-type')?.startsWith('application/json'))
+      return respErr('JSON required', { status: 415 });
+    const reader = request.body?.getReader();
+    let bytes = 0;
+    let json = '';
+    const decoder = new TextDecoder();
+    if (reader)
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        bytes += value.byteLength;
+        if (bytes > MAX_PROFILE_BODY_BYTES) {
+          await reader.cancel();
+          return respErr('Profile is too large', { status: 413 });
+        }
+        json += decoder.decode(value, { stream: true });
+      }
+    json += decoder.decode();
+    const body = JSON.parse(json);
     const name = typeof body.name === 'string' ? body.name.trim() : undefined;
     const image =
       typeof body.image === 'string' ? body.image.trim() : undefined;
@@ -28,18 +59,15 @@ async function PATCH({ request }: { request: Request }) {
       return respErr('Name too long');
     }
     if (image !== undefined && image.length > 0) {
-      const isDataUrl = /^data:image\/[a-zA-Z0-9.+-]+;base64,/.test(image);
-      if (isDataUrl) {
-        // Cap inline base64 to avoid bloating the user row (matches upload route default).
-        const maxBytes =
-          (Number(envConfigs.inline_image_max_kb) || 2048) * 1024;
-        // base64 length ≈ ceil(bytes / 3) * 4; reverse with a small slack.
-        const approxBytes = Math.floor(
-          (image.length - image.indexOf(',') - 1) * 0.75
-        );
-        if (approxBytes > maxBytes) {
-          return respErr('Image too large');
-        }
+      if (image.startsWith('data:')) {
+        if (!validAvatarDataUrl(image))
+          return respErr('Invalid avatar image', { status: 400 });
+      } else if (
+        image.startsWith('/') &&
+        !image.startsWith('//') &&
+        !image.includes('\\')
+      ) {
+        // Previously uploaded same-site images remain valid.
       } else {
         try {
           const u = new URL(image);
@@ -75,7 +103,7 @@ async function PATCH({ request }: { request: Request }) {
       image: updated.image,
     });
   } catch (error: any) {
-    return respErr(error.message || 'Internal error');
+    return respErr('Unable to update profile', { status: 400 });
   }
 }
 

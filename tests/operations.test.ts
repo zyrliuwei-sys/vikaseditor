@@ -113,6 +113,32 @@ test('first-touch cohort and account claims remain immutable across return visit
     .where(eq(schema.analyticsVisitor.id, 'claim'));
 });
 
+test('test exclusion applies to returning visitors and survives concurrent ordinary visits', async () => {
+  const visit = {
+    id: 'returning-tester',
+    userId: null,
+    source: 'google.com',
+    country: 'US',
+    entryPath: '/pricing',
+    buildId: 'v1',
+    excluded: false,
+  };
+  await operations.recordVisitor(visit);
+  await Promise.all([
+    operations.recordVisitor({ ...visit, excluded: true }),
+    operations.recordVisitor(visit),
+  ]);
+  await operations.recordVisitor(visit);
+  const [returned] = await db()
+    .select()
+    .from(schema.analyticsVisitor)
+    .where(eq(schema.analyticsVisitor.id, visit.id));
+  assert.equal(returned.excluded, true);
+  assert.equal(returned.source, visit.source);
+  assert.equal(returned.entryPath, visit.entryPath);
+  assert.equal(returned.buildId, visit.buildId);
+});
+
 test('real payment metrics, refunds, unique cohorts, staff exclusion and daily boundaries', async () => {
   const now = new Date('2026-11-02T04:30:00Z');
   const visitAt = new Date('2026-11-01T17:00:00Z');

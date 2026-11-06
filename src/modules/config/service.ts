@@ -98,6 +98,7 @@ const PROTECTED_CONFIG_KEYS: ReadonlySet<string> = new Set([
 const MODULE_MANAGED_CONFIG_KEYS: ReadonlySet<string> = new Set([
   'footer_badges',
   'indexnow_key',
+  'vikas_image_trial_budget',
 ]);
 
 /**

@@ -23,6 +23,7 @@ export function Header() {
       logo={envConfigs.app_logo}
       user={session?.user}
       activeHref={activeHref}
+      signInHref={`/sign-in?callbackUrl=${encodeURIComponent(`${pathname}${location.searchStr}${pathname === '/' || pathname.startsWith('/create') ? '#studio' : ''}`)}`}
       links={[
         { href: '/#templates', label: m['vikas.nav.templates']() },
         { href: '/create/image', label: m['vikas.nav.image']() },

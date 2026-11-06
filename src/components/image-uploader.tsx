@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { ImageIcon, RefreshCw, Upload, X } from 'lucide-react';
@@ -29,6 +27,7 @@ interface ImageUploaderProps {
   className?: string;
   defaultPreviews?: string[];
   onChange?: (items: ImageUploaderValue[]) => void;
+  uploadFile?: (file: File) => Promise<string>;
 }
 
 type ImageUploaderLabels = {
@@ -98,10 +97,11 @@ export function ImageUploader({
   className,
   defaultPreviews,
   onChange,
+  uploadFile = uploadImageFile,
   labels: labelOverrides,
 }: ImageUploaderProps) {
   const labels = { ...defaultLabels, ...labelOverrides };
-  const upload = useMutation({ mutationFn: uploadImageFile });
+  const upload = useMutation({ mutationFn: uploadFile });
   const inputRef = useRef<HTMLInputElement | null>(null);
   const isInitializedRef = useRef(false);
   const onChangeRef = useRef(onChange);

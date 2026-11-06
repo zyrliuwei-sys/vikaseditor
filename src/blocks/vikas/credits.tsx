@@ -7,6 +7,7 @@ import { useSession } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import type { PricingProduct } from '@/config/pricing';
 import { apiGet, apiPost } from '@/lib/api-client';
+import { track } from '@/lib/track';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
 import { VikasArtwork } from '@/components/vikas/artwork';
@@ -50,6 +51,7 @@ export function VikasCredits() {
       router.push('/sign-in?callbackUrl=%2Fpricing');
       return;
     }
+    track('plan_selected', { product: id, interval: billing });
     checkout.mutate(id);
   }
   const config = useQuery({

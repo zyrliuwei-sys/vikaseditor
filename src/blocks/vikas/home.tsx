@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { MediaMode, StudioSelection, VikasTemplate } from '@/types/vikas';
 
+import { m } from '@/paraglide/messages.js';
 import {
   VikasIntroduction,
   VikasPromptGuide,
@@ -14,17 +15,45 @@ import {
   VikasHowItWorks,
   VikasVideoStory,
 } from '@/blocks/vikas/story';
-import { VikasStudio } from '@/blocks/vikas/studio';
 import { getVikasTemplates } from '@/blocks/vikas/templates';
+
+const VikasStudio = lazy(() =>
+  import('@/blocks/vikas/studio').then((m) => ({ default: m.VikasStudio }))
+);
 
 export function VikasHome() {
   const templates = getVikasTemplates();
+  const [studioVisible, setStudioVisible] = useState(false);
+  const [incomingPhoto, setIncomingPhoto] = useState<File | null>(null);
+  const studioRef = useRef<HTMLDivElement>(null);
+  const uploadRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (
+      window.location.hash === '#studio' ||
+      !('IntersectionObserver' in window)
+    ) {
+      setStudioVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setStudioVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '600px' }
+    );
+    if (studioRef.current) observer.observe(studioRef.current);
+    return () => observer.disconnect();
+  }, []);
   const [selection, setSelection] = useState<StudioSelection>({
     mode: 'image',
     templateId: templates[0].id,
     revision: 0,
   });
   function revealStudio() {
+    setStudioVisible(true);
     requestAnimationFrame(() => {
       const studio = document.getElementById('studio');
       studio?.scrollIntoView({
@@ -46,9 +75,7 @@ export function VikasHome() {
     }));
     revealStudio();
     if (upload) {
-      (
-        document.getElementById('vikas-photo') as HTMLInputElement | null
-      )?.click();
+      uploadRef.current?.click();
     }
   }
   function selectTemplate(template: VikasTemplate) {
@@ -62,13 +89,39 @@ export function VikasHome() {
   }
   return (
     <>
+      <input
+        ref={uploadRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        hidden
+        onChange={(event) => {
+          const file = event.currentTarget.files?.[0];
+          if (file) {
+            setIncomingPhoto(file);
+            revealStudio();
+          }
+          event.currentTarget.value = '';
+        }}
+      />
       <VikasHero
         templates={templates}
         onCreate={create}
         onTemplate={selectTemplate}
       />
       <VikasGallery templates={templates} />
-      <VikasStudio templates={templates} selection={selection} />
+      <div ref={studioRef}>
+        <Suspense fallback={<StudioPlaceholder />}>
+          {studioVisible ? (
+            <VikasStudio
+              templates={templates}
+              selection={selection}
+              incomingPhoto={incomingPhoto}
+            />
+          ) : (
+            <StudioPlaceholder onOpen={() => setStudioVisible(true)} />
+          )}
+        </Suspense>
+      </div>
       <VikasHowItWorks />
       <VikasVideoStory onCreate={() => selectTemplate(templates[7])} />
       <VikasIntroduction />
@@ -77,5 +130,21 @@ export function VikasHome() {
       <VikasGuides />
       <VikasFAQ />
     </>
+  );
+}
+
+function StudioPlaceholder({ onOpen }: { onOpen?: () => void }) {
+  return (
+    <section id="studio" className="vikas-studio-placeholder">
+      <h2>{m['vikas.studio.title']()}</h2>
+      <p>{m['vikas.studio.subtitle']()}</p>
+      {onOpen ? (
+        <button type="button" className="vikas-button" onClick={onOpen}>
+          {m['vikas.nav.start']()}
+        </button>
+      ) : (
+        <p role="status">{m['common.loading']()}</p>
+      )}
+    </section>
   );
 }

@@ -29,6 +29,9 @@ export interface GenerationCapabilities {
 export interface GenerationAccess {
   paidCredits: number;
   freeImageAvailable: boolean;
+  trialRequiresVerification: boolean;
+  trialPaused: boolean;
+  emailVerificationAvailable: boolean;
 }
 
 export interface GenerationResult {

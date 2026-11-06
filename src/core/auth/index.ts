@@ -24,6 +24,7 @@ import {
   sanitizeReferrer,
   sanitizeUtm,
 } from '@/lib/cookie';
+import { isEmailSendingConfigured } from '@/lib/email-config';
 import { getUuid } from '@/lib/hash';
 import { OPERATIONS_COOKIE, readVisitorCookie } from '@/lib/operations-cookie';
 
@@ -57,6 +58,20 @@ export function getAuthCookiePrefix(): string {
 const recentVerificationEmailSentAt = new Map<string, number>();
 const VERIFICATION_EMAIL_MIN_INTERVAL_MS = 60_000;
 
+function escapeEmailHtml(value: string) {
+  return value.replace(
+    /[&<>"']/g,
+    (char) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[char]!
+  );
+}
+
 function getDatabaseProvider(provider: string): 'sqlite' | 'pg' | 'mysql' {
   switch (provider) {
     case 'sqlite':
@@ -88,6 +103,7 @@ let authInstance: any;
 let socialConfigsSignature = '';
 let emailEnabledLoaded = true;
 let emailVerificationEnabledLoaded = false;
+let emailSendingLoaded = false;
 
 function getSocialProviders(configs: Record<string, string>) {
   const providers: Record<string, any> = {};
@@ -154,7 +170,7 @@ function getEmailProvider(
 
 /** Check whether email sending is available for the selected provider */
 function isEmailConfigured(configs: Record<string, string>): boolean {
-  return getEmailProvider(configs) !== null;
+  return isEmailSendingConfigured(configs);
 }
 
 function getAuthPlugins(configs: Record<string, string> | undefined) {
@@ -188,6 +204,11 @@ export function getAuth(configs?: Record<string, string>) {
 
   // Rebuild if the email-verification flag changed
   if (configs) {
+    const emailSending = isEmailConfigured(configs);
+    if (emailSending !== emailSendingLoaded) {
+      authInstance = null;
+      emailSendingLoaded = emailSending;
+    }
     const nextVerificationEnabled =
       configs.email_verification_enabled === 'true' &&
       isEmailConfigured(configs);
@@ -412,7 +433,7 @@ export function getAuth(configs?: Record<string, string>) {
           console.error(
             '[auth] sendResetPassword: No email provider configured'
           );
-          return;
+          throw new Error('Email delivery is unavailable');
         }
         const appName = all.app_name || envConfigs.app_name;
         const greeting = user.name ? `Hi ${user.name},` : 'Hi,';
@@ -420,17 +441,18 @@ export function getAuth(configs?: Record<string, string>) {
           to: user.email,
           subject: `Reset your ${appName} password`,
           text: `${greeting}\n\nYou recently requested to reset your password for ${appName}. Use the link below to choose a new one:\n\n${url}\n\nThis link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.`,
-          html: `<p>${greeting}</p>
-<p>You recently requested to reset your password for <strong>${appName}</strong>. Click the link below to choose a new one:</p>
-<p><a href="${url}">Reset your password</a></p>
+          html: `<p>${escapeEmailHtml(greeting)}</p>
+<p>You recently requested to reset your password for <strong>${escapeEmailHtml(appName)}</strong>. Click the link below to choose a new one:</p>
+<p><a href="${escapeEmailHtml(url)}">Reset your password</a></p>
 <p>This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.</p>`,
         });
         if (!result.success) {
-          console.error('[auth] sendResetPassword failed:', result.error);
+          console.error('[auth] Password reset email delivery failed');
+          throw new Error('Email delivery failed');
         }
       },
     },
-    ...(emailVerificationEnabled
+    ...(configs && isEmailConfigured(configs)
       ? {
           emailVerification: {
             sendOnSignUp: false,
@@ -452,9 +474,6 @@ export function getAuth(configs?: Record<string, string>) {
                 if (key && now - last < VERIFICATION_EMAIL_MIN_INTERVAL_MS) {
                   return;
                 }
-                if (key) {
-                  recentVerificationEmailSentAt.set(key, now);
-                }
 
                 const all = await getAllConfigs();
                 const emailCtx = getEmailProvider(all);
@@ -462,7 +481,7 @@ export function getAuth(configs?: Record<string, string>) {
                   console.error(
                     '[auth] sendVerificationEmail: No email provider configured'
                   );
-                  return;
+                  throw new Error('Email delivery is unavailable');
                 }
                 const appName = all.app_name || envConfigs.app_name;
                 // Email clients don't render SVG <img>; only embed a raster logo,
@@ -480,13 +499,11 @@ export function getAuth(configs?: Record<string, string>) {
                   react: VerifyEmail({ appName, logoUrl, url }),
                 });
                 if (!result.success) {
-                  console.error(
-                    '[auth] sendVerificationEmail failed:',
-                    result.error
-                  );
+                  throw new Error('Email delivery failed');
                 }
+                if (key) recentVerificationEmailSentAt.set(key, now);
               } catch (e) {
-                console.error('[auth] sendVerificationEmail error:', e);
+                throw new Error('Email delivery failed');
               }
             },
           },

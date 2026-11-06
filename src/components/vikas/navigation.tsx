@@ -1,16 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ArrowRight, Menu, X } from 'lucide-react';
 
 import { Link } from '@/core/i18n/navigation';
 import { showLocaleSwitcher } from '@/config/locale';
 import { LocaleSelector } from '@/components/locale-selector';
-import { SiteUserMenu } from '@/components/site-user-menu';
 import { ThemeToggle } from '@/components/theme-toggle';
+
+const SiteUserMenu = lazy(() =>
+  import('@/components/site-user-menu').then((m) => ({
+    default: m.SiteUserMenu,
+  }))
+);
 
 interface NavigationProps {
   brand: string;
   logo: string;
   activeHref?: string;
+  signInHref?: string;
   links: { href: string; label: string }[];
   copy: {
     signIn: string;
@@ -32,6 +38,7 @@ export function VikasNavigation({
   copy,
   user,
   activeHref,
+  signInHref = '/sign-in',
 }: NavigationProps) {
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -80,13 +87,24 @@ export function VikasNavigation({
               </div>
             )}
             {user ? (
-              <SiteUserMenu
-                name={user.name}
-                email={user.email}
-                image={user.image}
-              />
+              <Suspense
+                fallback={
+                  <span
+                    className="inline-flex size-11 items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    {user.name.charAt(0).toUpperCase()}
+                  </span>
+                }
+              >
+                <SiteUserMenu
+                  name={user.name}
+                  email={user.email}
+                  image={user.image}
+                />
+              </Suspense>
             ) : (
-              <Link className="vikas-login" href="/sign-in">
+              <Link className="vikas-login" href={signInHref}>
                 {copy.signIn}
               </Link>
             )}
@@ -124,7 +142,7 @@ export function VikasNavigation({
                 lightLabel={copy.lightTheme}
                 darkLabel={copy.darkTheme}
               />
-              {!user && <Link href="/sign-in">{copy.signIn}</Link>}
+              {!user && <Link href={signInHref}>{copy.signIn}</Link>}
             </div>
           </nav>
         )}

@@ -2,6 +2,7 @@ import { oneTapClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
 import { clearAccountCache, getQueryClient } from '@/lib/query-client';
+import { clearStudioDraft } from '@/lib/studio-draft';
 
 const baseURL =
   typeof window !== 'undefined'
@@ -20,7 +21,11 @@ export const {
 
 export async function signOut(...args: Parameters<typeof authClient.signOut>) {
   const result = await authClient.signOut(...args);
-  if (!result.error) await clearAccountCache(getQueryClient());
+  if (!result.error)
+    await Promise.all([
+      clearAccountCache(getQueryClient()),
+      clearStudioDraft(),
+    ]);
   return result;
 }
 

@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import { filterPublicConfigs, getAllConfigs } from '@/modules/config/service';
 import { getStoredFooterBadges } from '@/modules/footer-badges/service';
+import { isEmailSendingConfigured } from '@/lib/email-config';
 import { respData } from '@/lib/resp';
 
 const noStore = {
@@ -40,18 +41,6 @@ const publicKeys = [
   'footer_badges',
 ];
 
-function isEmailSendingConfigured(configs: Record<string, string>): boolean {
-  const provider = configs.email_provider || 'resend';
-  if (provider === 'cloudflare') {
-    return (
-      !!configs.cloudflare_email_api_token &&
-      !!configs.cloudflare_email_account_id &&
-      !!configs.cloudflare_email_sender_email
-    );
-  }
-  return !!configs.resend_api_key && !!configs.resend_sender_email;
-}
-
 async function GET({ request }: { request: Request }) {
   const [configs, storedFooterBadges] = await Promise.all([
     getAllConfigs(),
@@ -61,6 +50,7 @@ async function GET({ request }: { request: Request }) {
   if (storedFooterBadges === undefined) delete result.footer_badges;
   else result.footer_badges = storedFooterBadges;
   const emailConfigured = isEmailSendingConfigured(configs);
+  result.email_sending_enabled = emailConfigured ? 'true' : 'false';
   result.password_reset_enabled =
     configs.email_auth_enabled !== 'false' && emailConfigured
       ? 'true'

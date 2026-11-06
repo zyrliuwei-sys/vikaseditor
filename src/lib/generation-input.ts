@@ -16,6 +16,7 @@ const schema = z
     prompt: z.string().trim().min(3).max(2000),
     image: z.string().max(MAX_GENERATION_BODY_BYTES).optional(),
     aspectRatio: z.enum(GENERATION_ASPECTS),
+    usePaidCredits: z.boolean().optional(),
   })
   .strict();
 
@@ -135,6 +136,7 @@ export async function generationIdentity(
       prompt: input.prompt,
       image: input.image || '',
       aspectRatio: input.aspectRatio,
+      ...(input.usePaidCredits ? { usePaidCredits: true } : {}),
     })
   );
   return { id, fingerprint };

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type DragEvent } from 'react';
-import { useForm } from '@tanstack/react-form';
+import { useForm, useStore } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   GenerationAccess,
@@ -32,6 +32,11 @@ import { z } from 'zod';
 import { useSession } from '@/core/auth/client';
 import { Link, usePathname } from '@/core/i18n/navigation';
 import { ApiError, apiGet, apiPost } from '@/lib/api-client';
+import {
+  clearStudioDraft,
+  restoreStudioDraft,
+  saveStudioDraft,
+} from '@/lib/studio-draft';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
 import { Button } from '@/components/ui/button';
@@ -66,12 +71,17 @@ export function VikasStudio({
   templates,
   selection,
   onModeChange,
+  incomingPhoto,
 }: {
   templates: VikasTemplate[];
   selection: StudioSelection;
   onModeChange?: (mode: MediaMode) => void;
+  incomingPhoto?: File | null;
 }) {
   const pathname = usePathname();
+  // Router location changes before the outgoing component unmounts. Keep the
+  // draft attached to this studio, never to the sign-in page being entered.
+  const draftScope = useRef(pathname).current;
   const { data: session, isPending: sessionPending } = useSession();
   const queryClient = useQueryClient();
   const initialTemplate = templates.find(
@@ -90,6 +100,12 @@ export function VikasStudio({
   );
   const [outputTab, setOutputTab] = useState<'preview' | 'history'>('preview');
   const [mediaError, setMediaError] = useState(false);
+  const [draftReady, setDraftReady] = useState(false);
+  const [draftStatus, setDraftStatus] = useState<'saved' | 'error' | null>(
+    null
+  );
+  const draftEdited = useRef(false);
+  const draftOwner = useRef<string | null>(session?.user.id ?? null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const requestIdRef = useRef<string | null>(null);
   const lastSelectionRef = useRef<number | null>(null);
@@ -124,6 +140,7 @@ export function VikasStudio({
       prompt: string;
       image?: string;
       aspectRatio: AspectRatio;
+      usePaidCredits: boolean;
     }) => {
       const { userId: _userId, ...body } = variables;
       return apiPost<GenerationResult>('/api/generations', body);
@@ -173,6 +190,9 @@ export function VikasStudio({
       : (capabilities.data?.imageCredits ?? 51);
   const freeImage =
     mode === 'image' && access.data?.freeImageAvailable === true;
+  const verificationNeeded =
+    mode === 'image' && access.data?.trialRequiresVerification === true;
+  const trialPaused = mode === 'image' && access.data?.trialPaused === true;
   const needsPayment = Boolean(
     session?.user &&
     access.data &&
@@ -191,6 +211,7 @@ export function VikasStudio({
   };
 
   function edited() {
+    draftEdited.current = true;
     requestIdRef.current = null;
     setError('');
     setCopied(false);
@@ -198,6 +219,8 @@ export function VikasStudio({
 
   function errorMessage(cause: unknown) {
     const message = cause instanceof Error ? cause.message : '';
+    if (/Free image availability changed/i.test(message))
+      return m['vikas.studio.trial_changed']();
     if (/insufficient credits|not enough credits/i.test(message))
       return m['vikas.studio.credits_error']();
     if (/unauthorized|sign in|authentication/i.test(message))
@@ -253,16 +276,106 @@ export function VikasStudio({
           prompt: value.prompt.trim(),
           ...(image ? { image } : {}),
           aspectRatio: value.aspectRatio,
+          usePaidCredits: !freeImage,
         });
       } catch (cause) {
         setError(errorMessage(cause));
+        if (cause instanceof ApiError)
+          void queryClient.invalidateQueries({
+            queryKey: ['vikas-generation-access', session.user.id],
+          });
       }
     },
   });
+  const draftValues = useStore(form.store, (state) => state.values);
+
+  useEffect(() => {
+    if (sessionPending) return;
+    let canceled = false;
+    if (
+      draftOwner.current !== null &&
+      draftOwner.current !== (session?.user.id ?? null)
+    ) {
+      draftEdited.current = false;
+      setPhoto(null);
+      form.reset();
+      setDraftStatus(null);
+    }
+    draftOwner.current = session?.user.id ?? null;
+    setDraftReady(false);
+    void restoreStudioDraft(draftScope, session?.user.id ?? null)
+      .then((draft) => {
+        if (canceled || draftEdited.current) return;
+        if (draft) {
+          setMode(draft.mode);
+          setTemplateId(draft.templateId);
+          form.setFieldValue('prompt', draft.prompt);
+          form.setFieldValue('aspectRatio', draft.aspectRatio);
+          setPhoto(draft.photo);
+          if (draft.photoMissing)
+            setPhotoError(m['vikas.studio.draft_photo_missing']());
+          draftEdited.current = true;
+          setDraftStatus(draft.photoMissing ? 'error' : 'saved');
+        }
+      })
+      .catch(() => {
+        if (!canceled) setDraftStatus('error');
+      })
+      .finally(() => {
+        if (!canceled) setDraftReady(true);
+      });
+    return () => {
+      canceled = true;
+    };
+  }, [sessionPending, session?.user.id, draftScope, form]);
+
+  useEffect(() => {
+    if (!draftReady || !draftEdited.current || sessionPending) return;
+    let canceled = false;
+    void saveStudioDraft(
+      {
+        scope: draftScope,
+        ownerId: session?.user.id ?? null,
+        mode,
+        templateId,
+        ...draftValues,
+      },
+      photo
+    )
+      .then(() => {
+        if (!canceled) setDraftStatus('saved');
+      })
+      .catch(() => {
+        if (!canceled) setDraftStatus('error');
+      });
+    return () => {
+      canceled = true;
+    };
+  }, [
+    draftReady,
+    draftValues,
+    mode,
+    templateId,
+    photo,
+    sessionPending,
+    session?.user.id,
+    draftScope,
+  ]);
+
+  function discardDraft() {
+    draftEdited.current = false;
+    void clearStudioDraft();
+    setPhoto(null);
+    setTemplateId('');
+    form.setFieldValue('prompt', '');
+    setDraftStatus(null);
+    requestIdRef.current = null;
+  }
 
   useEffect(() => {
     if (lastSelectionRef.current === selection.revision) return;
     lastSelectionRef.current = selection.revision;
+    if (selection.revision > 0) draftEdited.current = true;
     const next = templates.find((item) => item.id === selection.templateId);
     setMode(selection.mode);
     setTemplateId(next?.id ?? '');
@@ -355,6 +468,10 @@ export function VikasStudio({
     selectPhoto(event.dataTransfer.files[0]);
   }
 
+  useEffect(() => {
+    if (incomingPhoto) selectPhoto(incomingPhoto);
+  }, [incomingPhoto]);
+
   function changeMode(nextMode: MediaMode) {
     edited();
     setMode(nextMode);
@@ -416,6 +533,18 @@ export function VikasStudio({
             void form.handleSubmit();
           }}
         >
+          {draftStatus && (
+            <div className="vs-draft-note" role="status">
+              <p>
+                {draftStatus === 'saved'
+                  ? m['vikas.studio.draft_saved']()
+                  : m['vikas.studio.draft_error']()}
+              </p>
+              <button type="button" onClick={discardDraft}>
+                {m['vikas.studio.draft_discard']()}
+              </button>
+            </div>
+          )}
           <div
             className="vs-mode-switch"
             role="group"
@@ -670,6 +799,46 @@ export function VikasStudio({
                 {m['vikas.studio.retry']()}
               </button>
             </p>
+          )}
+          {verificationNeeded && (
+            <div className="vs-service-notice" role="status">
+              <div>
+                <p>
+                  {access.data?.emailVerificationAvailable
+                    ? m['vikas.studio.verify_trial']()
+                    : m['vikas.studio.verification_unavailable']()}
+                </p>
+                {access.data?.emailVerificationAvailable && (
+                  <Link
+                    href={`/verify-email?email=${encodeURIComponent(session?.user.email ?? '')}&callbackUrl=${encodeURIComponent(returnPath)}`}
+                    className="vs-copy"
+                  >
+                    {m['vikas.studio.verify_email']()}
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  className="vs-copy"
+                  disabled={access.isFetching}
+                  onClick={() => void access.refetch()}
+                >
+                  {m['vikas.studio.refresh_balance']()}
+                </button>
+              </div>
+            </div>
+          )}
+          {trialPaused && !working && (
+            <div role="status" className="vs-service-notice">
+              <p>{m['vikas.studio.trial_paused']()}</p>
+              <button
+                type="button"
+                className="vs-copy"
+                disabled={access.isFetching}
+                onClick={() => void access.refetch()}
+              >
+                {m['vikas.studio.refresh_balance']()}
+              </button>
+            </div>
           )}
           {capabilities.isSuccess && !configured && !working ? (
             <div className="vs-service-notice" role="status">

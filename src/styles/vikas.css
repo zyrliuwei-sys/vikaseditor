@@ -1999,3 +1999,17 @@ html[lang='zh'] .vikas-hero h1 > span {
   font-size: 13px;
   line-height: 1.7;
 }
+.vikas-studio-placeholder {
+  width: min(1280px, calc(100% - 40px));
+  min-height: 700px;
+  margin: 0 auto;
+  padding: 96px 0;
+  scroll-margin-top: 90px;
+}
+.vikas-studio-placeholder h2 {
+  font-size: clamp(30px, 3.4vw, 46px);
+}
+.vikas-studio-placeholder p {
+  color: var(--muted-foreground);
+  margin: 20px 0;
+}

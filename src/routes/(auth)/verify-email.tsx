@@ -43,7 +43,12 @@ function getCooldownKey(email?: string | null) {
 function getCooldownRemainingSeconds(email?: string | null) {
   if (typeof window === 'undefined') return 0;
   if (!email) return 0;
-  const raw = window.localStorage.getItem(getCooldownKey(email));
+  let raw: string | null;
+  try {
+    raw = window.localStorage.getItem(getCooldownKey(email));
+  } catch {
+    return 0;
+  }
   const last = raw ? Number(raw) : 0;
   if (!last || Number.isNaN(last)) return 0;
   const elapsedSeconds = Math.floor((Date.now() - last) / 1000);
@@ -65,6 +70,7 @@ function VerifyEmailPage() {
   const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
   const [paramsReady, setParamsReady] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [hasSent, setHasSent] = useState(false);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const lastSessionCheckAtRef = useRef(0);
 
@@ -77,6 +83,7 @@ function VerifyEmailPage() {
     setEmail(e);
     setCallbackUrl(cb);
     setParamsReady(true);
+    setHasSent(sent === '1' || getCooldownRemainingSeconds(e) > 0);
 
     if (sent === '1') {
       if (getCooldownRemainingSeconds(e) === 0) {
@@ -127,7 +134,7 @@ function VerifyEmailPage() {
     lastSessionCheckAtRef.current = now;
     try {
       const { data } = await authClient.getSession();
-      if (data?.user) {
+      if (data?.user?.emailVerified) {
         hardNavigateToNextUrl();
       }
     } catch {}
@@ -142,12 +149,12 @@ function VerifyEmailPage() {
     return () => window.clearInterval(timer);
   }, [email, paramsReady]);
 
-  // If session exists, redirect to next.
+  // A signed-in but unverified user still needs to finish verification.
   useEffect(() => {
-    if (paramsReady && !isPending && session?.user) {
+    if (paramsReady && !isPending && session?.user?.emailVerified) {
       hardNavigateToNextUrl();
     }
-  }, [paramsReady, isPending, session?.user, nextUrl]);
+  }, [paramsReady, isPending, session?.user?.emailVerified, nextUrl]);
 
   // Brief polling on mount: detect verification link → cookie → session.
   useEffect(() => {
@@ -161,7 +168,7 @@ function VerifyEmailPage() {
       await checkSessionAndRedirect();
       if (attempts >= maxAttempts) return;
       const { data } = await authClient.getSession();
-      if (!data?.user) {
+      if (!data?.user?.emailVerified) {
         window.setTimeout(tick, 1000);
       }
     };
@@ -208,6 +215,7 @@ function VerifyEmailPage() {
         return;
       }
       markSentNow(email);
+      setHasSent(true);
       setCooldownSeconds(getCooldownRemainingSeconds(email));
     } catch (e: any) {
       toast.error(e?.message || m['common.sign.verify_email_send_failed']());
@@ -217,14 +225,14 @@ function VerifyEmailPage() {
   };
 
   const handleContinue = () => {
-    if (session?.user) {
+    if (session?.user?.emailVerified) {
       hardNavigateToNextUrl();
       return;
     }
     void (async () => {
       await checkSessionAndRedirect();
       const { data } = await authClient.getSession();
-      if (data?.user) {
+      if (data?.user?.emailVerified) {
         hardNavigateToNextUrl();
       } else {
         // User hasn't verified yet — show a toast instead of redirecting
@@ -248,7 +256,9 @@ function VerifyEmailPage() {
               {m['common.sign.verify_email_page_title']()}
             </h1>
             <CardDescription className="text-xs md:text-sm">
-              {m['common.sign.verify_email_page_description']()}
+              {hasSent
+                ? m['common.sign.verify_email_page_description']()
+                : m['common.sign.verify_email_send_description']()}
               {email ? ` ${email}` : ''}
             </CardDescription>
           </CardHeader>
@@ -267,8 +277,10 @@ function VerifyEmailPage() {
                   m['common.sign.resend_verification_countdown']({
                     seconds: cooldownSeconds,
                   })
-                ) : (
+                ) : hasSent ? (
                   m['common.sign.resend_verification']()
+                ) : (
+                  m['common.sign.send_verification']()
                 )}
               </Button>
 

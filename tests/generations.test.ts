@@ -60,6 +60,8 @@ const {
   listGenerations,
   markGenerationUncertain,
   generationResponse,
+  imageTrialAccess,
+  TRIAL_BUDGET_KEY,
 } = await import('../src/modules/ai-tasks/generations');
 const {
   planRevoke,
@@ -91,7 +93,12 @@ async function account(credits = 255, usedTrial = true) {
   const id = `generation-user-${count++}`;
   await db()
     .insert(schema.user)
-    .values({ id, email: `${id}@example.test`, name: 'Test creator' });
+    .values({
+      id,
+      email: `${id}@example.test`,
+      name: 'Test creator',
+      emailVerified: true,
+    });
   await db()
     .insert(schema.order)
     .values({
@@ -142,7 +149,11 @@ async function balance(userId: string) {
     .reduce((sum: number, row: any) => sum + row.remainingCredits, 0);
 }
 async function taskParams(userId: string, requestId = crypto.randomUUID()) {
-  const input = parseGenerationInput({ ...base, requestId });
+  const input = parseGenerationInput({
+    ...base,
+    requestId,
+    usePaidCredits: true,
+  });
   const identity = await generationIdentity(userId, input);
   const provider = generationProviderInput(input);
   return {
@@ -153,6 +164,7 @@ async function taskParams(userId: string, requestId = crypto.randomUUID()) {
     prompt: input.prompt,
     aspectRatio: input.aspectRatio,
     credits: provider.credits,
+    usePaidCredits: input.usePaidCredits,
   };
 }
 
@@ -431,6 +443,33 @@ test('trial is image-only, gifts cannot fund videos, and failed free images refu
   assert.equal(await getPaidBalance(user), 0);
 });
 
+test('concurrent free quotes cannot spend purchased credits after another tab uses the trial', async () => {
+  const user = await account(255, false);
+  const params = await Promise.all(
+    Array.from({ length: 4 }, () => taskParams(user))
+  );
+  const results = await Promise.allSettled(
+    params.map((p) => createGeneration({ ...p, usePaidCredits: false }))
+  );
+  assert.equal(results.filter((r) => r.status === 'fulfilled').length, 1);
+  assert.equal(await getPaidBalance(user), 255);
+  assert.equal((await listGenerations(user)).length, 1);
+  const staleQuote = { ...(await taskParams(user)), usePaidCredits: false };
+  await assert.rejects(
+    createGeneration(staleQuote),
+    /Free image availability changed/
+  );
+  assert.equal(await getPaidBalance(user), 255);
+  await assert.rejects(
+    createGeneration({ ...staleQuote, usePaidCredits: undefined }),
+    /Refresh this page/
+  );
+  assert.equal(await getPaidBalance(user), 255);
+  const paid = await createGeneration({ ...staleQuote, usePaidCredits: true });
+  assert.equal(JSON.parse(paid.task.options!).funding, 'paid');
+  assert.equal(await getPaidBalance(user), 204);
+});
+
 test('paid credits enable video and cannot be spent twice concurrently', async () => {
   const user = await account(796, false);
   const params = await Promise.all([taskParams(user), taskParams(user)]);
@@ -459,4 +498,111 @@ test('a paid-only debit aborts atomically when its payment begins refunding', as
   await assert.rejects(atomic(plan.steps));
   assert.equal(await balance(user), 1000);
   assert.equal(await getPaidBalance(user), 0);
+});
+
+test('unverified accounts cannot spend a free image, but can use purchased credits', async () => {
+  const id = await account(0, false);
+  await db()
+    .update(schema.user)
+    .set({ emailVerified: false })
+    .where(eq(schema.user.id, id));
+  const access = await imageTrialAccess(id, 51);
+  assert.equal(access.freeImageAvailable, false);
+  assert.equal(access.trialRequiresVerification, true);
+  await assert.rejects(
+    createGeneration(await taskParams(id)),
+    /Verify your email/
+  );
+  assert.equal((await listGenerations(id)).length, 0);
+  const paid = await account(51, false);
+  await db()
+    .update(schema.user)
+    .set({ emailVerified: false })
+    .where(eq(schema.user.id, paid));
+  const { task } = await createGeneration(await taskParams(paid));
+  assert.equal(JSON.parse(task.options!).funding, 'paid');
+  assert.equal(await getPaidBalance(paid), 0);
+});
+
+test('the site-wide free-image limit holds across concurrent accounts and retries', async () => {
+  const [before] = await db()
+    .select()
+    .from(schema.config)
+    .where(eq(schema.config.name, TRIAL_BUDGET_KEY));
+  const day = new Date().toISOString().slice(0, 10);
+  await db()
+    .insert(schema.config)
+    .values({
+      name: TRIAL_BUDGET_KEY,
+      value: JSON.stringify({ day, used: 49 }),
+    })
+    .onConflictDoUpdate({
+      target: schema.config.name,
+      set: { value: JSON.stringify({ day, used: 49 }) },
+    });
+  try {
+    const ids = await Promise.all([account(0, false), account(0, false)]);
+    const params = await Promise.all(ids.map((id) => taskParams(id)));
+    const results = await Promise.allSettled(params.map(createGeneration));
+    assert.equal(results.filter((r) => r.status === 'fulfilled').length, 1);
+    const [budget] = await db()
+      .select()
+      .from(schema.config)
+      .where(eq(schema.config.name, TRIAL_BUDGET_KEY));
+    assert.equal(JSON.parse(budget.value!).used, 50);
+    const winner = results.findIndex((r) => r.status === 'fulfilled');
+    assert.equal((await createGeneration(params[winner])).created, false);
+    assert.equal(
+      (await imageTrialAccess(ids[1 - winner], 51)).trialPaused,
+      true
+    );
+    assert.equal((await listGenerations(ids[1 - winner])).length, 0);
+    const paid = await account(51, false);
+    const paidParams = await taskParams(paid);
+    await assert.rejects(
+      createGeneration({ ...paidParams, usePaidCredits: false }),
+      /today’s limit/
+    );
+    assert.equal(
+      await getPaidBalance(paid),
+      51,
+      'a stale free offer cannot silently debit paid credits'
+    );
+    const authorized = { ...paidParams, usePaidCredits: true };
+    const paidResults = await Promise.all([
+      createGeneration(authorized),
+      createGeneration(authorized),
+    ]);
+    assert.equal(paidResults.filter((r) => r.created).length, 1);
+    assert.equal(JSON.parse(paidResults[0].task.options!).funding, 'paid');
+    assert.equal(await getPaidBalance(paid), 0);
+    assert.equal(
+      await imageTrialAvailable(paid, 51),
+      true,
+      'paid generation keeps the unused trial'
+    );
+    const [afterPaid] = await db()
+      .select()
+      .from(schema.config)
+      .where(eq(schema.config.name, TRIAL_BUDGET_KEY));
+    assert.equal(JSON.parse(afterPaid.value!).used, 50);
+    await db()
+      .update(schema.config)
+      .set({ value: JSON.stringify({ day: '2020-01-01', used: 50 }) })
+      .where(eq(schema.config.name, TRIAL_BUDGET_KEY));
+    assert.equal(
+      (await imageTrialAccess(ids[1 - winner], 51)).freeImageAvailable,
+      true
+    );
+  } finally {
+    if (before)
+      await db()
+        .update(schema.config)
+        .set({ value: before.value })
+        .where(eq(schema.config.name, TRIAL_BUDGET_KEY));
+    else
+      await db()
+        .delete(schema.config)
+        .where(eq(schema.config.name, TRIAL_BUDGET_KEY));
+  }
 });

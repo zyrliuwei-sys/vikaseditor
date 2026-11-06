@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { useSession } from '@/core/auth/client';
 import { apiPatch } from '@/lib/api-client';
+import { prepareAvatar } from '@/lib/avatar';
 import { m } from '@/paraglide/messages.js';
 import { ImageUploader, ImageUploaderValue } from '@/blocks/image-uploader';
 import { TextField } from '@/components/form-field';
@@ -100,6 +101,7 @@ export function SettingsForm({
           <div className="space-y-2">
             <Label>{m['settings.profile.avatar']()}</Label>
             <ImageUploader
+              uploadFile={prepareAvatar}
               defaultPreviews={image ? [image] : []}
               onChange={handleAvatarChange}
               maxSizeMB={2}

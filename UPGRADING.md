@@ -1,3 +1,19 @@
+## 2026-11-06 — Account recovery, studio drafts and trial limits
+
+- Configure Settings → Email with the selected provider's credentials and a verified sender. Resend uses `resend_api_key` / `resend_sender_email` (or `RESEND_API_KEY` / `RESEND_SENDER_EMAIL`). Optional verification now works for existing signed-in accounts even when signup does not require verification. Missing mail configuration returns a consistent unavailable response; provider failures are not treated as successful verification sends. No real email delivery has been verified by the local regression suite.
+- Free image attempts now require a verified email and share a server-enforced daily budget. `IMAGE_TRIAL_DAILY_LIMIT` defaults to **50 attempts per UTC day**; `0` pauses free attempts. Failed provider attempts still count toward that day's cap, while the account's free eligibility is restored. Review the limit for your provider budget before deployment. Budget state is atomic and stored in one module-managed `config` row, so no schema migration is needed.
+- Purchased credits require `usePaidCredits: true` after the displayed cost is reviewed. Without that opt-in a depleted free offer returns 429; a stale free quote whose account trial is already consumed returns 409. The studio refreshes access after rejected requests so users can review the current price. Older clients must reload before submitting a new paid generation; retries of already-created tasks remain idempotent. The server catalog still controls prices.
+- Edited studio drafts stay in the current tab through login and refresh, including the reference photo, prompt, template, mode and ratio. Photos expire after 30 minutes and expired files are removed on the next draft-storage use. Discard/sign-out clears the tab's draft; a different account cannot restore another account's draft. Privacy text describes this local storage.
+- Profile avatars are resized in the browser (maximum 256 px / 32 KB) and stored in the existing account image field. They no longer require R2. Other object-storage features still require storage configuration. Profile writes validate type/signature/size and same-origin authenticated access.
+- The homepage loads the studio near the viewport or on interaction; signed-out visitors defer account-menu code. This reduces initial work but does not establish production Core Web Vitals. See `docs/launch-fixes-2026-11-06.md` for verification and remaining configuration.
+
+## 2026-11-06 — Launch audit: operations accuracy
+
+- Vikas pricing now records `plan_selected` for authenticated package selections, so the operations funnel and user timeline include the actual product's purchase buttons. Historical missing events cannot be reconstructed.
+- Operations page tracking waits for a successfully matched route, ignores 404/error pages, and is disabled in Vite development. Development account creation can still write to the configured database: use an isolated database for tests, especially when `DATABASE_D1_REMOTE=true`.
+- Opening a returning visitor's browser with `?ops_test=1` now marks that visitor excluded, even after its first visit or alongside a concurrent ordinary request. The exclusion is one-way; later ordinary visits do not undo it. Existing unmarked test accounts/visits are not automatically reclassified.
+- The English and Chinese `/create` titles now describe the working image/video studio. No schema migration, permission change or new configuration is required. See `docs/launch-audit-2026-11-06.md` for remaining launch issues and verification.
+
 ## 2026-11-05 — Automatic badge installation
 
 Deploy `POST /api/integrations/footer-badges`, set the server-only

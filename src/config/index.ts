@@ -38,6 +38,7 @@ export const envConfigs: Record<string, string> = {
   footer_badge_automation_token_hash:
     procEnv.FOOTER_BADGE_AUTOMATION_TOKEN_HASH ?? '',
   auth_cookie_prefix: procEnv.AUTH_COOKIE_PREFIX ?? '',
+  image_trial_daily_limit: procEnv.IMAGE_TRIAL_DAILY_LIMIT ?? '50',
 
   // Payment - Stripe
   stripe_secret_key: procEnv.STRIPE_SECRET_KEY ?? '',

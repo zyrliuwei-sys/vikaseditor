@@ -119,6 +119,13 @@ export async function recordVisitor(
       if (!winner) throw error;
     }
   }
+  // Test traffic may be marked after its first visit. This is deliberately
+  // one-way, including when a simultaneous ordinary request won the insert.
+  if (input.excluded)
+    await db()
+      .update(visitor)
+      .set({ excluded: true })
+      .where(eq(visitor.id, input.id));
   if (input.userId) await linkVisitor(input.id, input.userId);
 }
 

@@ -98,6 +98,14 @@ export const Route = createFileRoute('/sitemap.xml')({
             priority: 0.8,
           });
 
+        entries.push({
+          path: '/guides/editing-by-vikas-templates',
+          lastModified: '2026-11-12',
+          changeFrequency: 'monthly',
+          priority: 0.8,
+          languages: ['en'],
+        });
+
         // Match the blog's published-only DB + registered MDX sources.
         // An empty locale stays out until its first article is published.
         const { publishedBlogEntries } = await import('@/server/blog-sitemap');

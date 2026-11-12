@@ -358,6 +358,9 @@ html[lang='zh'] .vikas-hero h1 > span {
   padding-top: 56px;
   padding-bottom: 42px;
 }
+.vikas-gallery .vikas-section-heading {
+  flex-wrap: wrap;
+}
 .vikas-gallery-tools {
   display: flex;
   justify-content: space-between;

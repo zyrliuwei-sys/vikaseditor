@@ -1,10 +1,16 @@
 import { useState } from 'react';
 import type { TemplateCategory, VikasTemplate } from '@/types/vikas';
-import { ArrowDown, Search, SlidersHorizontal } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUpRight,
+  Search,
+  SlidersHorizontal,
+} from 'lucide-react';
 
 import { Link } from '@/core/i18n/navigation';
 import { templatePath } from '@/config/template-pages';
 import { m } from '@/paraglide/messages.js';
+import { getLocale } from '@/paraglide/runtime.js';
 import { VikasTemplateCard } from '@/components/vikas/template-card';
 
 export function VikasGallery({ templates }: { templates: VikasTemplate[] }) {
@@ -39,6 +45,15 @@ export function VikasGallery({ templates }: { templates: VikasTemplate[] }) {
           <h2 id="gallery-title">{m['vikas.gallery.title']()}</h2>
           <p>{m['vikas.gallery.description']()}</p>
         </div>
+        {getLocale() === 'en' && (
+          <Link
+            href="/guides/editing-by-vikas-templates"
+            className="vikas-button"
+          >
+            editing by vikas templates
+            <ArrowUpRight size={16} aria-hidden="true" />
+          </Link>
+        )}
       </div>
       <div className="vikas-gallery-tools">
         <div

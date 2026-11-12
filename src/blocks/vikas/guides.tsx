@@ -8,6 +8,7 @@ import {
   type GuideSlug,
 } from '@/config/guides';
 import { m } from '@/paraglide/messages.js';
+import { getLocale } from '@/paraglide/runtime.js';
 
 export function getGuideLabels() {
   return {
@@ -33,6 +34,13 @@ export function getGuideLabels() {
     },
   };
 }
+
+const HOME_GUIDE_ANCHORS: Record<GuideSlug, string> = {
+  'vikas-editor': 'Vikas Editor complete guide',
+  'vikas-editor-logo': 'Vikas Editor logo files',
+  vikasheditor: 'Vikasheditor workflow guide',
+  'vikas-editor-prompt': 'Vikas Editor prompt recipes',
+};
 
 export function VikasGuides({ exclude }: { exclude?: GuideSlug }) {
   const labels = getGuideLabels();
@@ -72,7 +80,10 @@ export function VikasGuides({ exclude }: { exclude?: GuideSlug }) {
               <h3>{labels[slug].title}</h3>
               <p>{labels[slug].description}</p>
               <span className="guide-read">
-                {m['vikas.guides.read']()} <ArrowUpRight size={16} />
+                {!exclude && getLocale() === 'en'
+                  ? HOME_GUIDE_ANCHORS[slug]
+                  : m['vikas.guides.read']()}{' '}
+                <ArrowUpRight size={16} />
               </span>
             </div>
           </Link>

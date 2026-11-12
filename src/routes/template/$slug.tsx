@@ -40,10 +40,11 @@ export const Route = createFileRoute('/template/$slug')({
     const path = templatePath(page.id);
     const head = vikasPageHead(
       path,
-      m['vikas.template_page.meta_title'](
-        { title: template.title },
-        { locale }
-      ),
+      copy.seo?.title ??
+        m['vikas.template_page.meta_title'](
+          { title: template.title },
+          { locale }
+        ),
       copy.description,
       locale
     );

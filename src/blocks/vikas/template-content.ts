@@ -1,5 +1,8 @@
+import { TEMPLATE_ENGLISH_SEO } from '@/config/template-seo';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
+
+import { TEMPLATE_EDITORIAL } from './template-editorial.en';
 
 export function getTemplateCopy(id: string, locale = getLocale()) {
   const copy = {
@@ -157,5 +160,15 @@ export function getTemplateCopy(id: string, locale = getLocale()) {
       ],
     },
   };
-  return copy[id as keyof typeof copy];
+  return {
+    ...copy[id as keyof typeof copy],
+    editorial:
+      locale === 'en'
+        ? TEMPLATE_EDITORIAL[id as keyof typeof TEMPLATE_EDITORIAL]
+        : undefined,
+    seo:
+      locale === 'en'
+        ? TEMPLATE_ENGLISH_SEO[id as keyof typeof TEMPLATE_ENGLISH_SEO]
+        : undefined,
+  };
 }

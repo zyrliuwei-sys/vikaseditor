@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Check, Copy } from 'lucide-react';
 
 export function GuideDownload({
@@ -24,7 +24,7 @@ export function GuideTable({
   rows,
 }: {
   columns: string[];
-  rows: string[][];
+  rows: ReactNode[][];
 }) {
   return (
     <div

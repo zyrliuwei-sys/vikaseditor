@@ -9,6 +9,10 @@ import {
   templatePath,
   type TemplatePage,
 } from '@/config/template-pages';
+import {
+  EDITING_BY_VIKAS_NOTE,
+  TEMPLATE_ENGLISH_SEO,
+} from '@/config/template-seo';
 import { m } from '@/paraglide/messages.js';
 import { getTemplateCopy } from '@/blocks/vikas/template-content';
 
@@ -48,7 +52,10 @@ export function VikasTemplatePage({
       <div className="vikas-template-intro">
         <header>
           <p className="vikas-eyebrow">{m['vikas.template_page.eyebrow']()}</p>
-          <h1>{template.title}</h1>
+          <h1>{copy.seo?.name ?? template.title}</h1>
+          {copy.seo && (
+            <p className="vikas-template-help">{EDITING_BY_VIKAS_NOTE}</p>
+          )}
           <p className="vikas-template-effect">{copy.effect}</p>
           <Link
             href={`/create?mode=${template.mediaType}&template=${encodeURIComponent(template.id)}`}
@@ -66,7 +73,11 @@ export function VikasTemplatePage({
         <figure>
           <img
             src={images[0]}
-            alt={copy.captions[0]}
+            alt={
+              copy.seo
+                ? `${copy.seo.name} AI photo edit by vikas style example 1`
+                : copy.captions[0]
+            }
             width={512}
             height={512}
             fetchPriority="high"
@@ -79,7 +90,9 @@ export function VikasTemplatePage({
         <section id="prompt" aria-labelledby="template-prompt-title">
           <div className="vikas-template-section-heading">
             <h2 id="template-prompt-title">
-              {m['vikas.template_page.prompt_title']()}
+              {copy.seo
+                ? 'The full prompt'
+                : m['vikas.template_page.prompt_title']()}
             </h2>
             <button
               type="button"
@@ -94,6 +107,9 @@ export function VikasTemplatePage({
               </span>
             </button>
           </div>
+          {copy.editorial && (
+            <p className="vikas-template-help">{copy.editorial.introduction}</p>
+          )}
           <blockquote className="vikas-template-prompt" lang="en">
             {prompt}
           </blockquote>
@@ -112,6 +128,31 @@ export function VikasTemplatePage({
           </ul>
         </section>
       </div>
+
+      {copy.editorial && (
+        <div className="vikas-template-editorial">
+          <section aria-labelledby="template-look-title">
+            <h2 id="template-look-title">What this look changes</h2>
+            {copy.editorial.changes.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </section>
+          <section aria-labelledby="template-skin-title">
+            <h2 id="template-skin-title">
+              Adjusting it for Indian skin tones and sarees
+            </h2>
+            <p>{copy.editorial.skinTones}</p>
+          </section>
+          <section aria-labelledby="template-problems-title">
+            <h2 id="template-problems-title">Common problems</h2>
+            <ul>
+              {copy.editorial.problems.map((problem) => (
+                <li key={problem}>{problem}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      )}
 
       <section
         className="vikas-template-examples"
@@ -133,7 +174,11 @@ export function VikasTemplatePage({
             <figure key={src}>
               <img
                 src={src}
-                alt={copy.captions[index + 1]}
+                alt={
+                  copy.seo
+                    ? `${copy.seo.name} AI photo edit by vikas style example ${index + 2}`
+                    : copy.captions[index + 1]
+                }
                 width={1024}
                 height={1024}
                 loading="lazy"
@@ -150,17 +195,32 @@ export function VikasTemplatePage({
         aria-labelledby="template-related-title"
       >
         <h2 id="template-related-title">
-          {m['vikas.template_page.related_title']()}
+          {copy.seo
+            ? 'Related editing prompts'
+            : m['vikas.template_page.related_title']()}
         </h2>
         <nav aria-label={m['vikas.template_page.all_templates']()}>
           {related.map((item) => (
             <Link href={templatePath(item.id)} key={item.id}>
-              <h3>{item.title}</h3>
+              <h3>
+                {copy.seo
+                  ? TEMPLATE_ENGLISH_SEO[item.id as TemplatePage['id']].anchor
+                  : item.title}
+              </h3>
               <p>{item.description}</p>
               <ArrowUpRight size={18} aria-hidden="true" />
             </Link>
           ))}
         </nav>
+        {copy.seo && (
+          <p className="vikas-template-help">
+            Read the independent guide to{' '}
+            <Link href="/guides/editing-by-vikas-templates">
+              editing by vikas templates
+            </Link>
+            .
+          </p>
+        )}
       </section>
     </article>
   );

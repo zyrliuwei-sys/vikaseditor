@@ -1,30 +1,38 @@
-import {
-  GuideDownload,
-  GuideFigure,
-  GuideTable,
-} from '../../components/vikas/guide-elements';
+import { GuideFigure, GuideTable } from '../../components/vikas/guide-elements';
 
 export const meta = {
-  title: 'Vikas Editor Logo: Download the SVG & Use It Clearly',
+  title: 'Vikas Editor Logo: Download PNG & SVG (512px, 1024px)',
   description:
-    'Download the original logo for vikas-editor.net. Learn how to choose SVG or PNG, preserve clear space and distinguish a site logo from an editing watermark.',
-  updated_at: '2026-11-05',
+    'Download the vikas-editor.net logo as transparent PNG or SVG in 512 and 1024 pixels. Free for personal use, with clear-space and usage notes.',
+  updated_at: '2026-11-12',
   kind: 'guide',
-  category: '02 / VISUAL IDENTITY',
-  minutes: 5,
-  image: '/imgs/guides/logo-sheet.svg',
-  image_alt:
-    'The Vikas Editor AI V-shaped mark and the exact website address vikas-editor.net on a charcoal background',
-  image_caption:
-    'The mark used by this website, vikas-editor.net. It does not identify other sites or creators with a similar name.',
-  toc: [
-    { id: 'which-logo', label: 'Which logo do you need?' },
-    { id: 'download', label: 'Download the original' },
-    { id: 'choose-a-format', label: 'Choose a file format' },
-    { id: 'place-the-logo', label: 'Place it in a layout' },
-    { id: 'logo-or-watermark', label: 'Logo or watermark?' },
-    { id: 'questions', label: 'Common questions' },
+  imageObjects: [
+    { src: '/vikas-editor-logo-transparent-512.png', caption: 'Vikas Editor logo PNG 512px transparent', width: 512, height: 512 },
+    { src: '/vikas-editor-logo-512.png', caption: 'Vikas Editor logo PNG card version', width: 512, height: 512 },
+    { src: '/vikas-editor-logo-1024.png', caption: 'Vikas Editor logo PNG 1024px', width: 1024, height: 1024 },
   ],
+  downloads: [
+    { href: '/vikas-editor-logo-transparent-512.png', filename: 'vikas-editor-logo-transparent-512.png', label: 'Download PNG (512px, transparent)' },
+    { href: '/vikas-editor-logo-512.png', filename: 'vikas-editor-logo-512.png', label: 'Download PNG (Card, 512px)' },
+    { href: '/vikas-editor-logo-1024.png', filename: 'vikas-editor-logo-1024.png', label: 'Download PNG (1024px)' },
+    { href: '/logo.svg', filename: 'vikas-editor-logo.svg', label: 'Download SVG' },
+  ],
+
+category: '02 / VISUAL IDENTITY',
+minutes: 5,
+image: '/imgs/guides/logo-sheet.svg',
+image_alt:
+'The Vikas Editor AI V-shaped mark and the exact website address vikas-editor.net on a charcoal background',
+image_caption:
+'The mark used by this website, vikas-editor.net. It does not identify other sites or creators with a similar name.',
+toc: [
+{ id: 'which-logo', label: 'Which logo do you need?' },
+{ id: 'download', label: 'Download the original' },
+{ id: 'choose-a-format', label: 'Choose a file format' },
+{ id: 'place-the-logo', label: 'Place it in a layout' },
+{ id: 'logo-or-watermark', label: 'Logo or watermark?' },
+{ id: 'questions', label: 'Common questions' },
+],
 };
 
 Looking for a **Vikas Editor logo** can mean several things: the icon for an editing website, a creator's signature, an overlay for a video or a mark for your own editing profile. Those are different assets. This guide provides the original mark for [Vikas Editor AI](/) at **vikas-editor.net**, along with practical ways to place it in a tutorial, comparison or website link.
@@ -39,13 +47,33 @@ Avoid extracting a logo from a small search thumbnail. It may be compressed, cro
 
 <h2 id="download">{"Download this site's original logo"}</h2>
 
-<GuideDownload
-  href="/logo.svg"
-  filename="vikas-editor-ai-logo.svg"
-  label="Download the Vikas Editor AI SVG"
-/>
+The four download buttons above link directly to the actual files. Choose the transparent 512 × 512 PNG for the gold V alone, the 512 × 512 card PNG for the charcoal background and original gold linework, or the 1024 × 1024 card PNG for a larger raster export. The SVG remains the scalable source with its original 64 × 64 view box.
 
-The file is the same SVG used in our navigation, with a **64 × 64 view box**. It includes the charcoal rounded square and gold linework. That square is part of the artwork: the logo is not a floating gold V on a fully transparent canvas.
+These files are **free for personal use** when identifying this website accurately. Keep the proportions and leave clear space around the mark.
+
+<div className="guide-logo-files">
+  <GuideFigure
+    src="/vikas-editor-logo-transparent-512.png"
+    alt="Vikas Editor logo PNG 512px transparent"
+    caption="Vikas Editor logo PNG 512px transparent"
+    width={512}
+    height={512}
+  />
+  <GuideFigure
+    src="/vikas-editor-logo-512.png"
+    alt="Vikas Editor logo PNG card version"
+    caption="Vikas Editor logo PNG card version"
+    width={512}
+    height={512}
+  />
+  <GuideFigure
+    src="/vikas-editor-logo-1024.png"
+    alt="Vikas Editor logo PNG 1024px"
+    caption="Vikas Editor logo PNG 1024px"
+    width={1024}
+    height={1024}
+  />
+</div>
 
 When identifying this service, pair the mark with “Vikas Editor AI” and a link to [vikas-editor.net](/). Keep any descriptive text outside the artwork. Do not alter it to suggest that a different product, creator account or paid course is operated by this site. For partnership or other usage questions, contact [support@vikas-editor.net](mailto:support@vikas-editor.net).
 
@@ -60,9 +88,21 @@ When identifying this service, pair the mark with “Vikas Editor AI” and a li
       'Keep the original proportions and check that the destination supports SVG.',
     ],
     [
-      'PNG',
-      'A slide, thumbnail or video editor that needs a raster image.',
-      'Export a sufficiently large copy. PNG supports transparency, but the original logo’s charcoal square remains part of the design.',
+      'PNG · transparent',
+      'A gold V overlay for a slide, thumbnail or video editor.',
+      <a
+        href="/vikas-editor-logo-transparent-512.png"
+        download="vikas-editor-logo-transparent-512.png"
+      >
+        Download transparent PNG (512px)
+      </a>,
+    ],
+    [
+      'PNG · card',
+      'The charcoal card with gold linework, ready for a light or dark layout.',
+      <a href="/vikas-editor-logo-512.png" download="vikas-editor-logo-512.png">
+        Download card PNG (512px)
+      </a>,
     ],
     [
       'JPEG',
@@ -75,10 +115,10 @@ When identifying this service, pair the mark with “Vikas Editor AI” and a li
 <GuideFigure
   src="/imgs/guides/logo-formats.svg"
   alt="Diagram comparing SVG scalable source artwork, PNG transparent pixels and JPEG flat backgrounds"
-  caption="Download the SVG master, then export a copy in the format your destination accepts."
+  caption="Choose a ready-made PNG download or keep the SVG master for other sizes."
 />
 
-If an editor will not accept SVG, open the downloaded file in a vector editor and export a PNG. Choose a square canvas and keep the aspect ratio locked. For a small screen placement, a 512 × 512 export is a useful starting point; use a larger export if the logo will occupy more pixels. Enlarging an already small PNG cannot restore the original edge detail.
+If an editor will not accept SVG, use one of the PNG downloads above. The 512px versions suit small screen placements; choose the 1024px card when you need a larger raster image. For a different size, export from the SVG with a square canvas and the aspect ratio locked. Enlarging a small PNG cannot restore the original edge detail.
 
 Renaming `.svg` to `.png` does not convert the file. Use an actual export command, inspect the saved image and keep the SVG separately for future sizes.
 
@@ -104,13 +144,13 @@ If your goal is to make a clean composition, begin with a photo you may use and 
 
 <h2 id="questions">{'Common logo questions'}</h2>
 
-### Is this the official logo of Editing By Vikas?
+### Is this the same logo used by Editing By Vikas?
 
 No. It is the logo of this independent website, vikas-editor.net. Use the source website's own assets when referring to another service or creator.
 
 ### Is there a transparent PNG download here?
 
-This page supplies the original SVG. You can export a PNG in a compatible editor. The charcoal square is intentionally included, so exporting does not make that part transparent.
+Yes. Download the 512px transparent PNG above: it contains only the gold V, with no charcoal background or corner brackets. The separate card PNGs preserve the original charcoal square and gold linework.
 
 ### Can I use this as my own editing channel's logo?
 

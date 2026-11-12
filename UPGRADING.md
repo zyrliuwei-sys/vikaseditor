@@ -1,3 +1,11 @@
+## 2026-11-12 — Six scoped English SEO updates
+
+- Publish three PNG logo downloads and ImageObject metadata on `/guides/vikas-editor-logo`; `/logo.svg` is unchanged.
+- The existing nine English template pages share exact title mappings, an independent-creator note, distinct editing guidance and descriptive links. Existing slugs and Chinese titles remain unchanged.
+- Add only `/guides/editing-by-vikas-templates` (English), linked from the homepage FAQ, starting guide and template pages. The four-guide homepage collection and sitemap/robots definitions are unchanged.
+- Keep the homepage Title/H1, add the requested positioning sentence and matching six-item FAQPage data, and update its four guide labels. Distinguish the three create-page headings/titles and add hub links. Parameterised `/create` URLs retain the existing query-free canonical.
+- No database migration, secret, dependency or provider configuration change is required. Rebuild and deploy the Worker with its public assets.
+
 ## 2026-11-06 — Account recovery, studio drafts and trial limits
 
 - Configure Settings → Email with the selected provider's credentials and a verified sender. Resend uses `resend_api_key` / `resend_sender_email` (or `RESEND_API_KEY` / `RESEND_SENDER_EMAIL`). Optional verification now works for existing signed-in accounts even when signup does not require verification. Missing mail configuration returns a consistent unavailable response; provider failures are not treated as successful verification sends. No real email delivery has been verified by the local regression suite.

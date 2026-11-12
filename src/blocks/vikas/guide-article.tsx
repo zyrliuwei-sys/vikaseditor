@@ -6,11 +6,14 @@ import { Link } from '@/core/i18n/navigation';
 import type { GuideSlug } from '@/config/guides';
 import { m } from '@/paraglide/messages.js';
 import { mdxComponents } from '@/components/mdx-components';
+import { GuideDownload } from '@/components/vikas/guide-elements';
 
 import { VikasGuides } from './guides';
 
 export type GuideMeta = {
   title: string;
+  heading?: string;
+  downloads?: { href: string; filename: string; label: string }[];
   description: string;
   updated_at: string;
   kind: 'guide';
@@ -37,7 +40,7 @@ export function VikasGuideArticle({
         <header className="guide-header">
           <div>
             <p className="vikas-eyebrow">{meta.category}</p>
-            <h1>{meta.title}</h1>
+            <h1>{meta.heading ?? meta.title}</h1>
             <p className="guide-deck">{meta.description}</p>
             <div className="guide-byline">
               <span>{m['vikas.guides.author']()}</span>
@@ -49,6 +52,13 @@ export function VikasGuideArticle({
                 {m['vikas.guides.reading_time']({ minutes: meta.minutes })}
               </span>
             </div>
+            {meta.downloads && (
+              <div className="guide-downloads">
+                {meta.downloads.map((download) => (
+                  <GuideDownload key={download.href} {...download} />
+                ))}
+              </div>
+            )}
             <Link href="/#templates" className="guide-start">
               {m['vikas.guides.explore']()} <ArrowUpRight size={17} />
             </Link>

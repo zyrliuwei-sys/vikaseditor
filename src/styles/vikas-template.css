@@ -182,3 +182,21 @@
     grid-template-columns: 1fr;
   }
 }
+
+.vikas-template-editorial {
+  max-width: 800px;
+  padding: 8px 0 48px;
+}
+.vikas-template-editorial section + section {
+  margin-top: 36px;
+}
+.vikas-template-editorial p,
+.vikas-template-editorial li {
+  margin-top: 18px;
+  line-height: 1.85;
+  color: var(--muted-foreground);
+}
+.vikas-template-editorial ul {
+  list-style: disc;
+  padding-left: 22px;
+}

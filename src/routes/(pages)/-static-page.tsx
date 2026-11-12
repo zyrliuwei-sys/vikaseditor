@@ -16,6 +16,12 @@ type PageMeta = {
   description: string;
   updated_at: string;
   kind?: 'guide';
+  imageObjects?: {
+    src: string;
+    caption: string;
+    width: number;
+    height: number;
+  }[];
 };
 
 type PageModule = {
@@ -52,11 +58,14 @@ type LoaderData = {
 // content plus a thin route file using this factory.
 export function staticPageRouteOptions(
   slug: string,
-  translations?: Record<string, PageModule>
+  translations?: Record<string, PageModule>,
+  options?: { onlyLocales?: ReturnType<typeof getLocale>[] }
 ) {
   return {
     loader: (): LoaderData => {
       const locale = getLocale();
+      if (options?.onlyLocales && !options.onlyLocales.includes(locale))
+        throw notFound();
       const page =
         translations?.[locale] ??
         translations?.[baseLocale] ??
@@ -75,6 +84,15 @@ export function staticPageRouteOptions(
         meta.description,
         locale
       );
+      if (options?.onlyLocales)
+        head.links = head.links.filter(
+          (link) =>
+            !('hrefLang' in link) ||
+            link.hrefLang === 'x-default' ||
+            options.onlyLocales!.includes(
+              link.hrefLang as ReturnType<typeof getLocale>
+            )
+        );
       if (meta.kind !== 'guide') return head;
       const guide = meta as GuideMeta;
       const url = head.links.find((link) => link.rel === 'canonical')!.href;
@@ -101,6 +119,16 @@ export function staticPageRouteOptions(
               )
           ),
         scripts: [
+          ...(meta.imageObjects ?? []).map((image) =>
+            jsonLd({
+              '@context': 'https://schema.org',
+              '@type': 'ImageObject',
+              contentUrl: new URL(image.src, envConfigs.app_url).href,
+              caption: image.caption,
+              width: image.width,
+              height: image.height,
+            })
+          ),
           jsonLd({
             '@context': 'https://schema.org',
             '@type': 'Article',

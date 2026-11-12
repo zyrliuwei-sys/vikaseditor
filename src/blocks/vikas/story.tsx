@@ -10,8 +10,11 @@ import {
   Sparkles,
 } from 'lucide-react';
 
+import { Link } from '@/core/i18n/navigation';
 import { m } from '@/paraglide/messages.js';
 import { VikasArtwork } from '@/components/vikas/artwork';
+
+import { getVikasFaq } from './faq-content';
 
 export function VikasVideoStory({ onCreate }: { onCreate: () => void }) {
   const [playing, setPlaying] = useState(false);
@@ -131,14 +134,7 @@ export function VikasHowItWorks() {
 }
 
 export function VikasFAQ() {
-  const items = [
-    { q: m['vikas.faq.q1'](), a: m['vikas.faq.a1']() },
-    { q: m['vikas.faq.q2'](), a: m['vikas.faq.a2']() },
-    { q: m['vikas.faq.q3'](), a: m['vikas.faq.a3']() },
-    { q: m['vikas.faq.q4'](), a: m['vikas.faq.a4']() },
-    { q: m['vikas.faq.q5'](), a: m['vikas.faq.a5']() },
-    { q: m['vikas.faq.q6'](), a: m['vikas.faq.a6']() },
-  ];
+  const items = getVikasFaq();
   return (
     <section
       id="faq"
@@ -156,7 +152,16 @@ export function VikasFAQ() {
               {item.q}
               <Plus size={18} />
             </summary>
-            <p>{item.a}</p>
+            <p>
+              {item.a}
+              {item.guide && (
+                <>
+                  {' '}
+                  Read our{' '}
+                  <Link href={item.guide.href}>{item.guide.label}</Link> guide.
+                </>
+              )}
+            </p>
           </details>
         ))}
       </div>

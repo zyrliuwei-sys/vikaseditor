@@ -6,6 +6,7 @@ import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
 import { Footer } from '@/blocks/footer';
 import { Header } from '@/blocks/header';
+import { getVikasFaq } from '@/blocks/vikas/faq-content';
 import { VikasHome } from '@/blocks/vikas/home';
 
 function HomePage() {
@@ -41,6 +42,22 @@ export const Route = createFileRoute('/')({
         },
       ],
       scripts: [
+        ...(locale === 'en'
+          ? [
+              jsonLd({
+                '@context': 'https://schema.org',
+                '@type': 'FAQPage',
+                mainEntity: getVikasFaq(locale).map(({ q, a, guide }) => ({
+                  '@type': 'Question',
+                  name: q,
+                  acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: guide ? `${a} Read our ${guide.label} guide.` : a,
+                  },
+                })),
+              }),
+            ]
+          : []),
         jsonLd({
           '@context': 'https://schema.org',
           '@type': 'WebSite',

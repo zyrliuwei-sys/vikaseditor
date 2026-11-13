@@ -32,6 +32,10 @@ const { user } = await import('../src/config/db/schema');
 const { getAllConfigs, saveConfigs } =
   await import('../src/modules/config/service');
 const { ResendProvider } = await import('../src/core/email/resend');
+const { generationAccess } = await import('../src/server/generations/handlers');
+const { createGeneration } =
+  await import('../src/modules/ai-tasks/generations');
+const { GENERATION_CATALOG } = await import('../src/config/generation');
 const { Route: authRoute } = await import('../src/routes/api/auth/$');
 const { Route: profileRoute } = await import('../src/routes/api/user/profile');
 const authPost = (authRoute.options.server!.handlers as any).POST;
@@ -78,6 +82,44 @@ const request = (body: unknown, extra: Record<string, string> = {}) =>
     },
     body: JSON.stringify(body),
   });
+
+test('email signup without a mail provider starts a session and can claim a free image', async () => {
+  assert.equal(created.user.emailVerified, false);
+  const session = await auth.api.getSession({
+    headers: new Headers({ cookie }),
+  });
+  assert.equal(session?.user.id, uid);
+  const response = await generationAccess({
+    request: new Request('http://localhost:3000/api/generations/access', {
+      headers: { cookie },
+    }),
+  });
+  assert.equal(response.status, 200);
+  assert.deepEqual((await response.json()).data, {
+    paidCredits: 0,
+    freeImageAvailable: true,
+    trialPaused: false,
+  });
+  const { task } = await createGeneration({
+    id: 'new-signup-free-image',
+    userId: uid,
+    fingerprint: 'new-signup-free-image',
+    mediaType: 'image',
+    model: GENERATION_CATALOG.image.textModel,
+    prompt: 'A cinematic portrait',
+    aspectRatio: '3:4',
+    credits: GENERATION_CATALOG.image.credits,
+    usePaidCredits: false,
+  });
+  assert.equal(JSON.parse(task.options!).funding, 'image_trial');
+  const [saved] = await db().select().from(user).where(eq(user.id, uid));
+  assert.equal(saved.emailVerified, false);
+  assert.equal(
+    sent.length,
+    0,
+    'signup and free access do not send verification mail'
+  );
+});
 
 test('profile avatars save without storage and remain scoped to the authenticated user', async () => {
   const result = await patch({

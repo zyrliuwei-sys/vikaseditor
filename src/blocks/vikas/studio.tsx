@@ -190,8 +190,6 @@ export function VikasStudio({
       : (capabilities.data?.imageCredits ?? 51);
   const freeImage =
     mode === 'image' && access.data?.freeImageAvailable === true;
-  const verificationNeeded =
-    mode === 'image' && access.data?.trialRequiresVerification === true;
   const trialPaused = mode === 'image' && access.data?.trialPaused === true;
   const needsPayment = Boolean(
     session?.user &&
@@ -799,33 +797,6 @@ export function VikasStudio({
                 {m['vikas.studio.retry']()}
               </button>
             </p>
-          )}
-          {verificationNeeded && (
-            <div className="vs-service-notice" role="status">
-              <div>
-                <p>
-                  {access.data?.emailVerificationAvailable
-                    ? m['vikas.studio.verify_trial']()
-                    : m['vikas.studio.verification_unavailable']()}
-                </p>
-                {access.data?.emailVerificationAvailable && (
-                  <Link
-                    href={`/verify-email?email=${encodeURIComponent(session?.user.email ?? '')}&callbackUrl=${encodeURIComponent(returnPath)}`}
-                    className="vs-copy"
-                  >
-                    {m['vikas.studio.verify_email']()}
-                  </Link>
-                )}
-                <button
-                  type="button"
-                  className="vs-copy"
-                  disabled={access.isFetching}
-                  onClick={() => void access.refetch()}
-                >
-                  {m['vikas.studio.refresh_balance']()}
-                </button>
-              </div>
-            </div>
           )}
           {trialPaused && !working && (
             <div role="status" className="vs-service-notice">

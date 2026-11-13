@@ -20,7 +20,6 @@ import {
 } from '@/modules/ai-tasks/generations';
 import { getAllConfigs } from '@/modules/config/service';
 import { getPaidBalance } from '@/modules/credits/service';
-import { isEmailSendingConfigured } from '@/lib/email-config';
 import { safeGenerationDownloadUrl } from '@/lib/generation-download';
 import {
   generationIdentity,
@@ -86,16 +85,14 @@ export async function generationAccess({ request }: { request: Request }) {
   try {
     const userId = await authenticate(request, 200, 'access');
     if (userId instanceof Response) return userId;
-    const [paidCredits, trial, config] = await Promise.all([
+    const [paidCredits, trial] = await Promise.all([
       getPaidBalance(userId),
       imageTrialAccess(userId, GENERATION_CATALOG.image.credits),
-      getAllConfigs(),
     ]);
     return respData(
       {
         paidCredits,
         ...trial,
-        emailVerificationAvailable: isEmailSendingConfigured(config),
       },
       PRIVATE
     );

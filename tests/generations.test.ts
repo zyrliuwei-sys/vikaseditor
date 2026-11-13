@@ -97,7 +97,7 @@ async function account(credits = 255, usedTrial = true) {
       id,
       email: `${id}@example.test`,
       name: 'Test creator',
-      emailVerified: true,
+      emailVerified: false,
     });
   await db()
     .insert(schema.order)
@@ -393,7 +393,7 @@ test('Fal errors expose only status and preserve transient polling failures', as
   }
 });
 
-test('a new account gets exactly one free image across concurrent distinct requests', async () => {
+test('an unverified new account gets exactly one free image across concurrent distinct requests', async () => {
   const user = await account(0, false);
   const params = await Promise.all(
     Array.from({ length: 12 }, () => taskParams(user))
@@ -500,28 +500,44 @@ test('a paid-only debit aborts atomically when its payment begins refunding', as
   assert.equal(await getPaidBalance(user), 0);
 });
 
-test('unverified accounts cannot spend a free image, but can use purchased credits', async () => {
+test('unverified accounts can claim a free image without changing their identity or spending paid credits', async () => {
+  const id = await account(51, false);
+  const access = await imageTrialAccess(id, 51);
+  assert.deepEqual(access, { freeImageAvailable: true, trialPaused: false });
+  const { task } = await createGeneration({
+    ...(await taskParams(id)),
+    usePaidCredits: false,
+  });
+  assert.equal(JSON.parse(task.options!).funding, 'image_trial');
+  assert.equal(await getPaidBalance(id), 51);
+  assert.equal((await imageTrialAccess(id, 51)).freeImageAvailable, false);
+  const [saved] = await db()
+    .select()
+    .from(schema.user)
+    .where(eq(schema.user.id, id));
+  assert.equal(saved.emailVerified, false);
+  await assert.rejects(
+    createGeneration({ ...(await taskParams(id)), usePaidCredits: false }),
+    /Free image availability changed/
+  );
+  assert.equal((await listGenerations(id)).length, 1);
+  const paid = await createGeneration(await taskParams(id));
+  assert.equal(JSON.parse(paid.task.options!).funding, 'paid');
+  assert.equal(await getPaidBalance(id), 0);
+});
+
+test('already verified accounts retain their free image eligibility', async () => {
   const id = await account(0, false);
   await db()
     .update(schema.user)
-    .set({ emailVerified: false })
+    .set({ emailVerified: true })
     .where(eq(schema.user.id, id));
-  const access = await imageTrialAccess(id, 51);
-  assert.equal(access.freeImageAvailable, false);
-  assert.equal(access.trialRequiresVerification, true);
-  await assert.rejects(
-    createGeneration(await taskParams(id)),
-    /Verify your email/
-  );
-  assert.equal((await listGenerations(id)).length, 0);
-  const paid = await account(51, false);
-  await db()
-    .update(schema.user)
-    .set({ emailVerified: false })
-    .where(eq(schema.user.id, paid));
-  const { task } = await createGeneration(await taskParams(paid));
-  assert.equal(JSON.parse(task.options!).funding, 'paid');
-  assert.equal(await getPaidBalance(paid), 0);
+  assert.equal((await imageTrialAccess(id, 51)).freeImageAvailable, true);
+  const { task } = await createGeneration({
+    ...(await taskParams(id)),
+    usePaidCredits: false,
+  });
+  assert.equal(JSON.parse(task.options!).funding, 'image_trial');
 });
 
 test('the site-wide free-image limit holds across concurrent accounts and retries', async () => {

@@ -1,3 +1,9 @@
+## 2026-11-13 — Free images without email verification
+
+- Signed-in accounts can claim their first free image without verifying an email or configuring a mail provider. This supersedes the verification prerequisite introduced on November 6. Existing email verification status and identity-linking protections are unchanged.
+- Keep the atomic one-image-per-account claim, the site-wide `IMAGE_TRIAL_DAILY_LIMIT` (50 attempts per UTC day by default), failure restoration and explicit consent before spending purchased credits. Video still requires purchased credits.
+- The studio no longer displays verification gates. `/api/generations/access` now returns only `paidCredits`, `freeImageAvailable` and `trialPaused`; deploy the updated frontend with the backend. Related English and Chinese trial descriptions reflect the new eligibility. No schema migration, secret or environment change is required.
+
 ## 2026-11-12 — Six scoped English SEO updates
 
 - Publish three PNG logo downloads and ImageObject metadata on `/guides/vikas-editor-logo`; `/logo.svg` is unchanged.

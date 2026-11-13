@@ -3,7 +3,7 @@ import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
 import { db } from '@/core/db';
 import { atomic, AtomicGuardError, guard } from '@/core/db/atomic';
 import { envConfigs } from '@/config';
-import { aiTask, config, user } from '@/config/db/schema';
+import { aiTask, config } from '@/config/db/schema';
 import {
   imageTrialAvailable,
   planConsume,
@@ -51,21 +51,13 @@ export async function imageTrialBudget(now = new Date()) {
 }
 
 export async function imageTrialAccess(userId: string, credits: number) {
-  const [[account], unused, budget] = await Promise.all([
-    db()
-      .select({ verified: user.emailVerified })
-      .from(user)
-      .where(eq(user.id, userId))
-      .limit(1),
+  const [unused, budget] = await Promise.all([
     imageTrialAvailable(userId, credits),
     imageTrialBudget(),
   ]);
   return {
-    freeImageAvailable: Boolean(
-      unused && account?.verified && budget.available
-    ),
-    trialRequiresVerification: Boolean(unused && !account?.verified),
-    trialPaused: Boolean(unused && account?.verified && !budget.available),
+    freeImageAvailable: Boolean(unused && budget.available),
+    trialPaused: Boolean(unused && !budget.available),
   };
 }
 export type GenerationTask = typeof aiTask.$inferSelect;
@@ -151,15 +143,7 @@ export async function createGeneration(params: {
     const unusedTrial =
       params.mediaType === 'image' &&
       (await imageTrialAvailable(params.userId, params.credits));
-    const [account] = unusedTrial
-      ? await db()
-          .select({ verified: user.emailVerified })
-          .from(user)
-          .where(eq(user.id, params.userId))
-          .limit(1)
-      : [];
-    const eligibleTrial = Boolean(unusedTrial && account?.verified);
-    const currentBudget = eligibleTrial ? await imageTrialBudget() : null;
+    const currentBudget = unusedTrial ? await imageTrialBudget() : null;
     if (currentBudget && !currentBudget.available && !params.usePaidCredits)
       throw new GenerationTaskError(
         'Free images have reached today’s limit. Please try again tomorrow.',
@@ -193,11 +177,6 @@ export async function createGeneration(params: {
       // A concurrent duplicate may have spent the last credits while we read.
       const concurrent = await findGeneration(params.id, params.userId);
       if (concurrent) return matchingTask(concurrent, params.fingerprint);
-      if (unusedTrial && !account?.verified)
-        throw new GenerationTaskError(
-          'Verify your email before using the free image.',
-          403
-        );
       throw new GenerationTaskError(
         'Not enough credits. Add credits before generating.',
         402
@@ -225,13 +204,6 @@ export async function createGeneration(params: {
       await atomic((q) => [
         ...(budget
           ? [
-              guard({
-                table: user,
-                column: 'id',
-                where: eq(user.id, params.userId),
-                require: eq(user.emailVerified, true),
-                message: 'Email verification changed',
-              }),
               q
                 .insert(config)
                 .values({ name: TRIAL_BUDGET_KEY, value: budget.initial })

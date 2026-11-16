@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import type { MediaMode } from '@/types/vikas';
 
 import { Link } from '@/core/i18n/navigation';
+import { trackMarketingEvent } from '@/lib/marketing-analytics';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
 import { VikasStudio } from '@/blocks/vikas/studio';
@@ -17,6 +19,10 @@ export function VikasCreate({
   templateId?: string;
   onModeChange?: (mode: MediaMode) => void;
 }) {
+  useEffect(() => {
+    trackMarketingEvent('studio_viewed', { mode });
+  }, [mode]);
+
   const templates = getVikasTemplates();
   const template =
     templates.find(
@@ -35,6 +41,9 @@ export function VikasCreate({
               : m['vikas.create.title']()}
           </h1>
           <p>{m['vikas.create.description']()}</p>
+          <p className="vikas-create-free-note">
+            {m['vikas.create.free_note']()}
+          </p>
           {!entry && getLocale() === 'en' && (
             <p className="vikas-create-links">
               Choose the <Link href="/create/image">AI photo editor</Link> or

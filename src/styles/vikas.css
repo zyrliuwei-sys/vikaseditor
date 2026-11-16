@@ -1282,6 +1282,19 @@ html[lang='zh'] .vikas-hero h1 > span {
 .vikas-hero-explore:hover {
   color: var(--primary);
 }
+.vikas-hero-free-note {
+  margin: 13px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.vikas-mobile-signup {
+  gap: 8px;
+}
+.vikas-create-free-note {
+  color: var(--foreground) !important;
+  font-weight: 600;
+}
 .vikas-desktop-links > a,
 .vikas-login {
   display: inline-flex;

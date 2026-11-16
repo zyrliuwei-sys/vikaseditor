@@ -17,9 +17,11 @@ interface NavigationProps {
   logo: string;
   activeHref?: string;
   signInHref?: string;
+  signUpHref?: string;
   links: { href: string; label: string }[];
   copy: {
     signIn: string;
+    signUp: string;
     start: string;
     openMenu: string;
     closeMenu: string;
@@ -39,6 +41,7 @@ export function VikasNavigation({
   user,
   activeHref,
   signInHref = '/sign-in',
+  signUpHref = '/sign-up',
 }: NavigationProps) {
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -108,8 +111,11 @@ export function VikasNavigation({
                 {copy.signIn}
               </Link>
             )}
-            <Link href="/create" className="vikas-button vikas-button-small">
-              {copy.start}
+            <Link
+              href={user ? '/create' : signUpHref}
+              className="vikas-button vikas-button-small"
+            >
+              {user ? copy.start : copy.signUp}
               <ArrowRight size={15} />
             </Link>
             <button
@@ -142,7 +148,18 @@ export function VikasNavigation({
                 lightLabel={copy.lightTheme}
                 darkLabel={copy.darkTheme}
               />
-              {!user && <Link href={signInHref}>{copy.signIn}</Link>}
+              {!user && (
+                <>
+                  <Link href={signInHref}>{copy.signIn}</Link>
+                  <Link
+                    href={signUpHref}
+                    className="vikas-button vikas-button-small vikas-mobile-signup"
+                  >
+                    {copy.signUp}
+                    <ArrowRight size={15} />
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         )}

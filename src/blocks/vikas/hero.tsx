@@ -1,6 +1,7 @@
 import type { MediaMode, VikasTemplate } from '@/types/vikas';
 import { ArrowRight, ArrowUpRight, ImagePlus } from 'lucide-react';
 
+import { trackMarketingEvent } from '@/lib/marketing-analytics';
 import { m } from '@/paraglide/messages.js';
 import { VikasArtwork } from '@/components/vikas/artwork';
 
@@ -27,7 +28,12 @@ export function VikasHero({
           <div className="vikas-hero-actions">
             <button
               className="vikas-button"
-              onClick={() => onCreate('image', undefined, true)}
+              onClick={() => {
+                trackMarketingEvent('hero_free_image_clicked', {
+                  mode: 'image',
+                });
+                onCreate('image', undefined, true);
+              }}
             >
               <ImagePlus size={18} />
               {m['vikas.hero.upload']()}
@@ -37,6 +43,7 @@ export function VikasHero({
               <ArrowRight size={17} />
             </a>
           </div>
+          <p className="vikas-hero-free-note">{m['vikas.hero.free_note']()}</p>
         </div>
         <div className="vikas-hero-art">
           <div className="vikas-art-label">

@@ -17,13 +17,15 @@ export function Header() {
     pathname === '/create'
       ? `/create/${location.search.mode === 'video' ? 'video' : 'image'}`
       : pathname;
+  const callbackUrl = `${pathname}${location.searchStr}${pathname === '/' || pathname.startsWith('/create') ? '#studio' : ''}`;
   return (
     <VikasNavigation
       brand={envConfigs.app_name}
       logo={envConfigs.app_logo}
       user={session?.user}
       activeHref={activeHref}
-      signInHref={`/sign-in?callbackUrl=${encodeURIComponent(`${pathname}${location.searchStr}${pathname === '/' || pathname.startsWith('/create') ? '#studio' : ''}`)}`}
+      signInHref={`/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+      signUpHref={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}
       links={[
         { href: '/#templates', label: m['vikas.nav.templates']() },
         { href: '/create/image', label: m['vikas.nav.image']() },
@@ -32,6 +34,7 @@ export function Header() {
       ]}
       copy={{
         signIn: m['vikas.nav.signin'](),
+        signUp: m['vikas.nav.signup'](),
         start: m['vikas.nav.start'](),
         openMenu: m['vikas.nav.menu'](),
         closeMenu: m['vikas.nav.close'](),

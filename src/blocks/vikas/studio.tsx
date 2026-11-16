@@ -32,11 +32,13 @@ import { z } from 'zod';
 import { useSession } from '@/core/auth/client';
 import { Link, usePathname } from '@/core/i18n/navigation';
 import { ApiError, apiGet, apiPost } from '@/lib/api-client';
+import { trackMarketingEvent } from '@/lib/marketing-analytics';
 import {
   clearStudioDraft,
   restoreStudioDraft,
   saveStudioDraft,
 } from '@/lib/studio-draft';
+import { track } from '@/lib/track';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
 import { Button } from '@/components/ui/button';
@@ -111,6 +113,7 @@ export function VikasStudio({
   const lastSelectionRef = useRef<number | null>(null);
   const activeUserRef = useRef<string | undefined>(session?.user.id);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const paywallTrackedRef = useRef(false);
 
   const capabilities = useQuery({
     queryKey: ['vikas-generation-config'],
@@ -266,6 +269,11 @@ export function VikasStudio({
       }
       try {
         const image = photo ? await readImage(photo) : undefined;
+        trackMarketingEvent('generation_started', {
+          mode,
+          has_photo: Boolean(image),
+          free_image: freeImage,
+        });
         requestIdRef.current ??= crypto.randomUUID();
         await generation.mutateAsync({
           userId: session.user.id,
@@ -418,6 +426,18 @@ export function VikasStudio({
     }
   }, [result?.id, result?.status, queryClient]);
 
+  useEffect(() => {
+    if (needsPayment && !working && !paywallTrackedRef.current) {
+      paywallTrackedRef.current = true;
+      trackMarketingEvent('paywall_viewed', { mode });
+      track('paywall_hit', {
+        feature: mode === 'image' ? 'image_generation' : 'video_generation',
+      });
+    } else if (!needsPayment) {
+      paywallTrackedRef.current = false;
+    }
+  }, [mode, needsPayment, working]);
+
   useEffect(
     () => () => {
       if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
@@ -453,6 +473,7 @@ export function VikasStudio({
       setPhotoError(m['vikas.studio.file_size_error']());
       return;
     }
+    trackMarketingEvent('photo_selected', { mode });
     setPhoto(file);
   }
 
@@ -823,7 +844,13 @@ export function VikasStudio({
               <Info size={17} />
             </Button>
           ) : !sessionPending && !session?.user ? (
-            <Link href={signInUrl} className="vs-generate">
+            <Link
+              href={signInUrl}
+              className="vs-generate"
+              onClick={() =>
+                trackMarketingEvent('auth_prompt_clicked', { mode })
+              }
+            >
               <span>{m['vikas.studio.sign_in_generate']()}</span>
               <ArrowRight size={18} />
             </Link>

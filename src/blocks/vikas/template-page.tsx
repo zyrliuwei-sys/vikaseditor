@@ -13,6 +13,7 @@ import {
   EDITING_BY_VIKAS_NOTE,
   TEMPLATE_ENGLISH_SEO,
 } from '@/config/template-seo';
+import { trackMarketingEvent } from '@/lib/marketing-analytics';
 import { m } from '@/paraglide/messages.js';
 import { getTemplateCopy } from '@/blocks/vikas/template-content';
 
@@ -60,6 +61,12 @@ export function VikasTemplatePage({
           <Link
             href={`/create?mode=${template.mediaType}&template=${encodeURIComponent(template.id)}`}
             className="vikas-button"
+            onClick={() =>
+              trackMarketingEvent('template_cta_clicked', {
+                template: template.id,
+                media: template.mediaType,
+              })
+            }
           >
             {m['vikas.template_page.use']()} <ArrowUpRight size={17} />
           </Link>

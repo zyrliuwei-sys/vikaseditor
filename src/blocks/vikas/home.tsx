@@ -108,7 +108,6 @@ export function VikasHome() {
         onCreate={create}
         onTemplate={selectTemplate}
       />
-      <VikasGallery templates={templates} />
       <div ref={studioRef}>
         <Suspense fallback={<StudioPlaceholder />}>
           {studioVisible ? (
@@ -122,6 +121,7 @@ export function VikasHome() {
           )}
         </Suspense>
       </div>
+      <VikasGallery templates={templates} />
       <VikasHowItWorks />
       <VikasVideoStory onCreate={() => selectTemplate(templates[7])} />
       <VikasIntroduction />

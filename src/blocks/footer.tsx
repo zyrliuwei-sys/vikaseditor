@@ -4,6 +4,7 @@ import { Link } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { openCookieSettings } from '@/lib/cookie-consent';
 import { m } from '@/paraglide/messages.js';
+import { getLocale } from '@/paraglide/runtime.js';
 import { FooterBadgeList } from '@/components/footer-badge-list';
 
 const rootRoute = getRouteApi('__root__');
@@ -24,6 +25,9 @@ export function Footer() {
         { href: '/#templates', label: m['vikas.nav.templates']() },
         { href: '/#how-it-works', label: m['vikas.nav.how']() },
         { href: '/#guides', label: m['vikas.guides.eyebrow']() },
+        ...(getLocale() === 'en'
+          ? [{ href: '/blog', label: m['blog.title']() }]
+          : []),
         { href: '/pricing', label: m['vikas.footer.credits']() },
       ],
     },

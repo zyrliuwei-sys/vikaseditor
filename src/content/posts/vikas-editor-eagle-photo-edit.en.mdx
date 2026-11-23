@@ -1,0 +1,168 @@
+import { GuidePrompt, GuideTable } from '../../components/vikas/guide-elements';
+import { BLOG_PROMPTS } from '../blog-prompts';
+
+export const meta = {
+  title: 'Vikas Editor Eagle Photo Edit: Prompts & Steps',
+  description:
+    'Create a Vikas Editor eagle photo edit with three original prompts. Learn wing placement, natural skin tones, saree details and fixes for awkward composites.',
+  created_at: '2026-11-23T09:00:00+08:00',
+  author_name: 'Vikas Editor AI',
+  locales: ['en'],
+  image: '/imgs/blog/vikas-editor-eagle-photo-edit.webp',
+  image_alt:
+    'AI concept illustration of an Indian man with a brown eagle flying behind him over a rocky landscape',
+  image_caption:
+    'AI-generated concept illustration for composition reference. It is not a verified result from the prompts or the Vikas Editor generator.',
+  image_width: 1536,
+  image_height: 1024,
+};
+
+A **Vikas Editor eagle photo edit** places a person and an eagle in the same imagined scene. The useful starting point is a clear portrait, enough open sky for the wings and a prompt that describes where the bird sits relative to the person. Simply adding “eagle, cinematic, HD” leaves those decisions to the model.
+
+This guide focuses on a finished **still photograph**. Copy an original eagle AI photo editing prompt below, adapt it to your photo and use the [AI photo editor](/create/image). For a moving giant-bird entrance, use the separate [Jatayu AI video prompt tutorial](/blog/jatayu-ai-video-prompt).
+
+These are independent recipes from vikas-editor.net, not another creator's downloadable template or an endorsement by a similarly named channel. The prompts describe intended results; they do not guarantee face matching or a particular composition.
+
+## Choose the composition before choosing the prompt
+
+Decide whether you want a readable portrait or a wide fantasy scene. A close face and an enormous fully visible bird compete for space. In a portrait, put the eagle further back and leave space above the head. In a landscape frame, keep the person large enough to recognize while giving the wings more horizontal room.
+
+Keep the eagle **behind the person**, with a gap between their silhouettes. Wings emerging directly from the shoulders produce a different concept: a winged person. If that is not your intention, say so explicitly. A distant bird can still feel imposing through its placement and lighting without covering the face.
+
+<GuideTable
+  columns={['Decision', 'Portrait approach', 'Wide-scene approach']}
+  rows={[
+    [
+      'Format',
+      '3:4 gives the face more room than a very tall crop.',
+      '16:9 gives the eagle more horizontal space.',
+    ],
+    [
+      'Person',
+      'Waist-up or three-quarter length, with a clear face.',
+      'Lower centre, still large enough to recognize.',
+    ],
+    [
+      'Bird',
+      'Above and behind; both wing tips inside the image.',
+      'Middle distance, separated from the foreground person.',
+    ],
+    [
+      'Background',
+      'Simple sky and a soft distant ridge.',
+      'Low horizon and open sky, with few competing details.',
+    ],
+  ]}
+/>
+
+## Prepare one useful reference photo
+
+Choose a sharp picture with the face unobstructed and reasonably even light. A front or three-quarter view is easier to describe than a face hidden by a hand, deep shadow or a strong beauty filter. If the intended result includes a saree or a specific shirt, show enough of that clothing in the source image.
+
+Use a photo you have permission to edit. The studio accepts JPG, PNG and WebP files up to 5 MB. An image can be generated without a reference, but it will not know your appearance from your name or from the words “same face.” A reference supplies information; it still does not guarantee an identical face.
+
+## Eagle photo editing prompt: three original starting points
+
+Each prompt below fits the studio's 2,000-character limit. Use one at a time. Replace a setting or lighting direction when needed instead of joining all three into a longer, contradictory instruction.
+
+### 1. A clear portrait with an eagle behind you
+
+Start here for a solo portrait. The important instructions are the separation between the subjects, consistent light and room around the wings. Choose **3:4** in the studio for a portrait composition.
+
+<GuidePrompt
+  prompt={BLOG_PROMPTS.eaglePortrait}
+  copyLabel="Copy eagle portrait prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+### 2. A saree portrait with natural fabric and skin
+
+This version keeps the source outfit instead of inventing a new garment. Describe the actual saree colour if it matters. The pallu and feathers should remain separate, and the rim light should not turn brown skin orange or pale.
+
+<GuidePrompt
+  prompt={BLOG_PROMPTS.eagleSaree}
+  copyLabel="Copy eagle saree prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+### 3. A wide eagle scene with room for the wings
+
+Choose **16:9** for this version. Keep the person prominent rather than shrinking them to a tiny figure under the bird. If you need a vertical social post, make a separate composition; cropping the sides of a wide image may remove the wing tips.
+
+<GuidePrompt
+  prompt={BLOG_PROMPTS.eagleWide}
+  copyLabel="Copy wide eagle prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+## Make the eagle edit in Vikas Editor
+
+1. Open the [image generator](/create/image) and select **Image**.
+2. Under **Choose your style**, select **Your own idea**. Upload the reference photo under **Your photo**.
+3. Copy one prompt from this article and paste it into **Describe your idea**, replacing any existing text. Adjust the clothing, setting and light to match your source.
+4. Choose **3:4** or **16:9** under **Format**. The format control determines the canvas; typing “8K” into a prompt does not change the output resolution.
+5. Check the displayed availability and cost, then generate. Each account can claim one free image subject to daily availability; later images use purchased credits. Sign in when asked.
+6. Inspect the face, hands, feather edges and wing tips before downloading. Save the file within the studio's stated download window, currently 24 hours.
+
+The studio's template preview is a style reference. It is not an eagle result generated from your new prompt. Judge the finished output after the job completes. For general account and credit steps, see the [Vikas Editor starting guide](/guides/vikas-editor).
+
+## Fix the specific thing that went wrong
+
+Make one targeted change per attempt. Replacing the whole prompt after every result makes it harder to see which instruction helped.
+
+<GuideTable
+  columns={['Problem', 'Next adjustment']}
+  rows={[
+    [
+      'The face looks different',
+      'Use a clearer reference, keep its original viewing angle and remove requests for a new expression or hairstyle.',
+    ],
+    [
+      'The wings grow from the shoulders',
+      'Specify a visible gap and a bird several metres behind the person; remove phrases such as “give me eagle wings.”',
+    ],
+    [
+      'A wing tip is missing',
+      'Move the eagle further into the background or choose 16:9. Ask for sky around both tips.',
+    ],
+    [
+      'The eagle hides the face',
+      'Place the bird higher and further back, with no feathers crossing the head or shoulders.',
+    ],
+    [
+      'Skin looks grey or orange',
+      'Ask for neutral skin tones and one consistent light source. Remove heavy teal-and-orange grading.',
+    ],
+    [
+      'The saree merges into feathers',
+      'Ask for distinct silhouettes, a natural pallu and a visible background gap between fabric and bird.',
+    ],
+    [
+      'The background is excessively blurred',
+      'Ask for readable distant hills with mild depth softness, rather than extreme bokeh.',
+    ],
+  ]}
+/>
+
+## Questions about the eagle edit
+
+### Is there an Eagle button or a template file to download?
+
+There is no dedicated Eagle template in the current style menu. Use **Your own idea** and paste the prompt. These instructions do not require a CapCut project, VN code or an APK.
+
+### Can I use the prompt without uploading a photo?
+
+Yes, for an invented person or a bird-only scene. Remove the reference-photo instructions and describe the desired subject. Upload a reference when you want the result to resemble a particular consenting person.
+
+### Does “keep my face” guarantee the same face?
+
+No. It expresses a preference to the model. Compare the eyes, nose, jaw, hairstyle and skin tone with the source before sharing the result. Avoid promising someone an exact likeness from an untested prompt.
+
+### Can this still become a Jatayu video?
+
+Yes, it can serve as a starting frame. If the bird is already visible, animate a gentle hover instead of asking it to appear from nowhere. The [Jatayu video tutorial](/blog/jatayu-ai-video-prompt) explains both the reveal approach and the simpler existing-bird approach.
+
+Ready to try a still? [Open the AI photo editor](/create/image), choose **Your own idea** and paste your selected eagle prompt.

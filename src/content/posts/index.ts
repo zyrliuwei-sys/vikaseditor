@@ -12,7 +12,10 @@ import { baseLocale } from '@/paraglide/runtime.js';
  * local posts via the pure helpers below.
  */
 // Template articles stay in source as examples; publish only product content here.
-export const BLOG_POST_SLUGS: readonly string[] = [];
+export const BLOG_POST_SLUGS: readonly string[] = [
+  'vikas-editor-eagle-photo-edit',
+  'jatayu-ai-video-prompt',
+];
 
 export type BlogPostMeta = {
   title: string;
@@ -21,6 +24,12 @@ export type BlogPostMeta = {
   author_name?: string;
   author_image?: string;
   image?: string;
+  /** Limit publication to languages actually provided by the article. */
+  locales?: readonly string[];
+  image_alt?: string;
+  image_caption?: string;
+  image_width?: number;
+  image_height?: number;
 };
 
 type PostModule = {
@@ -33,6 +42,11 @@ export type BlogPost = {
   title: string;
   description: string;
   image?: string;
+  locales?: readonly string[];
+  imageAlt?: string;
+  imageCaption?: string;
+  imageWidth?: number;
+  imageHeight?: number;
   /** ISO date string — serializable across loader/server-fn boundaries */
   createdAt: string;
   authorName?: string;
@@ -71,11 +85,11 @@ export function loadLocalPost(slug: string, locale: string): PostModule | null {
   if (!BLOG_POST_SLUGS.includes(slug as (typeof BLOG_POST_SLUGS)[number])) {
     return null;
   }
-  return (
+  const mod =
     postModules[`/src/content/posts/${slug}.${locale}.mdx`] ??
     postModules[`/src/content/posts/${slug}.${baseLocale}.mdx`] ??
-    null
-  );
+    null;
+  return mod?.meta.locales && !mod.meta.locales.includes(locale) ? null : mod;
 }
 
 function localPostToItem(slug: string, meta: BlogPostMeta): BlogPost {
@@ -84,6 +98,11 @@ function localPostToItem(slug: string, meta: BlogPostMeta): BlogPost {
     title: meta.title,
     description: meta.description,
     image: meta.image,
+    locales: meta.locales,
+    imageAlt: meta.image_alt,
+    imageCaption: meta.image_caption,
+    imageWidth: meta.image_width,
+    imageHeight: meta.image_height,
     createdAt: new Date(meta.created_at).toISOString(),
     authorName: meta.author_name,
     authorImage: meta.author_image,

@@ -1,0 +1,163 @@
+import { GuidePrompt, GuideTable } from '../../components/vikas/guide-elements';
+import { BLOG_PROMPTS } from '../blog-prompts';
+
+export const meta = {
+  title: 'Jatayu AI Video Prompt: A 5-Second Giant-Bird Reveal',
+  description:
+    'Copy an original Jatayu AI video prompt for a 5-second giant-bird reveal. Plan your starting photo, timing and camera, then fix face drift and clipped wings.',
+  created_at: '2026-11-23T09:00:00+08:00',
+  author_name: 'Vikas Editor AI',
+  locales: ['en'],
+  image: '/imgs/blog/jatayu-ai-video-prompt.webp',
+  image_alt:
+    'AI concept still of a woman in a rust-red saree with a giant golden-brown bird rising behind her',
+  image_caption:
+    'AI-generated concept still showing the intended scene. This is not a video frame produced by the tutorial or a verified Vikas Editor result.',
+  image_width: 1536,
+  image_height: 1024,
+};
+
+A **Jatayu AI video prompt** needs to describe movement over time: what remains still, when the giant bird appears and where its wings move. A list of visual adjectives can describe a photograph, but it does not give the video model a clear sequence to follow.
+
+This tutorial plans a **single five-second shot** for the [photo-to-video studio](/create/video). It uses an uploaded image and an original motion prompt. For the still-image composition itself, start with the [Vikas Editor eagle photo edit guide](/blog/vikas-editor-eagle-photo-edit).
+
+This is an independent creative interpretation from vikas-editor.net. It is not a film clip, another creator's project file or a promise to reproduce an existing reel shot for shot. The prompts are starting points; the timings and likeness are instructions, not guaranteed output.
+
+## What kind of Jatayu edit are you making?
+
+Here, “Jatayu edit” means a fantasy scene with a large bird rising or hovering behind a person. Jatayu also refers to a figure in the Ramayana, and to the sculpture at [Jatayu Earth's Center in Kerala](https://jatayuearthscenter.in/sculpture/). A travel portrait beside that stone sculpture is a different brief. Specify **a living feathered bird** if you want movement rather than an animated statue.
+
+Keep the tone respectful and use your own photo or one you have permission to animate. A generated fantasy scene should be presented as an AI edit rather than evidence that a real person visited a location or encountered a giant bird.
+
+## Pick the starting frame that matches the motion
+
+The first image establishes the person's pose, clothing and environment. A sharp, stable starting frame reduces the number of things the video model has to invent. Keep the person in the lower part of the frame and leave open sky above and to both sides.
+
+There are two useful approaches:
+
+- **Reveal:** start with a person, open sky and a distant ridge, without a visible bird. Ask a bird to rise behind the ridge. This requires the model to introduce a new subject, so it is more demanding and may need revision.
+- **Gentle hover:** start with an approved composite that already contains the person and bird. Ask for a small wing movement while their positions stay stable. This avoids asking the model to invent the bird's entire entrance.
+
+If your starting picture already has an eagle spanning the sky, use the hover prompt. Asking that same bird to appear from behind a ridge can cause it to disappear, duplicate or change shape. Fix a malformed face, hand or wing in the still before spending credits on motion.
+
+## Plan a simple five-second sequence
+
+The current Vikas Editor video flow produces **5-second, 720p clips**. The pacing below is a proposed brief for that duration. Do not put a ten-second walk, a full arm gesture, a bird entrance and a camera orbit into the same request.
+
+<GuideTable
+  columns={['Time', 'Main action', 'Keep stable']}
+  rows={[
+    [
+      '0–1 seconds',
+      'Establish the person and landscape; only a slight breeze.',
+      'Face, body pose, ground and horizon.',
+    ],
+    [
+      '1–4 seconds',
+      'One bird rises slowly in the background and opens its wings.',
+      'Camera position and a clear gap behind the person.',
+    ],
+    [
+      '4–5 seconds',
+      'Hold a gentle hover so the final composition can be seen.',
+      'Wing tips inside the frame; no sudden cut or zoom.',
+    ],
+  ]}
+/>
+
+Start with a locked camera. Once the scene works, a different attempt can explore a very small camera push. Changing the camera, body pose and wing motion together makes any distortion harder to diagnose.
+
+## Copy the Jatayu AI video prompt
+
+### Option 1: a giant bird rises behind the person
+
+Use this with a suitable photo that has open background space and no existing bird. The person stays in their starting pose. If you want outstretched arms, choose a reference that already has that pose instead of demanding a large new gesture during the reveal.
+
+<GuidePrompt
+  prompt={BLOG_PROMPTS.jatayuReveal}
+  copyLabel="Copy Jatayu reveal video prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+### Option 2: animate a bird already present in the still
+
+This shorter motion plan is a useful starting point when you already like your eagle composite. One small wing movement gives the model a simpler instruction than rapid flapping, circling birds and flying hair all at once.
+
+<GuidePrompt
+  prompt={BLOG_PROMPTS.jatayuHover}
+  copyLabel="Copy Jatayu hover video prompt"
+  copiedLabel="Copied"
+  errorLabel="Copy was unavailable. Select the prompt text and copy it manually."
+/>
+
+Both Jatayu video editing prompts fit within the studio's 2,000-character limit. Edit them to match your image. If it shows a rooftop instead of a ridge, describe a distant background entrance that keeps the bird behind the person and does not intersect the building.
+
+## Turn the starting photo into a video
+
+1. Prepare a JPG, PNG or WebP starting image up to 5 MB. Use the [eagle photo prompts](/blog/vikas-editor-eagle-photo-edit) if you first need to compose a still with the bird already in it.
+2. Open [Photo to Video AI](/create/video). Confirm **Video** is selected, then upload the starting image; a photo is required for this flow.
+3. Choose **Your own idea** under **Choose your style**. Paste either the reveal or hover prompt into **Describe your idea**, replacing the existing template prompt.
+4. Review the displayed credit cost before generating. All video generations use purchased credits; the account's free image attempt does not cover video.
+5. When the clip is ready, watch the beginning, middle and final frame. Check that the face stays recognizable, the bird remains behind the person and neither wing leaves the frame.
+6. Download the finished file promptly, within the studio's stated 24-hour window. Add any captions or music in an editor afterwards using material you are allowed to use.
+
+This workflow does not import a reference reel, reproduce its soundtrack or provide a CapCut timeline. Copying a text prompt is free; running the video model is a separate paid step. Check [plans and credits](/pricing) if you need to top up.
+
+## Troubleshoot the motion, not just the first frame
+
+A good opening image can still turn into an unstable clip. Review the whole sequence before deciding which sentence to change.
+
+<GuideTable
+  columns={['What happens', 'What to change next']}
+  rows={[
+    [
+      'The face changes as the bird rises',
+      'Keep the head still, remove facial-expression changes and use a sharper, larger face in the reference.',
+    ],
+    [
+      'The bird never appears',
+      'Try an approved still with the bird already visible and use the hover prompt. A new-subject reveal is less predictable.',
+    ],
+    [
+      'The wings clip out of view',
+      'Create more sky in the starting frame and reduce the wing movement. A text-only request cannot reliably recover missing composition space.',
+    ],
+    [
+      'The bird passes through the person',
+      'Specify a distant background path and a continuous gap. Avoid movement toward the camera.',
+    ],
+    [
+      'Hands or saree folds flicker',
+      'Keep the source pose and ask for only a slight breeze; remove arm gestures and vigorous cloth motion.',
+    ],
+    [
+      'The scene jumps or the horizon bends',
+      'Ask for one uninterrupted locked-camera shot. Remove orbiting, zooming and scene-transition instructions.',
+    ],
+    [
+      'Feathers appear to boil or shimmer',
+      'Reduce motion and background detail. Judge a slower, simpler attempt before adding particles or extra birds.',
+    ],
+  ]}
+/>
+
+## Questions about Jatayu video prompts
+
+### Is this the same as searching for “vikas editor jatayu”?
+
+This page offers a Jatayu-inspired workflow inside Vikas Editor AI. If you are looking for a particular creator's original reel or project, visit that creator's own source. Similar search names do not establish an affiliation.
+
+### Can the prompt recreate a reference video exactly?
+
+No. This site's flow takes a starting photo and written instructions. It does not expose a reference-video upload for copying a reel's timeline, and a prompt cannot guarantee identical timing, movement or faces.
+
+### Should I choose 9:16 for Reels?
+
+A vertical source can suit a vertical post, but a giant bird needs room on both sides. Compose the starting image with the entire wingspan inside the desired crop. Review the actual output dimensions and framing before posting; this tutorial does not promise a separate video aspect-ratio control.
+
+### Can I make the clip free or extend it by writing a longer duration?
+
+The current video flow requires purchased credits and runs for five seconds. Writing “15 seconds” or “4K” in the prompt does not change those product settings. You can arrange downloaded clips in an external editor, but that does not create additional generated motion between them.
+
+Have a checked starting image? [Open the photo-to-video studio](/create/video) and try one motion plan at a time. If the still needs work first, return to the [eagle photo editing tutorial](/blog/vikas-editor-eagle-photo-edit).

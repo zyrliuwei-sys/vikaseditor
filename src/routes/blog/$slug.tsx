@@ -70,11 +70,34 @@ export const Route = createFileRoute('/blog/$slug')({
       new URL(`/blog/${encodeURIComponent(post.slug)}`, envConfigs.app_url),
       { locale }
     ).href;
+    const image = post.image
+      ? new URL(post.image, envConfigs.app_url).href
+      : undefined;
     return {
       ...head,
-      meta: head.meta.map((meta) =>
-        meta.property === 'og:type' ? { ...meta, content: 'article' } : meta
+      links: head.links.filter(
+        (link) =>
+          link.rel !== 'alternate' ||
+          !post.locales ||
+          link.hrefLang === 'x-default' ||
+          post.locales.includes(link.hrefLang!)
       ),
+      meta: head.meta.map((meta) => {
+        if (meta.property === 'og:type') return { ...meta, content: 'article' };
+        if (
+          image &&
+          (meta.property === 'og:image' || meta.name === 'twitter:image')
+        ) {
+          return { ...meta, content: image };
+        }
+        if (post.imageAlt && meta.property === 'og:image:alt')
+          return { ...meta, content: post.imageAlt };
+        if (post.imageWidth && meta.property === 'og:image:width')
+          return { ...meta, content: String(post.imageWidth) };
+        if (post.imageHeight && meta.property === 'og:image:height')
+          return { ...meta, content: String(post.imageHeight) };
+        return meta;
+      }),
       scripts: [
         jsonLd({
           '@context': 'https://schema.org',
@@ -83,9 +106,19 @@ export const Route = createFileRoute('/blog/$slug')({
           description: post.description,
           url: canonical,
           datePublished: post.createdAt,
-          ...(post.image ? { image: post.image } : {}),
+          ...(image ? { image } : {}),
+          inLanguage: locale,
+          mainEntityOfPage: canonical,
           ...(post.authorName
-            ? { author: { '@type': 'Person', name: post.authorName } }
+            ? {
+                author: {
+                  '@type':
+                    post.authorName === envConfigs.app_name
+                      ? 'Organization'
+                      : 'Person',
+                  name: post.authorName,
+                },
+              }
             : {}),
           publisher: {
             '@type': 'Organization',
@@ -290,11 +323,20 @@ function BlogPostPage() {
           )}
 
           {post.image && (
-            <img
-              src={post.image}
-              alt={post.title}
-              className="border-border mb-8 w-full rounded-2xl border object-cover"
-            />
+            <figure className="mb-8">
+              <img
+                src={post.image}
+                alt={post.imageAlt || post.title}
+                width={post.imageWidth}
+                height={post.imageHeight}
+                className="border-border w-full rounded-2xl border object-cover"
+              />
+              {post.imageCaption && (
+                <figcaption className="text-muted-foreground mt-3 text-sm leading-6">
+                  {post.imageCaption}
+                </figcaption>
+              )}
+            </figure>
           )}
 
           {LocalContent ? (

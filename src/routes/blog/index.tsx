@@ -27,6 +27,14 @@ export const Route = createFileRoute('/blog/')({
     );
     return {
       ...head,
+      links: head.links.filter(
+        (link) =>
+          link.rel !== 'alternate' ||
+          link.hrefLang === 'x-default' ||
+          (loaderData?.posts ?? []).some(
+            (post) => !post.locales || post.locales.includes(link.hrefLang!)
+          )
+      ),
       meta: [
         ...head.meta,
         {

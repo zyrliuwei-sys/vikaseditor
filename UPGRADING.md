@@ -1,3 +1,9 @@
+## 2026-11-24 — Search-compatible favicons
+
+- The root HTML now declares a 96×96 PNG favicon, a 48×48 ICO fallback and a 180×180 PNG Apple touch icon, generated from the existing Vikas logo. The previous SVG remains available at its original URL.
+- Deploy the new `public/favicon.png`, `public/favicon.ico` and `public/apple-touch-icon.png` together with the updated root route. No database, secret or environment change is required.
+- After deployment, request indexing of the homepage in Google Search Console. Search-result icons depend on Google's recrawl and processing and will not update immediately.
+
 ## 2026-11-13 — Free images without email verification
 
 - Signed-in accounts can claim their first free image without verifying an email or configuring a mail provider. This supersedes the verification prerequisite introduced on November 6. Existing email verification status and identity-linking protections are unchanged.

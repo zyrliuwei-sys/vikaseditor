@@ -137,8 +137,23 @@ export const Route = createRootRoute({
         { name: 'generator', content: 'ShipAny' },
       ],
       links: [
-        { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
-        { rel: 'apple-touch-icon', href: '/favicon.svg' },
+        {
+          rel: 'icon',
+          href: '/favicon.ico',
+          type: 'image/x-icon',
+          sizes: '48x48',
+        },
+        {
+          rel: 'icon',
+          href: '/favicon.png',
+          type: 'image/png',
+          sizes: '96x96',
+        },
+        {
+          rel: 'apple-touch-icon',
+          href: '/apple-touch-icon.png',
+          sizes: '180x180',
+        },
       ],
     };
   },

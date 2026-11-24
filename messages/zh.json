@@ -1852,8 +1852,8 @@
   "vikas.pricing.credit_amount": "{count} 积分",
   "vikas.pricing.popular": "推荐",
   "vikas.pricing.sign_in": "登录后购买",
-  "vikas.pricing.buy": "使用 PayPal 购买",
-  "vikas.pricing.subscribe": "使用 PayPal 订阅",
+  "vikas.pricing.buy": "购买积分",
+  "vikas.pricing.subscribe": "订阅套餐",
   "vikas.pricing.equivalent": "最多 {images} 张图片或 {videos} 段视频",
   "vikas.pricing.all_models": "Nano Banana 2 + Seedance 2.0",
   "vikas.pricing.month_expiry": "每个已付款账期发放积分",
@@ -1880,5 +1880,9 @@
   "vikas.studio.trial_paused": "今日免费名额已用完。免费资格仍保留，你可以改天领取，或按显示的费用使用已购积分。",
   "vikas.studio.trial_changed": "免费资格已发生变化，本次没有扣除积分。请确认更新后的费用，再重新生成。",
   "common.sign.verify_email_send_description": "发送验证链接至",
-  "common.sign.send_verification": "发送验证邮件"
+  "common.sign.send_verification": "发送验证邮件",
+  "vikas.pricing.choose_provider_hint": "选择支付方式后，将前往对应的安全收银台。",
+  "vikas.pricing.stripe": "银行卡 · Stripe",
+  "vikas.pricing.stripe_hint": "通过 Stripe 使用借记卡或信用卡支付。",
+  "vikas.pricing.paypal_hint": "前往 PayPal 完成付款。"
 }

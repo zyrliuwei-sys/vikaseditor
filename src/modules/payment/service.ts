@@ -70,6 +70,8 @@ async function getPaymentManager(): Promise<PaymentManager> {
   // Rebuild manager if provider configs changed
   const hash = JSON.stringify([
     c('stripe_secret_key') || c('stripe_api_key'),
+    c('stripe_publishable_key'),
+    c('stripe_signing_secret') || c('stripe_webhook_secret'),
     c('paypal_enabled'),
     c('paypal_client_id'),
     c('paypal_client_secret'),
@@ -384,6 +386,33 @@ export async function settleCheckoutOrder(
   const subscriptionInfo = session.subscriptionInfo;
 
   if (session.paymentStatus === PaymentStatus.SUCCESS) {
+    if (
+      provider === 'stripe' &&
+      existingOrder.productId?.startsWith('vikas_')
+    ) {
+      const checkout = session.paymentResult;
+      // Stripe's signed/retrieved subtotal is the catalog price before any
+      // provider-managed discount. Never fulfill a different checkout or price.
+      if (
+        existingOrder.paymentProvider !== provider ||
+        checkout?.id !== existingOrder.paymentSessionId ||
+        checkout?.amount_subtotal !== existingOrder.amount ||
+        checkout?.currency?.toLowerCase() !==
+          existingOrder.currency.toLowerCase() ||
+        checkout?.mode !==
+          (existingOrder.paymentType === 'subscription'
+            ? 'subscription'
+            : 'payment') ||
+        !Number.isSafeInteger(checkout?.amount_total) ||
+        checkout.amount_total < 0 ||
+        paymentInfo?.paymentAmount !== checkout.amount_total ||
+        paymentInfo?.paymentCurrency?.toLowerCase() !==
+          existingOrder.currency.toLowerCase()
+      )
+        throw new Error(
+          'Stripe checkout amount, currency or session does not match the order'
+        );
+    }
     if (
       provider === 'paypal' &&
       (existingOrder.paymentProvider !== 'paypal' ||

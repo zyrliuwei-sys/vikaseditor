@@ -87,6 +87,7 @@ export class StripeProvider implements PaymentProvider {
         priceData.recurring = {
           interval: order.plan
             .interval as Stripe.Checkout.SessionCreateParams.LineItem.PriceData.Recurring.Interval,
+          interval_count: order.plan.intervalCount || 1,
         };
       } else {
         // create one-time payment
@@ -191,7 +192,12 @@ export class StripeProvider implements PaymentProvider {
         sessionParams.cancel_url = order.cancelUrl;
       }
 
-      const session = await this.client.checkout.sessions.create(sessionParams);
+      const session = await this.client.checkout.sessions.create(
+        sessionParams,
+        order.orderNo
+          ? { idempotencyKey: `checkout_${order.orderNo}` }
+          : undefined
+      );
       if (!session.id || !session.url) {
         throw new Error('create payment failed');
       }
@@ -266,6 +272,9 @@ export class StripeProvider implements PaymentProvider {
         paymentSession = await this.buildPaymentSessionFromCheckoutSession(
           event.data.object as Stripe.Response<Stripe.Checkout.Session>
         );
+        if (event.type === 'checkout.session.async_payment_failed') {
+          paymentSession.paymentStatus = PaymentStatus.FAILED;
+        }
       } else if (eventType === PaymentEventType.PAYMENT_SUCCESS) {
         paymentSession = await this.buildPaymentSessionFromInvoice(
           event.data.object as Stripe.Response<Stripe.Invoice>
@@ -455,6 +464,9 @@ export class StripeProvider implements PaymentProvider {
   private mapStripeEventType(eventType: string): PaymentEventType {
     switch (eventType) {
       case 'checkout.session.completed':
+      case 'checkout.session.async_payment_succeeded':
+      case 'checkout.session.async_payment_failed':
+      case 'checkout.session.expired':
         return PaymentEventType.CHECKOUT_SUCCESS;
       case 'invoice.payment_succeeded':
         return PaymentEventType.PAYMENT_SUCCESS;
@@ -506,11 +518,12 @@ export class StripeProvider implements PaymentProvider {
   private async buildPaymentSessionFromCheckoutSession(
     session: Stripe.Response<Stripe.Checkout.Session>
   ): Promise<PaymentSession> {
+    const paymentStatus = this.mapStripeStatus(session);
     let subscription: Stripe.Response<Stripe.Subscription> | undefined =
       undefined;
     let billingUrl = '';
 
-    if (session.subscription) {
+    if (session.subscription && paymentStatus === PaymentStatus.SUCCESS) {
       subscription = await this.client.subscriptions.retrieve(
         session.subscription as string
       );
@@ -518,7 +531,7 @@ export class StripeProvider implements PaymentProvider {
 
     const result: PaymentSession = {
       provider: this.name,
-      paymentStatus: this.mapStripeStatus(session),
+      paymentStatus,
       paymentInfo: {
         transactionId: session.id,
         discountCode: session.discounts?.find(

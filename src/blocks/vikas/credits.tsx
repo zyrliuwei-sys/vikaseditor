@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { GenerationCapabilities } from '@/types/vikas';
 import { ArrowRight, Film, Image as ImageIcon } from 'lucide-react';
@@ -7,10 +7,16 @@ import { useSession } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import type { PricingProduct } from '@/config/pricing';
 import { apiGet, apiPost } from '@/lib/api-client';
+import {
+  studioCheckoutUrl,
+  type StudioPaymentPlans,
+  type StudioPaymentProvider,
+} from '@/lib/studio-payment';
 import { track } from '@/lib/track';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
 import { VikasArtwork } from '@/components/vikas/artwork';
+import { VikasPaymentDialog } from '@/components/vikas/payment-dialog';
 import { VikasPricingCards } from '@/components/vikas/pricing-cards';
 
 export function VikasCredits() {
@@ -19,31 +25,39 @@ export function VikasCredits() {
   );
   const { data: session, isPending: sessionPending } = useSession();
   const router = useRouter();
+  const [selectedPlan, setSelectedPlan] = useState<PricingProduct | null>(null);
+  const checkoutLock = useRef(false);
   const plans = useQuery({
     queryKey: ['vikas-payment-plans'],
-    queryFn: () =>
-      apiGet<{ products: PricingProduct[]; provider: string | null }>(
-        '/api/payment/plans'
-      ),
+    queryFn: () => apiGet<StudioPaymentPlans>('/api/payment/plans'),
     staleTime: 30_000,
     retry: 1,
   });
   const checkout = useMutation({
-    mutationFn: (id: string) =>
-      apiPost<{ checkout_url: string }>('/api/payment/checkout', {
-        product_id: id,
+    mutationFn: async ({
+      productId,
+      provider,
+    }: {
+      productId: string;
+      provider: StudioPaymentProvider;
+    }) => {
+      const result = await apiPost<{
+        checkout_url: string;
+        payment_provider: string;
+      }>('/api/payment/checkout', {
+        product_id: productId,
+        payment_provider: provider,
         locale: getLocale(),
         redirect: '/create?payment=success',
-      }),
-    onSuccess: (result) => {
-      const url = new URL(result.checkout_url);
-      if (
-        url.protocol !== 'https:' ||
-        !['www.paypal.com', 'www.sandbox.paypal.com'].includes(url.hostname) ||
-        Boolean(url.username || url.password || url.port)
-      )
-        throw new Error('Invalid checkout destination');
-      window.location.assign(url.href);
+      });
+      if (result.payment_provider !== provider)
+        throw new Error('Payment method changed');
+      return studioCheckoutUrl(result.checkout_url, provider);
+    },
+    onSuccess: (url) => window.location.assign(url),
+    onError: () => {
+      checkoutLock.current = false;
+      void plans.refetch();
     },
   });
   function buy(id: string) {
@@ -51,8 +65,23 @@ export function VikasCredits() {
       router.push('/sign-in?callbackUrl=%2Fpricing');
       return;
     }
+    const plan = plans.data?.products.find((p) => p.productId === id);
+    if (!plan || checkoutLock.current) return;
+    checkout.reset();
     track('plan_selected', { product: id, interval: billing });
-    checkout.mutate(id);
+    setSelectedPlan(plan);
+  }
+  function chooseProvider(provider: StudioPaymentProvider) {
+    if (!selectedPlan || checkoutLock.current) return;
+    checkoutLock.current = true;
+    checkout.mutate({ productId: selectedPlan.productId, provider });
+  }
+  function formatPrice(plan: PricingProduct) {
+    return new Intl.NumberFormat(getLocale(), {
+      style: 'currency',
+      currency: plan.currency,
+      maximumFractionDigits: 0,
+    }).format(plan.priceInCents / 100);
   }
   const config = useQuery({
     queryKey: ['vikas-generation-config'],
@@ -121,8 +150,8 @@ export function VikasCredits() {
       )}
       {plans.data && (
         <VikasPricingCards
-          busyId={checkout.isPending ? checkout.variables : undefined}
-          disabled={sessionPending || !plans.data.provider}
+          busyId={checkout.isPending ? checkout.variables.productId : undefined}
+          disabled={sessionPending || !plans.data.providers.length}
           onChoose={buy}
           cards={plans.data.products
             .filter((p) => p.type === billing)
@@ -133,11 +162,7 @@ export function VikasCredits() {
                 m['vikas.pricing.creator'](),
                 m['vikas.pricing.studio'](),
               ][index],
-              price: new Intl.NumberFormat(getLocale(), {
-                style: 'currency',
-                currency: p.currency,
-                maximumFractionDigits: 0,
-              }).format(p.priceInCents / 100),
+              price: formatPrice(p),
               period:
                 billing === 'subscription'
                   ? m['vikas.pricing.per_month']()
@@ -146,7 +171,7 @@ export function VikasCredits() {
                 count: p.credits.toLocaleString(getLocale()),
               }),
               badge: index === 1 ? m['vikas.pricing.popular']() : undefined,
-              button: !plans.data.provider
+              button: !plans.data.providers.length
                 ? m['vikas.pricing.unavailable_button']()
                 : !session?.user
                   ? m['vikas.pricing.sign_in']()
@@ -173,16 +198,53 @@ export function VikasCredits() {
             }))}
         />
       )}
-      {plans.data && !plans.data.provider && (
+      {plans.data && !plans.data.providers.length && (
         <p className="vikas-credit-status" role="status">
           {m['vikas.pricing.unavailable']()}
         </p>
       )}
-      {checkout.isError && (
-        <p className="vikas-credit-status" role="alert">
-          {m['vikas.pricing.checkout_error']()}
-        </p>
-      )}
+      <VikasPaymentDialog
+        open={Boolean(selectedPlan)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedPlan(null);
+            checkout.reset();
+          }
+        }}
+        title={m['common.pricing.choose_payment']()}
+        description={m['vikas.pricing.choose_provider_hint']()}
+        planName={selectedPlan?.productName ?? ''}
+        price={
+          selectedPlan
+            ? `${formatPrice(selectedPlan)} ${selectedPlan.type === 'subscription' ? m['vikas.pricing.per_month']() : m['vikas.pricing.one_payment']()}`
+            : ''
+        }
+        credits={m['vikas.pricing.credit_amount']({
+          count: (selectedPlan?.credits ?? 0).toLocaleString(getLocale()),
+        })}
+        terms={
+          selectedPlan?.type === 'subscription'
+            ? m['vikas.pricing.month_terms']()
+            : m['vikas.pricing.once_terms']()
+        }
+        options={(plans.data?.providers ?? []).map((id) => ({
+          id,
+          label: id === 'stripe' ? m['vikas.pricing.stripe']() : 'PayPal',
+          description:
+            id === 'stripe'
+              ? m['vikas.pricing.stripe_hint']()
+              : m['vikas.pricing.paypal_hint'](),
+        }))}
+        pendingProvider={
+          checkout.isPending || checkout.isSuccess
+            ? checkout.variables?.provider
+            : undefined
+        }
+        error={
+          checkout.isError ? m['vikas.pricing.checkout_error']() : undefined
+        }
+        onSelect={chooseProvider}
+      />
       <p className="vikas-pricing-terms">
         {billing === 'subscription'
           ? m['vikas.pricing.month_terms']()

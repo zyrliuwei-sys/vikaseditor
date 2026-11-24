@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { resolveCharge } from '@/server/payment/charge';
-import { studioPaymentProvider } from '@/server/payment/storefront';
+import { selectStudioPaymentProvider } from '@/server/payment/storefront';
 
 import { getAuth } from '@/core/auth';
 import { getPricingProduct } from '@/config/pricing';
@@ -76,11 +76,11 @@ async function POST({ request }: { request: Request }) {
     stage = 'configuration';
     const configs = await getAllConfigs();
     const studioProvider = product.productId.startsWith('vikas_')
-      ? studioPaymentProvider(configs)
+      ? selectStudioPaymentProvider(configs, payment_provider)
       : undefined;
     if (studioProvider === null)
       return respErr(
-        'Purchases are not available yet. No payment has been taken.',
+        'The selected payment method is unavailable. Choose another method. No payment has been taken.',
         { status: 503 }
       );
     const selectedProvider = studioProvider || payment_provider;
@@ -141,7 +141,10 @@ async function POST({ request }: { request: Request }) {
       provider: selectedProvider,
     });
 
-    return respData({ checkout_url: checkout.checkoutInfo.checkoutUrl });
+    return respData({
+      checkout_url: checkout.checkoutInfo.checkoutUrl,
+      payment_provider: checkout.provider,
+    });
   } catch (error: any) {
     // Keep diagnostics server-side and omit messages/bodies: database errors
     // can embed bound customer data and provider responses can contain tokens.

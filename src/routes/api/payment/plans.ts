@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import {
   studioPaymentProvider,
+  studioPaymentProviders,
   studioProducts,
 } from '@/server/payment/storefront';
 
@@ -12,10 +13,12 @@ export const Route = createFileRoute('/api/payment/plans')({
     handlers: {
       GET: async () => {
         try {
+          const configs = await getAllConfigs();
           return respData(
             {
               products: studioProducts(),
-              provider: studioPaymentProvider(await getAllConfigs()),
+              providers: studioPaymentProviders(configs),
+              provider: studioPaymentProvider(configs),
             },
             { headers: { 'cache-control': 'no-store' } }
           );

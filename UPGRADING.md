@@ -1,3 +1,10 @@
+## 2026-11-24 — Stripe and PayPal checkout selection
+
+- Vikas pricing now opens a payment-method dialog for one-time packs and monthly plans. `/api/payment/plans` exposes enabled, fully configured `providers`; the existing `provider` field remains the default for older clients. Deploy frontend and backend together.
+- The checkout API honors an explicitly selected Stripe or PayPal provider and rejects unavailable methods instead of silently switching providers. Stripe requires its enabled switch, secret key and webhook signing secret; PayPal requires its enabled switch, client credentials and webhook ID. Prices and credits remain server-owned.
+- Stripe webhook configuration must deliver `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`, `invoice.payment_succeeded`, `customer.subscription.updated` and `customer.subscription.deleted` to `/api/payment/notify/stripe`. Signature-secret changes now invalidate the cached payment manager.
+- No schema migration, new secret or environment variable is required when both providers are already configured.
+
 ## 2026-11-24 — Search-compatible favicons
 
 - The root HTML now declares a 96×96 PNG favicon, a 48×48 ICO fallback and a 180×180 PNG Apple touch icon, generated from the existing Vikas logo. The previous SVG remains available at its original URL.

@@ -1852,8 +1852,8 @@
   "vikas.pricing.credit_amount": "{count} credits",
   "vikas.pricing.popular": "Most popular",
   "vikas.pricing.sign_in": "Sign in to purchase",
-  "vikas.pricing.buy": "Pay with PayPal",
-  "vikas.pricing.subscribe": "Subscribe with PayPal",
+  "vikas.pricing.buy": "Buy credits",
+  "vikas.pricing.subscribe": "Subscribe",
   "vikas.pricing.equivalent": "Up to {images} images or {videos} videos",
   "vikas.pricing.all_models": "Nano Banana 2 + Seedance 2.0",
   "vikas.pricing.month_expiry": "New credits each paid billing cycle",
@@ -1880,5 +1880,9 @@
   "vikas.studio.trial_paused": "Today’s free images have reached their limit. Keep your free image for another day, or use purchased credits at the price shown.",
   "vikas.studio.trial_changed": "Your free image is no longer available. No credits were charged. Review the updated price before generating again.",
   "common.sign.verify_email_send_description": "Send a verification link to",
-  "common.sign.send_verification": "Send verification email"
+  "common.sign.send_verification": "Send verification email",
+  "vikas.pricing.choose_provider_hint": "Choose how to pay. You will continue to secure checkout.",
+  "vikas.pricing.stripe": "Card · Stripe",
+  "vikas.pricing.stripe_hint": "Pay by debit or credit card with Stripe.",
+  "vikas.pricing.paypal_hint": "Continue to PayPal to complete your purchase."
 }

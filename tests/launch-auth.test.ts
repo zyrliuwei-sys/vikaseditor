@@ -97,6 +97,7 @@ test('email signup without a mail provider starts a session and can claim a free
   assert.equal(response.status, 200);
   assert.deepEqual((await response.json()).data, {
     paidCredits: 0,
+    videoPaidCredits: 0,
     freeImageAvailable: true,
     trialPaused: false,
   });

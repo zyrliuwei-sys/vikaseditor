@@ -28,6 +28,7 @@ export interface GenerationCapabilities {
 
 export interface GenerationAccess {
   paidCredits: number;
+  videoPaidCredits: number;
   freeImageAvailable: boolean;
   trialPaused: boolean;
 }
@@ -37,6 +38,7 @@ export interface GenerationResult {
   status: 'pending' | 'processing' | 'success' | 'failed' | 'canceled';
   mediaType: MediaMode;
   prompt: string;
+  freeImage?: boolean;
   url?: string;
   error?: string;
   createdAt: string;

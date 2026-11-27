@@ -244,12 +244,14 @@ test('real payment metrics, refunds, unique cohorts, staff exclusion and daily b
   await db().insert(schema.aiTask).values({
     id: 'task',
     userId: 'buyer',
-    mediaType: 'video',
+    mediaType: 'image',
     provider: 'test',
     model: 'test',
     prompt: 'test',
+    scene: 'vikas_studio',
     status: 'success',
     createdAt: signupAt,
+    updatedAt: signupAt,
   });
   await db()
     .insert(schema.userEvent)
@@ -298,6 +300,7 @@ test('real payment metrics, refunds, unique cohorts, staff exclusion and daily b
     'repeated clicks do not inflate the funnel'
   );
   assert.equal(report.totals.active, 1);
+  assert.equal(report.totals.firstImage, 1);
   assert.equal(report.totals.checkouts, 1);
   assert.equal(report.totals.paid, 1);
   assert.equal(

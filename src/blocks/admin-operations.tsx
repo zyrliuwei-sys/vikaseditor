@@ -43,6 +43,7 @@ function exportReport(report: OperationsReport) {
       'visitors',
       'signups',
       'active',
+      'first_image',
       'plan_selected',
       'checkouts',
       'paid',
@@ -55,6 +56,7 @@ function exportReport(report: OperationsReport) {
       r.visitors,
       r.signups,
       r.active,
+      r.firstImage,
       r.selected,
       r.checkouts,
       r.paid,
@@ -132,6 +134,7 @@ export function AdminOperations() {
   const steps = [
     { key: 'visitors', label: m['admin.operations.visitors']() },
     { key: 'signups', label: m['admin.operations.signups']() },
+    { key: 'firstImage', label: m['admin.operations.first_image']() },
     { key: 'selected', label: m['admin.operations.selected']() },
     { key: 'checkouts', label: m['admin.operations.checkouts']() },
     { key: 'paid', label: m['admin.operations.paid']() },
@@ -386,7 +389,7 @@ export function AdminOperations() {
         {tab === 'funnel' && (
           <>
             <section
-              className="grid gap-3 sm:grid-cols-5"
+              className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6"
               aria-label={m['admin.operations.funnel']()}
             >
               {steps.map((step, i) => (
@@ -395,7 +398,9 @@ export function AdminOperations() {
                     <span>
                       0{i + 1} / {step.label}
                     </span>
-                    {i < 4 && <ArrowUpRight className="size-3" />}
+                    {i < steps.length - 1 && (
+                      <ArrowUpRight className="size-3" />
+                    )}
                   </p>
                   <p className="my-3 text-2xl font-semibold tabular-nums">
                     {totals ? totals[step.key].toLocaleString() : '—'}
@@ -452,6 +457,8 @@ export function AdminOperations() {
                       m['admin.operations.visitors'](),
                       m['admin.operations.signups'](),
                       m['admin.operations.active'](),
+                      m['admin.operations.first_image'](),
+                      m['admin.operations.selected'](),
                       m['admin.operations.checkouts'](),
                       m['admin.operations.paid'](),
                       m['admin.operations.signup_rate'](),
@@ -468,7 +475,7 @@ export function AdminOperations() {
                   {!report?.rows.length ? (
                     <TableRow>
                       <TableCell
-                        colSpan={9}
+                        colSpan={11}
                         className="text-muted-foreground h-32 text-center"
                       >
                         {query.isPending
@@ -493,6 +500,8 @@ export function AdminOperations() {
                             row.visitors,
                             row.signups,
                             row.active,
+                            row.firstImage,
+                            row.selected,
                             row.checkouts,
                             row.paid,
                           ] as const

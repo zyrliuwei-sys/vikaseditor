@@ -16,7 +16,10 @@ import {
   GenerationTaskError,
   imageTrialAccess,
   listGenerations,
+  listGenerationsForSync,
   markGenerationUncertain,
+  noteGenerationSync,
+  type GenerationTask,
 } from '@/modules/ai-tasks/generations';
 import { getAllConfigs } from '@/modules/config/service';
 import { getPaidBalance } from '@/modules/credits/service';
@@ -85,13 +88,15 @@ export async function generationAccess({ request }: { request: Request }) {
   try {
     const userId = await authenticate(request, 200, 'access');
     if (userId instanceof Response) return userId;
-    const [paidCredits, trial] = await Promise.all([
+    const [paidCredits, videoPaidCredits, trial] = await Promise.all([
       getPaidBalance(userId),
+      getPaidBalance(userId, true),
       imageTrialAccess(userId, GENERATION_CATALOG.image.credits),
     ]);
     return respData(
       {
         paidCredits,
+        videoPaidCredits,
         ...trial,
       },
       PRIVATE
@@ -199,76 +204,12 @@ export async function generationGet({
     if (!['pending', 'processing'].includes(task.status) || !task.taskId)
       return respData(generationResponse(task), PRIVATE);
     const config = await getAllConfigs();
-    if (
-      task.provider === 'evolink'
-        ? !validEvoLinkConfig(config)
-        : !config.fal_api_key?.trim()
-    )
-      return fail('AI generation is not enabled yet.', 503);
-    const provider =
-      task.provider === 'evolink'
-        ? new EvoLinkProvider({
-            apiKey: config.evolink_api_key,
-            timeoutMs: 15_000,
-          })
-        : new FalProvider({
-            apiKey: config.fal_api_key,
-            timeoutMs: 15_000,
-          });
     try {
-      const result = await provider.query({
-        taskId: task.taskId,
-        model: task.model,
-        mediaType:
-          task.mediaType === 'video' ? AIMediaType.VIDEO : AIMediaType.IMAGE,
-      });
-      if (result.taskStatus === AITaskStatus.SUCCESS) {
-        const url =
-          task.mediaType === 'video'
-            ? result.taskInfo?.videos?.[0]?.videoUrl
-            : result.taskInfo?.images?.[0]?.imageUrl;
-        let validUrl = false;
-        try {
-          const parsed = new URL(url || '');
-          validUrl =
-            parsed.protocol === 'https:' &&
-            !parsed.username &&
-            !parsed.password;
-        } catch {
-          /* invalid result */
-        }
-        const completed = validUrl
-          ? await finishGeneration(task, { status: 'success', url: url! })
-          : await finishGeneration(task, {
-              status: 'failed',
-              error:
-                'No usable result was returned. Your credits were restored.',
-            });
-        return respData(generationResponse(completed), PRIVATE);
-      }
-      if (
-        result.taskStatus === AITaskStatus.FAILED ||
-        result.taskStatus === AITaskStatus.CANCELED
-      ) {
-        const failed = await finishGeneration(task, {
-          status: 'failed',
-          error:
-            'This generation could not be completed. Your credits were restored.',
-        });
-        return respData(generationResponse(failed), PRIVATE);
-      }
-      return respData(generationResponse(task), PRIVATE);
-    } catch (error) {
-      // A completed Fal request with validation/safety failure returns 422.
-      if (error instanceof FalRequestError && error.status === 422) {
-        const failed = await finishGeneration(task, {
-          status: 'failed',
-          error:
-            'This generation could not be completed. Your credits were restored.',
-        });
-        return respData(generationResponse(failed), PRIVATE);
-      }
-      // Transient polling failures never change task state or restore credits.
+      return respData(
+        generationResponse(await syncGeneration(task, config)),
+        PRIVATE
+      );
+    } catch {
       return fail(
         'Still checking your generation. Please try again shortly.',
         503
@@ -276,6 +217,83 @@ export async function generationGet({
     }
   } catch (error) {
     return safeError(error);
+  }
+}
+
+export async function syncGeneration(
+  task: GenerationTask,
+  config: Record<string, string>
+) {
+  if (!task.taskId) return task;
+
+  const provider =
+    task.provider === 'evolink'
+      ? validEvoLinkConfig(config) &&
+        new EvoLinkProvider({
+          apiKey: config.evolink_api_key,
+          timeoutMs: 15_000,
+        })
+      : config.fal_api_key?.trim() &&
+        new FalProvider({ apiKey: config.fal_api_key, timeoutMs: 15_000 });
+  if (!provider) throw new Error('Generation provider is unavailable');
+
+  try {
+    const result = await provider.query({
+      taskId: task.taskId,
+      model: task.model,
+      mediaType:
+        task.mediaType === 'video' ? AIMediaType.VIDEO : AIMediaType.IMAGE,
+    });
+    if (result.taskStatus === AITaskStatus.SUCCESS) {
+      const url =
+        task.mediaType === 'video'
+          ? result.taskInfo?.videos?.[0]?.videoUrl
+          : result.taskInfo?.images?.[0]?.imageUrl;
+      const parsed = URL.canParse(url || '') ? new URL(url!) : null;
+      return parsed?.protocol === 'https:' &&
+        !parsed.username &&
+        !parsed.password
+        ? finishGeneration(task, { status: 'success', url: url! })
+        : finishGeneration(task, {
+            status: 'failed',
+            error: 'No usable result was returned. Your credits were restored.',
+          });
+    }
+    if (
+      result.taskStatus === AITaskStatus.FAILED ||
+      result.taskStatus === AITaskStatus.CANCELED
+    ) {
+      return finishGeneration(task, {
+        status: 'failed',
+        error:
+          'This generation could not be completed. Your credits were restored.',
+      });
+    }
+    return task;
+  } catch (error) {
+    if (error instanceof FalRequestError && error.status === 422) {
+      return finishGeneration(task, {
+        status: 'failed',
+        error:
+          'This generation could not be completed. Your credits were restored.',
+      });
+    }
+    // A transient error does not settle the task or restore a reservation.
+    throw error;
+  }
+}
+
+export async function syncPendingGenerations(now = new Date()) {
+  const tasks = await listGenerationsForSync(now);
+  if (!tasks.length) return;
+  const config = await getAllConfigs();
+  for (let index = 0; index < tasks.length; index += 4) {
+    await Promise.allSettled(
+      tasks.slice(index, index + 4).map(async (task) => {
+        await noteGenerationSync(task, now);
+        await syncGeneration(task, config);
+      })
+    );
   }
 }
 

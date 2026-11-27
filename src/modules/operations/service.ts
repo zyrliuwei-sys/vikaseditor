@@ -212,6 +212,16 @@ export async function getOperationsReport({
     visitors: count(),
     signups: sql<number>`sum(case when ${signedUp} then 1 else 0 end)`,
     active: sql<number>`sum(case when ${signedUp} and ${reached(aiTask, isNull(aiTask.deletedAt))} then 1 else 0 end)`,
+    firstImage: sql<number>`sum(case when ${signedUp} and ${reached(
+      aiTask,
+      and(
+        eq(aiTask.scene, 'vikas_studio'),
+        eq(aiTask.mediaType, 'image'),
+        eq(aiTask.status, 'success'),
+        isNull(aiTask.deletedAt),
+        lt(aiTask.updatedAt, now)
+      )
+    )} then 1 else 0 end)`,
     selected: sql<number>`sum(case when ${signedUp} and ${reached(userEvent, eq(userEvent.kind, 'plan_selected'))} then 1 else 0 end)`,
     checkouts: sql<number>`sum(case when ${signedUp} and ${reached(order, and(liveOrder(), nonRenewal()))} then 1 else 0 end)`,
     paid: sql<number>`sum(case when ${signedUp} and ${reached(order, and(liveOrder(), nonRenewal(), inArray(order.status, paidStatuses), beforeNow))} then 1 else 0 end)`,
@@ -351,6 +361,7 @@ export async function getOperationsReport({
     visitors: Number(row.visitors ?? 0),
     signups: Number(row.signups ?? 0),
     active: Number(row.active ?? 0),
+    firstImage: Number(row.firstImage ?? 0),
     selected: Number(row.selected ?? 0),
     checkouts: Number(row.checkouts ?? 0),
     paid: Number(row.paid ?? 0),

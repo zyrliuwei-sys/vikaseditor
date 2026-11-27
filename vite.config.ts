@@ -131,6 +131,11 @@ export default defineConfig({
       srcDirectory: 'src',
     }),
     viteReact(),
-    nitro({ compressPublicAssets: true }),
+    nitro({
+      compressPublicAssets: true,
+      plugins: isCloudflareBuild
+        ? ['./src/server/generations/scheduled.ts']
+        : [],
+    }),
   ],
 });

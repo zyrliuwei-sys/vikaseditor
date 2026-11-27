@@ -30,20 +30,25 @@ import {
 import { z } from 'zod';
 
 import { useSession } from '@/core/auth/client';
-import { Link, usePathname } from '@/core/i18n/navigation';
-import { ApiError, apiGet, apiPost } from '@/lib/api-client';
+import { Link, usePathname, useRouter } from '@/core/i18n/navigation';
+import { ApiError, apiGet, apiGetBlob, apiPost } from '@/lib/api-client';
 import { trackMarketingEvent } from '@/lib/marketing-analytics';
 import {
   clearStudioDraft,
   restoreStudioDraft,
   saveStudioDraft,
 } from '@/lib/studio-draft';
+import { formatStudioPrice } from '@/lib/studio-payment';
 import { track } from '@/lib/track';
+import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
+import { useStudioCheckout } from '@/hooks/use-studio-checkout';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { VikasArtwork } from '@/components/vikas/artwork';
+
+import { StudioPaymentDialog } from './studio-payment-dialog';
 
 import '@/styles/vikas-studio.css';
 
@@ -73,14 +78,13 @@ export function VikasStudio({
   templates,
   selection,
   onModeChange,
-  incomingPhoto,
 }: {
   templates: VikasTemplate[];
   selection: StudioSelection;
   onModeChange?: (mode: MediaMode) => void;
-  incomingPhoto?: File | null;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   // Router location changes before the outgoing component unmounts. Keep the
   // draft attached to this studio, never to the sign-in page being entered.
   const draftScope = useRef(pathname).current;
@@ -102,6 +106,12 @@ export function VikasStudio({
   );
   const [outputTab, setOutputTab] = useState<'preview' | 'history'>('preview');
   const [mediaError, setMediaError] = useState(false);
+  const [preparingVideo, setPreparingVideo] = useState(false);
+  const [animateError, setAnimateError] = useState(false);
+  const [checkoutReturn, setCheckoutReturn] = useState<
+    'return' | 'cancel' | null
+  >(null);
+  const [awaitingPaymentUntil, setAwaitingPaymentUntil] = useState(0);
   const [draftReady, setDraftReady] = useState(false);
   const [draftStatus, setDraftStatus] = useState<'saved' | 'error' | null>(
     null
@@ -113,7 +123,12 @@ export function VikasStudio({
   const lastSelectionRef = useRef<number | null>(null);
   const activeUserRef = useRef<string | undefined>(session?.user.id);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const paywallTrackedRef = useRef(false);
+  const paywallRef = useRef<HTMLDivElement>(null);
+  const outputRef = useRef<HTMLDivElement>(null);
+  const restoredOutput = useRef(false);
+  const submittedTaskId = useRef<string | null>(null);
+  const trackedResult = useRef<string | null>(null);
+  const modeSwitching = useRef(false);
 
   const capabilities = useQuery({
     queryKey: ['vikas-generation-config'],
@@ -126,6 +141,16 @@ export function VikasStudio({
     queryFn: () => apiGet<GenerationAccess>('/api/generations/access'),
     enabled: Boolean(session?.user),
     staleTime: 0,
+    refetchInterval: (query) => {
+      if (Date.now() >= awaitingPaymentUntil) return false;
+      const short =
+        mode === 'video'
+          ? (query.state.data?.videoPaidCredits ?? 0) <
+            (capabilities.data?.videoCredits ?? 796)
+          : (query.state.data?.paidCredits ?? 0) <
+            (capabilities.data?.imageCredits ?? 51);
+      return short ? 2500 : false;
+    },
     retry: 1,
   });
   const history = useQuery({
@@ -152,6 +177,7 @@ export function VikasStudio({
     onSuccess: (result, variables) => {
       if (activeUserRef.current !== variables.userId) return;
       setSelectedTask(result);
+      submittedTaskId.current = result.id;
       setOutputTab('preview');
       setMediaError(false);
       // An ambiguous submission must retain its key so a retry cannot spend twice.
@@ -194,15 +220,17 @@ export function VikasStudio({
   const freeImage =
     mode === 'image' && access.data?.freeImageAvailable === true;
   const trialPaused = mode === 'image' && access.data?.trialPaused === true;
+  const availableCredits =
+    (mode === 'video'
+      ? access.data?.videoPaidCredits
+      : access.data?.paidCredits) ?? 0;
   const needsPayment = Boolean(
-    session?.user &&
-    access.data &&
-    !freeImage &&
-    access.data.paidCredits < credits
+    session?.user && access.data && !freeImage && availableCredits < credits
   );
   const configured = capabilities.data?.configured === true;
   const resultUrl =
     result?.url && /^https?:\/\//i.test(result.url) ? result.url : undefined;
+  const hasCompletedOutput = result?.status === 'success' && !!resultUrl;
   const statusLabels: Record<GenerationResult['status'], string> = {
     pending: m['vikas.studio.status_pending'](),
     processing: m['vikas.studio.status_processing'](),
@@ -295,6 +323,56 @@ export function VikasStudio({
   });
   const draftValues = useStore(form.store, (state) => state.values);
 
+  const workspaceSearch = pathname === '/create' ? `mode=${mode}&` : '';
+  const returnPath = `${pathname}${pathname === '/create' ? `?mode=${mode}` : ''}#studio`;
+  const signInUrl = `/sign-in?callbackUrl=${encodeURIComponent(returnPath)}`;
+  const payment = useStudioCheckout({
+    source: 'studio',
+    redirect: `${pathname}?${workspaceSearch}checkout=return#studio`,
+    cancelRedirect: `${pathname}?${workspaceSearch}checkout=cancel#studio`,
+    prepare: () => saveDraft(draftScope, mode, templateId, photo, draftValues),
+  });
+  const videoOffer = payment.plans.data?.videoOffer;
+  const imageOffer = payment.plans.data?.products.find(
+    (product) => product.productId === 'vikas_starter_once'
+  );
+  const videoPrice = videoOffer && formatStudioPrice(videoOffer, getLocale());
+  const canChoosePayment = Boolean(payment.plans.data?.providers.length);
+
+  function saveDraft(
+    scope: string,
+    draftMode: MediaMode,
+    draftTemplate: string,
+    draftPhoto: File | null,
+    values: typeof draftValues
+  ) {
+    return saveStudioDraft(
+      {
+        scope,
+        ownerId: session?.user.id ?? null,
+        mode: draftMode,
+        templateId: draftTemplate,
+        ...values,
+      },
+      draftPhoto
+    ).catch(() => {
+      setDraftStatus('error');
+    });
+  }
+
+  useEffect(() => {
+    const checkout = new URLSearchParams(window.location.search).get(
+      'checkout'
+    );
+    if (checkout !== 'return' && checkout !== 'cancel') return;
+    setCheckoutReturn(checkout);
+    if (checkout === 'return') setAwaitingPaymentUntil(Date.now() + 30_000);
+    trackMarketingEvent(
+      checkout === 'return' ? 'checkout_returned' : 'checkout_canceled',
+      { source: 'studio' }
+    );
+  }, []);
+
   useEffect(() => {
     if (sessionPending) return;
     let canceled = false;
@@ -380,8 +458,9 @@ export function VikasStudio({
 
   useEffect(() => {
     if (lastSelectionRef.current === selection.revision) return;
+    const firstSelection = lastSelectionRef.current === null;
     lastSelectionRef.current = selection.revision;
-    if (selection.revision > 0) draftEdited.current = true;
+    if (!firstSelection) draftEdited.current = true;
     const next = templates.find((item) => item.id === selection.templateId);
     setMode(selection.mode);
     setTemplateId(next?.id ?? '');
@@ -397,8 +476,17 @@ export function VikasStudio({
   }, [selection, templates, form]);
 
   useEffect(() => {
+    if (!draftReady || !history.data || restoredOutput.current) return;
+    restoredOutput.current = true;
+    const latest = history.data.find((entry) => entry.mediaType === mode);
+    if (latest && Date.now() - Date.parse(latest.createdAt) < 86_400_000)
+      setSelectedTask((current) => current ?? latest);
+  }, [draftReady, history.data, mode]);
+
+  useEffect(() => {
     if (sessionPending || activeUserRef.current === session?.user.id) return;
     activeUserRef.current = session?.user.id;
+    restoredOutput.current = false;
     setSelectedTask(null);
     setOutputTab('preview');
     requestIdRef.current = null;
@@ -427,16 +515,41 @@ export function VikasStudio({
   }, [result?.id, result?.status, queryClient]);
 
   useEffect(() => {
-    if (needsPayment && !working && !paywallTrackedRef.current) {
-      paywallTrackedRef.current = true;
+    if (!hasCompletedOutput || !result || trackedResult.current === result.id)
+      return;
+    trackedResult.current = result.id;
+    if (submittedTaskId.current !== result.id) return;
+    submittedTaskId.current = null;
+    trackMarketingEvent('generation_succeeded', {
+      mode: result.mediaType,
+      free_image: result.freeImage === true,
+    });
+    if (window.matchMedia('(max-width: 767px)').matches)
+      outputRef.current?.scrollIntoView({ block: 'start' });
+  }, [hasCompletedOutput, result]);
+
+  useEffect(() => {
+    const element = paywallRef.current;
+    if (!element || !needsPayment || working || !configured) return;
+    const recordImpression = () => {
       trackMarketingEvent('paywall_viewed', { mode });
       track('paywall_hit', {
         feature: mode === 'image' ? 'image_generation' : 'video_generation',
+        visibility: 'visible',
       });
-    } else if (!needsPayment) {
-      paywallTrackedRef.current = false;
-    }
-  }, [mode, needsPayment, working]);
+    };
+    if (!('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry || entry.intersectionRatio < 0.25) return;
+        observer.disconnect();
+        recordImpression();
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [mode, needsPayment, working, configured]);
 
   useEffect(
     () => () => {
@@ -487,15 +600,78 @@ export function VikasStudio({
     selectPhoto(event.dataTransfer.files[0]);
   }
 
-  useEffect(() => {
-    if (incomingPhoto) selectPhoto(incomingPhoto);
-  }, [incomingPhoto]);
-
-  function changeMode(nextMode: MediaMode) {
+  async function changeMode(nextMode: MediaMode, sourcePhoto = photo) {
+    if (modeSwitching.current || nextMode === mode) return;
+    const next = templates.find((item) => item.mediaType === nextMode);
+    const values = { ...form.state.values, prompt: next?.prompt ?? '' };
+    if (onModeChange) {
+      modeSwitching.current = true;
+      draftEdited.current = false;
+      await saveDraft(
+        `/create/${nextMode}`,
+        nextMode,
+        next?.id ?? '',
+        sourcePhoto,
+        values
+      );
+      onModeChange(nextMode);
+      return;
+    }
     edited();
     setMode(nextMode);
-    if (selectedTemplate?.mediaType !== nextMode) setTemplateId('');
-    onModeChange?.(nextMode);
+    setTemplateId(next?.id ?? '');
+    setPhoto(sourcePhoto);
+    setPhotoError('');
+    setSelectedTask(null);
+    setOutputTab('preview');
+    setCheckoutReturn(null);
+    form.setFieldValue('prompt', values.prompt);
+    requestAnimationFrame(() =>
+      document.getElementById('studio')?.scrollIntoView()
+    );
+  }
+
+  async function animateImage(id: string) {
+    if (preparingVideo) return;
+    setPreparingVideo(true);
+    setAnimateError(false);
+    try {
+      const blob = await apiGetBlob(`/api/generations/${id}/download`);
+      if (
+        !IMAGE_TYPES.has(blob.type) ||
+        !blob.size ||
+        blob.size > MAX_IMAGE_BYTES
+      )
+        throw new Error('Invalid reference image');
+      trackMarketingEvent('animate_result_clicked');
+      await changeMode(
+        'video',
+        new File([blob], 'vikas-creation', { type: blob.type })
+      );
+    } catch {
+      setAnimateError(true);
+    } finally {
+      setPreparingVideo(false);
+    }
+  }
+
+  async function enterSignIn() {
+    trackMarketingEvent('auth_prompt_clicked', { mode });
+    await saveDraft(draftScope, mode, templateId, photo, draftValues);
+    router.push(signInUrl);
+  }
+
+  function buyInStudio() {
+    const plan = mode === 'video' ? videoOffer : imageOffer;
+    if (!plan || !canChoosePayment) return;
+
+    const detail = { source: 'studio', product: plan.productId, mode };
+    trackMarketingEvent('purchase_cta_clicked', detail);
+    if (!session?.user) {
+      void enterSignIn();
+      return;
+    }
+    payment.choose(plan);
   }
 
   function chooseTemplate(nextId: string) {
@@ -519,10 +695,6 @@ export function VikasStudio({
     }
   }
 
-  const returnPath =
-    pathname === '/' ? '/#studio' : `${pathname}?mode=${mode}#studio`;
-  const signInUrl = `/sign-in?callbackUrl=${encodeURIComponent(returnPath)}`;
-
   return (
     <section
       id="studio"
@@ -544,7 +716,14 @@ export function VikasStudio({
         </span>
       </div>
 
-      <div className="vs-shell">
+      <div
+        className={cn(
+          'vs-shell',
+          hasCompletedOutput &&
+            outputTab === 'preview' &&
+            'has-completed-output'
+        )}
+      >
         <form
           className="vs-form"
           onSubmit={(event) => {
@@ -587,6 +766,84 @@ export function VikasStudio({
               <span className="vs-duration">5s</span>
             </button>
           </div>
+
+          {checkoutReturn && (
+            <p role="status" className="vs-checkout-status">
+              {checkoutReturn === 'cancel'
+                ? m['vikas.studio.checkout_canceled']()
+                : access.data && availableCredits >= credits
+                  ? m['vikas.studio.checkout_confirmed']()
+                  : m['vikas.studio.checkout_checking']()}
+            </p>
+          )}
+
+          {mode === 'video' && (
+            <div className="vs-video-offer" ref={paywallRef}>
+              <div className="vs-video-offer-copy">
+                <strong>{m['vikas.studio.video_offer_title']()}</strong>
+                <p>
+                  {videoPrice
+                    ? m['vikas.studio.video_offer_price']({ price: videoPrice })
+                    : m['vikas.studio.video_paywall']()}
+                </p>
+              </div>
+              {videoPrice &&
+                needsPayment &&
+                canChoosePayment &&
+                !working &&
+                configured && (
+                  <button
+                    type="button"
+                    className="vs-generate"
+                    onClick={buyInStudio}
+                  >
+                    <span>
+                      {m['vikas.studio.buy_video']({ price: videoPrice })}
+                    </span>
+                    <ArrowRight size={18} />
+                  </button>
+                )}
+              <div className="vs-motion-example">
+                <figure>
+                  <img
+                    src="/imgs/vikas/portrait-0.webp"
+                    alt={m['vikas.studio.video_example_source']()}
+                    width="540"
+                    height="540"
+                    loading="lazy"
+                  />
+                  <figcaption>
+                    {m['vikas.studio.video_example_before']()}
+                  </figcaption>
+                </figure>
+                <figure>
+                  <video
+                    controls
+                    playsInline
+                    preload="none"
+                    src="/imgs/vikas/portrait-motion-example.mp4"
+                    poster="/imgs/vikas/portrait-0.webp"
+                    aria-label={m['vikas.studio.video_example_after']()}
+                  />
+                  <figcaption>
+                    {m['vikas.studio.video_example_after']()}
+                  </figcaption>
+                </figure>
+              </div>
+              {!sessionPending &&
+                (!session?.user ||
+                  (needsPayment && access.data?.freeImageAvailable)) && (
+                  <button
+                    type="button"
+                    className="vs-text-button"
+                    onClick={() => void changeMode('image')}
+                  >
+                    {m['vikas.studio.try_image_first']()}
+                    <ArrowRight size={15} />
+                  </button>
+                )}
+            </div>
+          )}
 
           <div className="vs-field">
             <div className="vs-label-row">
@@ -807,7 +1064,7 @@ export function VikasStudio({
               {freeImage
                 ? m['vikas.studio.free_hint']()
                 : m['vikas.studio.paid_balance']({
-                    count: access.data.paidCredits,
+                    count: availableCredits,
                   })}
             </p>
           )}
@@ -847,28 +1104,55 @@ export function VikasStudio({
             <Link
               href={signInUrl}
               className="vs-generate"
-              onClick={() =>
-                trackMarketingEvent('auth_prompt_clicked', { mode })
-              }
+              onClick={(event) => {
+                if (
+                  event.button ||
+                  event.altKey ||
+                  event.ctrlKey ||
+                  event.metaKey ||
+                  event.shiftKey
+                )
+                  return;
+                event.preventDefault();
+                void enterSignIn();
+              }}
             >
               <span>{m['vikas.studio.sign_in_generate']()}</span>
               <ArrowRight size={18} />
             </Link>
           ) : needsPayment && !working ? (
-            <div className="vs-paywall" role="status">
+            <div
+              className="vs-paywall"
+              role="status"
+              ref={mode === 'image' ? paywallRef : undefined}
+            >
               <p>
                 {mode === 'video'
                   ? m['vikas.studio.video_paywall']()
                   : m['vikas.studio.image_paywall']()}
               </p>
-              <Link
-                href="/pricing"
-                target="_blank"
-                rel="noopener"
-                className="vs-generate"
-              >
-                <span>{m['vikas.studio.buy_credits']()}</span>
-                <ArrowRight size={18} />
+              {canChoosePayment &&
+                (mode === 'video' ? videoPrice : imageOffer) && (
+                  <button
+                    type="button"
+                    className="vs-generate"
+                    onClick={buyInStudio}
+                  >
+                    <span>
+                      {videoPrice && mode === 'video'
+                        ? m['vikas.studio.buy_video']({ price: videoPrice })
+                        : imageOffer &&
+                          m['vikas.studio.buy_image_credits']({
+                            count:
+                              imageOffer.credits.toLocaleString(getLocale()),
+                            price: formatStudioPrice(imageOffer, getLocale()),
+                          })}
+                    </span>
+                    <ArrowRight size={18} />
+                  </button>
+                )}
+              <Link href="/pricing" className="vs-text-button">
+                {m['vikas.studio.view_packs']()}
               </Link>
               <button
                 type="button"
@@ -938,7 +1222,7 @@ export function VikasStudio({
           ) : null}
         </form>
 
-        <div className="vs-output">
+        <div className="vs-output" ref={outputRef}>
           <div
             className="vs-output-nav"
             role="tablist"
@@ -1033,6 +1317,29 @@ export function VikasStudio({
                       {m['vikas.studio.download']()}
                     </a>
                   </div>
+                  {result.mediaType === 'image' && mode === 'image' && (
+                    <div className="vs-result-video">
+                      <button
+                        type="button"
+                        className="vs-text-button"
+                        disabled={preparingVideo}
+                        onClick={() => void animateImage(result.id)}
+                      >
+                        {preparingVideo ? (
+                          <LoaderCircle className="vs-spinner" size={16} />
+                        ) : (
+                          <Film size={16} />
+                        )}
+                        {m['vikas.studio.animate_image']()}
+                        <ArrowRight size={15} />
+                      </button>
+                      {animateError && (
+                        <p className="vs-error" role="alert">
+                          {m['vikas.studio.animate_failed']()}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </>
               ) : result?.status === 'success' && !resultUrl ? (
                 <div className="vs-state" role="status">
@@ -1208,6 +1515,7 @@ export function VikasStudio({
           )}
         </div>
       </div>
+      <StudioPaymentDialog payment={payment} />
     </section>
   );
 }

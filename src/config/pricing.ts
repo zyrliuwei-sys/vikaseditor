@@ -9,6 +9,9 @@
  */
 
 import { PaymentInterval, PaymentType } from '@/core/payment/types';
+import { GENERATION_CATALOG } from '@/config/generation';
+
+export const SINGLE_VIDEO_PRODUCT_ID = 'vikas_single_video';
 
 export type PricingPlanInfo = {
   name: string;
@@ -38,13 +41,25 @@ export type PricingProduct = {
    * /api/guest-posts/$id/checkout (tied to an approved submission); the
    * generic checkout refuses it.
    */
-  kind?: 'guest_post';
+  kind?: 'guest_post' | 'video_pass';
   /** Guest post packages: most external links the article may contain. */
   maxLinks?: number;
 };
 
-/** Vikas v1: 100 credits = USD 1. No bonus credits that dilute the 8× rate. */
+/** General-purpose packs use 100 credits per USD. A video pass is sold separately. */
 export const pricingCatalog: Record<string, PricingProduct> = {
+  [SINGLE_VIDEO_PRODUCT_ID]: {
+    productId: SINGLE_VIDEO_PRODUCT_ID,
+    productName: 'One 5-second video',
+    planName: 'Single video',
+    description: 'Vikas Editor AI — one 5-second video',
+    type: PaymentType.ONE_TIME,
+    priceInCents: 399,
+    currency: 'usd',
+    credits: GENERATION_CATALOG.video.credits,
+    creditsValidDays: 0,
+    kind: 'video_pass',
+  },
   vikas_starter_once: {
     productId: 'vikas_starter_once',
     productName: 'Vikas Starter',

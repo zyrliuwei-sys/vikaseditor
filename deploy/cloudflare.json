@@ -5,6 +5,7 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
+  "triggers": { "crons": ["* * * * *"] },
   "workers_dev": true,
   "preview_urls": false,
   "routes": [{ "pattern": "vikas-editor.net", "custom_domain": true }],

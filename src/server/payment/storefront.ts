@@ -1,4 +1,8 @@
-import { listPricingProducts } from '@/config/pricing';
+import {
+  getPricingProduct,
+  listPricingProducts,
+  SINGLE_VIDEO_PRODUCT_ID,
+} from '@/config/pricing';
 import type { StudioPaymentProvider } from '@/lib/studio-payment';
 
 /** Advertise only enabled providers with credentials and payment notifications configured. */
@@ -48,5 +52,10 @@ export function selectStudioPaymentProvider(
 }
 
 export function studioProducts() {
-  return listPricingProducts().filter((p) => p.productId.startsWith('vikas_'));
+  return listPricingProducts().filter(
+    (p) => p.productId.startsWith('vikas_') && p.kind !== 'video_pass'
+  );
 }
+
+export const studioVideoOffer = () =>
+  getPricingProduct(SINGLE_VIDEO_PRODUCT_ID);

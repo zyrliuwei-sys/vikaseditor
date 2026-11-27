@@ -19,7 +19,7 @@ export function VikasCreateEntry({ mode }: { mode: MediaMode }) {
         <VikasCreate
           mode={mode}
           entry={mode}
-          onModeChange={(next) => router.replace(`/create/${next}`)}
+          onModeChange={(next) => router.replace(`/create/${next}#studio`)}
         />
       </main>
       <Footer />

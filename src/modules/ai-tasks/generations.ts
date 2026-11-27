@@ -1,4 +1,14 @@
-import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  isNull,
+  lte,
+} from 'drizzle-orm';
 
 import { db } from '@/core/db';
 import { atomic, AtomicGuardError, guard } from '@/core/db/atomic';
@@ -115,6 +125,37 @@ export async function listGenerations(
     .limit(50);
 }
 
+export async function listGenerationsForSync(now: Date) {
+  return db()
+    .select()
+    .from(aiTask)
+    .where(
+      and(
+        eq(aiTask.scene, SCENE),
+        isNull(aiTask.deletedAt),
+        isNotNull(aiTask.taskId),
+        inArray(aiTask.status, ACTIVE),
+        gte(aiTask.createdAt, new Date(now.getTime() - 30 * 86_400_000)),
+        lte(aiTask.updatedAt, new Date(now.getTime() - 45_000))
+      )
+    )
+    .orderBy(asc(aiTask.updatedAt))
+    .limit(16) as Promise<GenerationTask[]>;
+}
+
+export async function noteGenerationSync(task: GenerationTask, now: Date) {
+  await db()
+    .update(aiTask)
+    .set({ updatedAt: now })
+    .where(
+      and(
+        eq(aiTask.id, task.id),
+        inArray(aiTask.status, ACTIVE),
+        lte(aiTask.updatedAt, now)
+      )
+    );
+}
+
 function matchingTask(task: GenerationTask, fingerprint: string) {
   if (parsed(task.options).fingerprint !== fingerprint) {
     throw new GenerationTaskError(
@@ -172,6 +213,7 @@ export async function createGeneration(params: {
           description: `AI ${params.mediaType} generation`,
           metadata: JSON.stringify({ taskId: params.id }),
           paidOnly: true,
+          includeVideoPass: params.mediaType === 'video',
         });
     if (!plan) {
       // A concurrent duplicate may have spent the last credits while we read.
@@ -342,6 +384,7 @@ export function generationResponse(task: GenerationTask) {
     status: task.status,
     mediaType: task.mediaType,
     prompt: task.prompt,
+    freeImage: parsed(task.options).funding === 'image_trial',
     ...(typeof result.url === 'string' && task.status === 'success'
       ? { url: result.url }
       : {}),

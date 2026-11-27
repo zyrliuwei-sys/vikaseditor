@@ -56,7 +56,8 @@ const schema = await import('../src/config/db/schema');
 const { createCheckout, handleWebhook, handlePaymentCallback } =
   await import('../src/modules/payment/service');
 const { PayPalProvider, PaymentManager } = await import('../src/core/payment');
-const { studioProducts } = await import('../src/server/payment/storefront');
+const { studioProducts, studioVideoOffer } =
+  await import('../src/server/payment/storefront');
 const { getPaidBalance } = await import('../src/modules/credits/service');
 const originalFetch = globalThis.fetch;
 let sequence = 0;
@@ -185,7 +186,9 @@ after(async () => {
 });
 
 async function checkout(productId: string) {
-  const p = studioProducts().find((p) => p.productId === productId)!;
+  const p = [...studioProducts(), studioVideoOffer()].find(
+    (p) => p?.productId === productId
+  )!;
   const userId = `buyer-${++sequence}`;
   await db()
     .insert(schema.user)
@@ -277,6 +280,22 @@ test('approval captures a one-time order; callback and webhook concurrency grant
     )
   );
   assert.equal(await getPaidBalance(userId), p.credits);
+});
+
+test('PayPal captures the single-video price and issues one video-only grant across retries', async () => {
+  const offer = studioVideoOffer()!;
+  const { userId, result, row } = await checkout(offer.productId);
+  const id = result.checkoutInfo.sessionId!;
+  const remote = orders.get(id);
+  assert.equal(remote.purchase_units[0].amount.value, '3.99');
+  assert.equal(await getPaidBalance(userId, true), 0);
+  remote.status = 'APPROVED';
+  await Promise.all([
+    handlePaymentCallback(row.orderNo),
+    webhook('CHECKOUT.ORDER.APPROVED', { id }),
+  ]);
+  assert.equal(await getPaidBalance(userId), 0);
+  assert.equal(await getPaidBalance(userId, true), offer.credits);
 });
 
 test('an approved subscription without a completed payment never grants credits', async () => {

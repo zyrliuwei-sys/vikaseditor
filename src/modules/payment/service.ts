@@ -20,9 +20,11 @@ import {
   type PaymentRefund,
 } from '@/core/payment/types';
 import { credit, order, subscription } from '@/config/db/schema';
+import { SINGLE_VIDEO_PRODUCT_ID } from '@/config/pricing';
 import { getAllConfigs } from '@/modules/config/service';
 import {
   calculateCreditExpirationTime,
+  CreditTransactionScene,
   planDeductForRefund,
 } from '@/modules/credits/service';
 import {
@@ -505,9 +507,11 @@ export async function settleCheckoutOrder(
       transactionNo: `grant_${existingOrder.orderNo}`,
       transactionType: 'grant',
       transactionScene:
-        existingOrder.paymentType === 'subscription'
-          ? 'subscription'
-          : 'payment',
+        existingOrder.productId === SINGLE_VIDEO_PRODUCT_ID
+          ? CreditTransactionScene.VIDEO_PASS
+          : existingOrder.paymentType === 'subscription'
+            ? 'subscription'
+            : 'payment',
       credits,
       remainingCredits: credits,
       description: 'Grant credit',
@@ -950,6 +954,7 @@ export async function refundOrder(params: {
       orderNo: existingOrder.orderNo,
       credits: creditsToDeduct,
       description: `Refund ${existingOrder.orderNo}`,
+      videoPass: existingOrder.productId === SINGLE_VIDEO_PRODUCT_ID,
     });
     await atomic((q) => [
       guard({

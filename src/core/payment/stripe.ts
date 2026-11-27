@@ -135,7 +135,10 @@ export class StripeProvider implements PaymentProvider {
       }
 
       // allow user input promotion code
-      if (this.configs.allowPromotionCodes && !sessionParams.discounts) {
+      if (
+        (order.allowPromotionCodes ?? this.configs.allowPromotionCodes) &&
+        !sessionParams.discounts
+      ) {
         sessionParams.allow_promotion_codes = true;
       }
 

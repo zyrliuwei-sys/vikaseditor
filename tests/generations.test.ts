@@ -58,6 +58,7 @@ const {
   findGeneration,
   finishGeneration,
   listGenerations,
+  listGenerationsForSync,
   markGenerationUncertain,
   generationResponse,
   imageTrialAccess,
@@ -70,6 +71,7 @@ const {
   getPaidBalance,
   planConsume,
 } = await import('../src/modules/credits/service');
+const { syncGeneration } = await import('../src/server/generations/handlers');
 const {
   parseGenerationInput,
   readGenerationInput,
@@ -498,6 +500,98 @@ test('a paid-only debit aborts atomically when its payment begins refunding', as
   await assert.rejects(atomic(plan.steps));
   assert.equal(await balance(user), 1000);
   assert.equal(await getPaidBalance(user), 0);
+});
+
+test('a video pass requires positive settled payment, cannot fund an image, and is spent by only one concurrent video', async () => {
+  const user = await account(796);
+  const video = async () => ({
+    ...(await taskParams(user)),
+    mediaType: 'video' as const,
+    model: 'seedance-2.0-image-to-video',
+    credits: 796,
+  });
+  await db()
+    .update(schema.credit)
+    .set({ transactionScene: 'video_pass' })
+    .where(eq(schema.credit.id, `grant-${user}`));
+
+  await db()
+    .update(schema.order)
+    .set({ status: 'created' })
+    .where(eq(schema.order.orderNo, `order-${user}`));
+  await assert.rejects(createGeneration(await video()), /Not enough credits/);
+  await db()
+    .update(schema.order)
+    .set({ status: 'paid', paymentAmount: 0 })
+    .where(eq(schema.order.orderNo, `order-${user}`));
+  await assert.rejects(createGeneration(await video()), /Not enough credits/);
+  assert.equal((await listGenerations(user)).length, 0);
+
+  await db()
+    .update(schema.order)
+    .set({ paymentAmount: 399 })
+    .where(eq(schema.order.orderNo, `order-${user}`));
+  assert.equal(await getPaidBalance(user), 0);
+  assert.equal(await getPaidBalance(user, true), 796);
+  await assert.rejects(
+    createGeneration(await taskParams(user)),
+    /Not enough credits/
+  );
+  const requests = await Promise.all(Array.from({ length: 4 }, video));
+  const attempts = await Promise.allSettled(requests.map(createGeneration));
+  assert.equal(
+    attempts.filter((attempt) => attempt.status === 'fulfilled').length,
+    1
+  );
+  assert.equal(await getPaidBalance(user, true), 0);
+  const [task] = await listGenerations(user);
+  await Promise.all([
+    finishGeneration(task, { status: 'failed', error: 'Confirmed failure' }),
+    finishGeneration(task, { status: 'failed', error: 'Confirmed failure' }),
+  ]);
+  assert.equal(await getPaidBalance(user, true), 796);
+  assert.equal(await getPaidBalance(user), 0);
+});
+
+test('an accepted task can settle server-side when the browser has stopped polling', async () => {
+  const user = await account(51);
+  const { task } = await createGeneration(await taskParams(user));
+  await acceptGeneration(task, 'scheduled-test-task');
+  const now = new Date(Date.now() + 60_000);
+  const active = (await listGenerationsForSync(now)).find(
+    (entry) => entry.id === task.id
+  );
+  assert.ok(active);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (input, init) => {
+    assert.equal(
+      String(input),
+      'https://api.evolink.ai/v1/tasks/scheduled-test-task'
+    );
+    assert.notEqual(init?.method, 'POST');
+    return Response.json({
+      id: 'scheduled-test-task',
+      status: 'completed',
+      results: ['https://files.evolink.ai/scheduled-image.png'],
+    });
+  };
+  try {
+    const settled = await Promise.all(
+      Array.from({ length: 2 }, () =>
+        syncGeneration(active, { evolink_api_key: 'fixture-only' })
+      )
+    );
+    assert.deepEqual(
+      settled.map((entry) => entry.status),
+      ['success', 'success']
+    );
+    assert.equal(
+      (await listGenerationsForSync(now)).some((entry) => entry.id === task.id),
+      false
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('unverified accounts can claim a free image without changing their identity or spending paid credits', async () => {

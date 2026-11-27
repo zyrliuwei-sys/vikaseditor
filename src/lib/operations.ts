@@ -30,6 +30,7 @@ export interface OperationsCounts {
   visitors: number;
   signups: number;
   active: number;
+  firstImage: number;
   selected: number;
   checkouts: number;
   paid: number;

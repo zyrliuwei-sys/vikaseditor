@@ -1,3 +1,10 @@
+## 2026-11-27 — Mobile Vikas checkout and single-video purchase
+
+- Deploy the workbench, catalog and payment backend together. `/api/payment/plans` adds a separate US$3.99 `videoOffer`. Its settlement creates a video-only grant through the existing ledger. Image purchases and general credits continue to use their existing balance. Video generation requires a positive, settled, non-refunding order.
+- The workbench can send a same-origin `cancel_redirect` and returns buyers to the original draft. `/api/generations/access` includes `videoPaidCredits` alongside the general `paidCredits`. The original checkout and plans fields remain available to older clients.
+- The Cloudflare deployment includes a one-minute Cron Trigger to reconcile active jobs with provider task IDs from the last 30 days. It queries existing jobs and settles confirmed outcomes through the same atomic path as browser polling. No migration or new credentials are needed. Jobs with no provider reference remain available for manual investigation.
+- The operations funnel reports first successful images and purchase clicks alongside server-recorded orders and payments. New `paywall_hit` events have `visibility: "visible"`, so historical page-state events can be distinguished from viewport impressions.
+
 ## 2026-11-24 — Stripe and PayPal checkout selection
 
 - Vikas pricing now opens a payment-method dialog for one-time packs and monthly plans. `/api/payment/plans` exposes enabled, fully configured `providers`; the existing `provider` field remains the default for older clients. Deploy frontend and backend together.

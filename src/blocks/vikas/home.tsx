@@ -24,9 +24,7 @@ const VikasStudio = lazy(() =>
 export function VikasHome() {
   const templates = getVikasTemplates();
   const [studioVisible, setStudioVisible] = useState(false);
-  const [incomingPhoto, setIncomingPhoto] = useState<File | null>(null);
   const studioRef = useRef<HTMLDivElement>(null);
-  const uploadRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (
       window.location.hash === '#studio' ||
@@ -64,19 +62,13 @@ export function VikasHome() {
       });
     });
   }
-  function create(mode: MediaMode, prompt?: string, upload?: boolean) {
+  function create(mode: MediaMode, prompt?: string) {
     setSelection((s) => ({
       mode,
       prompt,
-      templateId: upload
-        ? templates.find((template) => template.mediaType === mode)?.id
-        : undefined,
       revision: s.revision + 1,
     }));
     revealStudio();
-    if (upload) {
-      uploadRef.current?.click();
-    }
   }
   function selectTemplate(template: VikasTemplate) {
     setSelection((s) => ({
@@ -89,33 +81,11 @@ export function VikasHome() {
   }
   return (
     <>
-      <input
-        ref={uploadRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        hidden
-        onChange={(event) => {
-          const file = event.currentTarget.files?.[0];
-          if (file) {
-            setIncomingPhoto(file);
-            revealStudio();
-          }
-          event.currentTarget.value = '';
-        }}
-      />
-      <VikasHero
-        templates={templates}
-        onCreate={create}
-        onTemplate={selectTemplate}
-      />
+      <VikasHero templates={templates} onTemplate={selectTemplate} />
       <div ref={studioRef}>
         <Suspense fallback={<StudioPlaceholder />}>
           {studioVisible ? (
-            <VikasStudio
-              templates={templates}
-              selection={selection}
-              incomingPhoto={incomingPhoto}
-            />
+            <VikasStudio templates={templates} selection={selection} />
           ) : (
             <StudioPlaceholder onOpen={() => setStudioVisible(true)} />
           )}

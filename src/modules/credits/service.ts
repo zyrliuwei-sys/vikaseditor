@@ -7,6 +7,7 @@ import {
   gte,
   inArray,
   isNull,
+  ne,
   or,
   sql,
   sum,
@@ -42,6 +43,7 @@ export enum CreditTransactionScene {
   GIFT = 'gift',
   REWARD = 'reward',
   REFUND = 'refund',
+  VIDEO_PASS = 'video_pass',
 }
 
 type NewCredit = typeof credit.$inferInsert;
@@ -79,14 +81,36 @@ function validCreditConditions(userId: string) {
 }
 
 function paidCreditCondition() {
-  return sql`exists (select 1 from ${order} where ${order.orderNo} = ${credit.orderNo} and ${order.userId} = ${credit.userId} and ${order.status} = 'paid')`;
+  return sql`exists (
+    select 1 from ${order}
+    where ${order.orderNo} = ${credit.orderNo}
+      and ${order.userId} = ${credit.userId}
+      and ${order.status} = 'paid'
+      and ${order.deletedAt} is null
+      and coalesce(${order.paymentAmount}, ${order.amount}) > 0
+  )`;
 }
 
-export async function getPaidBalance(userId: string): Promise<number> {
+const noVideoPass = () =>
+  or(
+    isNull(credit.transactionScene),
+    ne(credit.transactionScene, CreditTransactionScene.VIDEO_PASS)
+  );
+
+export async function getPaidBalance(
+  userId: string,
+  includeVideoPass = false
+): Promise<number> {
   const [result] = await db()
     .select({ total: sum(credit.remainingCredits) })
     .from(credit)
-    .where(and(validCreditConditions(userId), paidCreditCondition()));
+    .where(
+      and(
+        validCreditConditions(userId),
+        paidCreditCondition(),
+        includeVideoPass ? undefined : noVideoPass()
+      )
+    );
   return Number(result?.total || 0);
 }
 
@@ -163,7 +187,7 @@ export async function getBalance(userId: string): Promise<number> {
   const [result] = await db()
     .select({ total: sum(credit.remainingCredits) })
     .from(credit)
-    .where(validCreditConditions(userId));
+    .where(and(validCreditConditions(userId), noVideoPass()));
 
   return parseInt(result?.total || '0');
 }
@@ -235,6 +259,7 @@ export async function planConsume(params: {
   description?: string;
   metadata?: string;
   paidOnly?: boolean;
+  includeVideoPass?: boolean;
 }): Promise<{
   consumedCredit: NewCredit;
   steps: (q: any) => AtomicStep[];
@@ -251,6 +276,7 @@ export async function planConsume(params: {
     throw new Error('Credits to consume must be a positive integer');
   }
 
+  const video = params.paidOnly && params.includeVideoPass;
   const grants: (typeof credit.$inferSelect)[] = await db()
     .select()
     .from(credit)
@@ -258,11 +284,19 @@ export async function planConsume(params: {
       and(
         validCreditConditions(userId),
         params.paidOnly ? paidCreditCondition() : undefined,
+        video ? undefined : noVideoPass(),
         // A welcome image is never a general-purpose credit balance.
         sql`coalesce(${credit.transactionScene}, '') <> 'image_trial'`
       )
     )
-    .orderBy(asc(credit.expiresAt))
+    .orderBy(
+      ...(video
+        ? [
+            sql`case when ${credit.transactionScene} = ${CreditTransactionScene.VIDEO_PASS} then 0 else 1 end`,
+          ]
+        : []),
+      asc(credit.expiresAt)
+    )
     .limit(10_000);
 
   let remainingToConsume = amount;
@@ -365,6 +399,7 @@ export async function planDeductForRefund(params: {
   orderNo: string;
   credits: number;
   description?: string;
+  videoPass?: boolean;
 }): Promise<{ deducted: number; steps: (q: any) => AtomicStep[] }> {
   const { userId, userEmail, orderNo, credits: amount, description } = params;
   if (!amount || amount <= 0) return { deducted: 0, steps: () => [] };
@@ -372,7 +407,12 @@ export async function planDeductForRefund(params: {
   const grants: (typeof credit.$inferSelect)[] = await db()
     .select()
     .from(credit)
-    .where(validCreditConditions(userId))
+    .where(
+      and(
+        validCreditConditions(userId),
+        params.videoPass ? eq(credit.orderNo, orderNo) : noVideoPass()
+      )
+    )
     .orderBy(
       sql`case when ${credit.orderNo} = ${orderNo} then 0 else 1 end`,
       asc(credit.expiresAt)

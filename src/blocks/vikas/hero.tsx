@@ -1,17 +1,16 @@
-import type { MediaMode, VikasTemplate } from '@/types/vikas';
+import type { VikasTemplate } from '@/types/vikas';
 import { ArrowRight, ArrowUpRight, ImagePlus } from 'lucide-react';
 
+import { Link } from '@/core/i18n/navigation';
 import { trackMarketingEvent } from '@/lib/marketing-analytics';
 import { m } from '@/paraglide/messages.js';
 import { VikasArtwork } from '@/components/vikas/artwork';
 
 export function VikasHero({
   templates,
-  onCreate,
   onTemplate,
 }: {
   templates: VikasTemplate[];
-  onCreate: (mode: MediaMode, prompt?: string, upload?: boolean) => void;
   onTemplate: (template: VikasTemplate) => void;
 }) {
   return (
@@ -26,18 +25,18 @@ export function VikasHero({
             {m['vikas.hero.description']()}
           </p>
           <div className="vikas-hero-actions">
-            <button
+            <Link
+              href="/create/image#studio"
               className="vikas-button"
               onClick={() => {
                 trackMarketingEvent('hero_free_image_clicked', {
                   mode: 'image',
                 });
-                onCreate('image', undefined, true);
               }}
             >
               <ImagePlus size={18} />
               {m['vikas.hero.upload']()}
-            </button>
+            </Link>
             <a href="#templates" className="vikas-hero-explore">
               {m['vikas.nav.templates']()}
               <ArrowRight size={17} />

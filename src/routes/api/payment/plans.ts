@@ -3,6 +3,7 @@ import {
   studioPaymentProvider,
   studioPaymentProviders,
   studioProducts,
+  studioVideoOffer,
 } from '@/server/payment/storefront';
 
 import { getAllConfigs } from '@/modules/config/service';
@@ -17,6 +18,7 @@ export const Route = createFileRoute('/api/payment/plans')({
           return respData(
             {
               products: studioProducts(),
+              videoOffer: studioVideoOffer(),
               providers: studioPaymentProviders(configs),
               provider: studioPaymentProvider(configs),
             },

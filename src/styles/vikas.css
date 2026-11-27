@@ -1027,6 +1027,30 @@ html[lang='zh'] .vikas-hero h1 > span {
   color: var(--primary);
   font-size: 13px;
 }
+.vikas-single-video-offer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  margin: 14px 0 24px;
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--primary);
+  border-radius: 5px;
+  background: var(--card);
+}
+.vikas-single-video-offer strong {
+  font-family: var(--font-display);
+  font-size: 22px;
+}
+.vikas-single-video-offer p {
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+.vikas-single-video-offer button {
+  min-height: 46px;
+}
 .vikas-billing-tabs {
   display: flex;
   width: fit-content;

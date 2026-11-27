@@ -81,6 +81,7 @@ export interface PaymentPlan {
  * Payment order interface for create payment
  */
 export interface PaymentOrder {
+  allowPromotionCodes?: boolean;
   type?: PaymentType; // optional
   orderNo?: string; // order no
   productId?: string; // create product first

@@ -55,7 +55,8 @@ const { setAtomicModeForTests } = await import('../src/core/db/atomic');
 const schema = await import('../src/config/db/schema');
 const { createCheckout, handleWebhook, handlePaymentCallback } =
   await import('../src/modules/payment/service');
-const { studioProducts } = await import('../src/server/payment/storefront');
+const { studioProducts, studioVideoOffer } =
+  await import('../src/server/payment/storefront');
 const { getPaidBalance } = await import('../src/modules/credits/service');
 const { createHmac } = await import('node:crypto');
 const originalFetch = globalThis.fetch;
@@ -117,7 +118,9 @@ after(async () => {
   await rm(directory, { recursive: true, force: true });
 });
 async function checkout(productId = 'vikas_starter_once') {
-  const p = studioProducts().find((p) => p.productId === productId)!;
+  const p = [...studioProducts(), studioVideoOffer()].find(
+    (p) => p?.productId === productId
+  )!;
   assert.ok(p, productId);
   const userId = `buyer-${++sequence}`;
   await db()
@@ -283,6 +286,35 @@ test('unpaid completion grants nothing, async success grants once', async () => 
   await webhook('checkout.session.async_payment_succeeded', remote);
   await webhook('checkout.session.async_payment_succeeded', remote);
   assert.equal(await getPaidBalance(userId), p.credits);
+});
+
+test('US$3.99 single video settles once and is excluded from regular credits', async () => {
+  const offer = studioVideoOffer()!;
+  assert.equal(offer.priceInCents, 399);
+  assert.equal(offer.type, 'one-time');
+  assert.equal(offer.kind, 'video_pass');
+  assert.equal(
+    studioProducts().some((p) => p.productId === offer.productId),
+    false
+  );
+  const { row, remote, userId } = await checkout(offer.productId);
+  assert.equal(remote.amount_total, 399);
+  await handlePaymentCallback(row.orderNo);
+  assert.equal(await getPaidBalance(userId, true), 0);
+  paid(remote);
+  await Promise.all([
+    webhook('checkout.session.completed', remote),
+    handlePaymentCallback(row.orderNo),
+    webhook('checkout.session.completed', remote),
+  ]);
+  assert.equal(await getPaidBalance(userId), 0);
+  assert.equal(await getPaidBalance(userId, true), offer.credits);
+  const grants = await db()
+    .select()
+    .from(schema.credit)
+    .where(eq(schema.credit.userId, userId));
+  assert.equal(grants.length, 1);
+  assert.equal(grants[0].transactionScene, 'video_pass');
 });
 test('invalid signature and mismatched price or currency never grant credits', async () => {
   for (const kind of ['signature', 'amount', 'currency']) {

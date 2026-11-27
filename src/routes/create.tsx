@@ -47,6 +47,7 @@ function CreatePage() {
             void navigate({
               to: nextMode === 'video' ? '/create/video' : '/create/image',
               search: {},
+              hash: 'studio',
               replace: true,
               resetScroll: false,
             });

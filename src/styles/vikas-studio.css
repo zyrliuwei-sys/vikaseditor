@@ -855,3 +855,82 @@
   justify-self: center;
   min-height: 36px;
 }
+.vs-paywall > .vs-generate {
+  justify-self: stretch;
+  min-height: 48px;
+}
+.vs-video-offer {
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--primary);
+  border-radius: 5px;
+  background: var(--background);
+}
+.vs-video-offer-copy strong {
+  font-family: var(--font-display);
+  font-size: 21px;
+}
+.vs-video-offer-copy p,
+.vs-checkout-status {
+  margin: 4px 0 0;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.vs-checkout-status {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+.vs-video-offer > .vs-text-button {
+  justify-self: start;
+  min-height: 44px;
+}
+.vs-motion-example {
+  display: grid;
+  grid-template-columns: minmax(0, 0.63fr) minmax(0, 1fr);
+  align-items: end;
+  gap: 10px;
+}
+.vs-motion-example figure {
+  margin: 0;
+}
+.vs-motion-example :is(img, video) {
+  display: block;
+  width: 100%;
+  height: clamp(110px, 28vw, 178px);
+  border-radius: 4px;
+  object-fit: contain;
+  background: #171513;
+}
+.vs-motion-example figcaption {
+  margin-top: 5px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.vs-result-video {
+  border-top: 1px solid var(--border);
+  padding: 4px 20px;
+}
+.vs-result-video button {
+  min-height: 44px;
+}
+@media (max-width: 767px) {
+  .vs-shell.has-completed-output .vs-form {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .vs-shell.has-completed-output .vs-output {
+    grid-column: 1;
+    grid-row: 1;
+    scroll-margin-top: 76px;
+  }
+  .vs-shell.has-completed-output .vs-result-media {
+    min-height: min(330px, 46svh);
+  }
+  .vs-shell.has-completed-output .vs-result-media :is(img, video) {
+    max-height: 51svh;
+  }
+}

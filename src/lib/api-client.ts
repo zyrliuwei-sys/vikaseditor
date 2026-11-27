@@ -60,6 +60,12 @@ export async function apiGetText(url: string) {
   };
 }
 
+export async function apiGetBlob(url: string): Promise<Blob> {
+  const response = await fetch(url);
+  if (!response.ok) throw new ApiError(response.status, 'Download failed');
+  return response.blob();
+}
+
 export const apiPost = <T = void>(url: string, body?: unknown) =>
   request<T>(url, {
     method: 'POST',

@@ -54,7 +54,8 @@ async function POST({ request }: { request: Request }) {
     if (userLimited) return userLimited;
 
     const body = await request.json().catch(() => ({}));
-    const { product_id, payment_provider, redirect, locale } = body;
+    const { product_id, payment_provider, redirect, cancel_redirect, locale } =
+      body;
 
     if (!product_id || typeof product_id !== 'string') {
       return respErr('Missing product_id');
@@ -109,7 +110,10 @@ async function POST({ request }: { request: Request }) {
     // Back in the buyer's language (the API URL has no locale prefix).
     const finalRedirect = `${baseUrl}${localizedPath(safeRedirectPath, locale)}`;
     const successUrl = `${baseUrl}/api/payment/callback?redirect=${encodeURIComponent(finalRedirect)}`;
-    const cancelUrl = `${baseUrl}${localizedPath('/pricing', locale)}`;
+    const cancelPath = product.productId.startsWith('vikas_')
+      ? safeSameOriginPath(cancel_redirect, '/pricing', baseUrl)
+      : '/pricing';
+    const cancelUrl = `${baseUrl}${localizedPath(cancelPath, locale)}`;
 
     stage = 'provider';
     const checkout = await createCheckout({
@@ -121,6 +125,7 @@ async function POST({ request }: { request: Request }) {
       creditsValidDays: product.creditsValidDays,
       paymentOrder: {
         productId: product.productId,
+        allowPromotionCodes: product.kind === 'video_pass' ? false : undefined,
         price: { amount: chargeAmount, currency },
         type: product.type,
         description: product.description,

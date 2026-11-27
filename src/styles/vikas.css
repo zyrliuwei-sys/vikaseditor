@@ -1493,18 +1493,40 @@ html[lang='zh'] .vikas-hero h1 > span {
   .vikas-mobile-links {
     display: flex;
     flex-direction: column;
+    max-height: calc(100vh - 81px);
+    max-height: calc(100dvh - 81px);
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
     gap: 22px;
     padding: 25px 32px 30px;
     border-top: 1px solid var(--border);
     background: var(--background);
     font-size: 14px;
   }
+  .vikas-mobile-links > * {
+    flex-shrink: 0;
+  }
   .vikas-mobile-bottom {
     border-top: 1px solid var(--border);
     padding-top: 20px;
     display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
     align-items: center;
     justify-content: space-between;
+  }
+  .vikas-mobile-bottom > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .vikas-search {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .vikas-search input {
+    min-height: 44px;
+    font-size: 16px;
   }
   .vikas-hero-layout {
     gap: 32px;
@@ -1599,6 +1621,8 @@ html[lang='zh'] .vikas-hero h1 > span {
   }
   .vikas-mobile-links {
     gap: 8px;
+    max-height: calc(100vh - 69px);
+    max-height: calc(100dvh - 69px);
   }
   .vikas-footer-column a {
     min-height: 44px;

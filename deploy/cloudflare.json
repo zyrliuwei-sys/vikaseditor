@@ -15,6 +15,7 @@
     "VITE_APP_NAME": "Vikas Editor AI",
     "VITE_APP_LOGO": "/logo.svg",
     "VITE_DEFAULT_LOCALE": "en",
+    "CLARITY_PROJECT_ID": "zk5a4qus0k",
     "PLAUSIBLE_SCRIPT_HOSTS": "stats.cadcraft.org"
   },
   "d1_databases": [

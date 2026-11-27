@@ -40,6 +40,9 @@ export const envConfigs: Record<string, string> = {
   auth_cookie_prefix: procEnv.AUTH_COOKIE_PREFIX ?? '',
   image_trial_daily_limit: procEnv.IMAGE_TRIAL_DAILY_LIMIT ?? '50',
 
+  // Analytics
+  clarity_project_id: procEnv.CLARITY_PROJECT_ID ?? '',
+
   // Payment - Stripe
   stripe_secret_key: procEnv.STRIPE_SECRET_KEY ?? '',
   stripe_publishable_key: procEnv.STRIPE_PUBLISHABLE_KEY ?? '',

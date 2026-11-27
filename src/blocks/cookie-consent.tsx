@@ -15,7 +15,13 @@ import { CookieConsentBanner } from '@/components/cookie-consent-banner';
  * whenever something calls openCookieSettings() (the footer link does).
  * Mounted in __root only when the admin enabled `cookie_consent_enabled`.
  */
-export function CookieConsent({ initial }: { initial: CookieConsentValue }) {
+export function CookieConsent({
+  initial,
+  sessionReplay,
+}: {
+  initial: CookieConsentValue;
+  sessionReplay?: boolean;
+}) {
   const consent = useCookieConsent(initial);
   const pathname = usePathname();
   const [reopened, setReopened] = useState(false);
@@ -42,7 +48,11 @@ export function CookieConsent({ initial }: { initial: CookieConsentValue }) {
   return (
     <CookieConsentBanner
       title={m['common.cookie_consent.title']()}
-      description={m['common.cookie_consent.description']()}
+      description={
+        sessionReplay
+          ? m['common.cookie_consent.clarity_description']()
+          : m['common.cookie_consent.description']()
+      }
       acceptLabel={m['common.cookie_consent.accept']()}
       rejectLabel={m['common.cookie_consent.reject']()}
       closeLabel={m['common.cookie_consent.close']()}

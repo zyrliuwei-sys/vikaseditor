@@ -45,10 +45,10 @@ export function VikasPaymentDialog({
       }}
     >
       <DialogContent
-        className="max-h-[90svh] overflow-y-auto sm:max-w-md"
+        className="max-h-[90svh] overflow-y-auto sm:max-w-md [&>[data-slot=dialog-close]]:size-11"
         showCloseButton={!pendingProvider}
       >
-        <DialogHeader>
+        <DialogHeader className="pr-10">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>

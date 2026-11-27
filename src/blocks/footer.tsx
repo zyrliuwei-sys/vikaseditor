@@ -9,7 +9,10 @@ import { FooterBadgeList } from '@/components/footer-badge-list';
 
 const rootRoute = getRouteApi('__root__');
 export function Footer() {
-  const consentEnabled = !!rootRoute.useLoaderData()?.cookieConsentEnabled;
+  const analytics = rootRoute.useLoaderData();
+  const consentEnabled = !!(
+    analytics?.cookieConsentEnabled || analytics?.clarityProjectId
+  );
   const groups = [
     {
       title: m['vikas.footer.create'](),

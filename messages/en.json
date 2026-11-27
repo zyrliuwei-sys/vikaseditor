@@ -1902,5 +1902,10 @@
   "vikas.studio.checkout_checking": "Checking your payment. Generation will be available once payment is confirmed.",
   "vikas.studio.animate_image": "Animate this photo · 5 sec",
   "vikas.studio.animate_failed": "Could not load this image. Download it and upload it in the video studio.",
-  "admin.operations.first_image": "First image completed"
+  "admin.operations.first_image": "First image completed",
+  "admin.settings.groups.clarity.title": "Microsoft Clarity",
+  "admin.settings.groups.clarity.description": "Opt-in heatmaps and session recordings for public creation flows.",
+  "admin.settings.fields.clarity_project_id": "Project ID",
+  "admin.settings.tips.clarity_project_id": "Enter the ID from your Clarity tracking code. Clarity starts after the visitor accepts optional cookies.",
+  "common.cookie_consent.clarity_description": "We use essential cookies to run the site. If you accept optional cookies, Microsoft Clarity helps us understand how people use the site through analytics, heatmaps and session recordings."
 }

@@ -853,7 +853,7 @@
 }
 .vs-paywall > button {
   justify-self: center;
-  min-height: 36px;
+  min-height: 44px;
 }
 .vs-paywall > .vs-generate {
   justify-self: stretch;

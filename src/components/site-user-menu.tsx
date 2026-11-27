@@ -38,6 +38,7 @@ export function SiteUserMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        data-clarity-mask="true"
         aria-label={m['common.account_menu']()}
         className="focus-visible:ring-ring flex min-h-11 min-w-11 items-center justify-center rounded-full outline-none focus-visible:ring-2"
       >
@@ -50,7 +51,10 @@ export function SiteUserMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="min-w-56" align="end" sideOffset={8}>
         <DropdownMenuGroup>
-          <DropdownMenuLabel className="p-0 font-normal">
+          <DropdownMenuLabel
+            className="p-0 font-normal"
+            data-clarity-mask="true"
+          >
             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar className="size-8">
                 <AvatarImage src={image || undefined} alt={name} />

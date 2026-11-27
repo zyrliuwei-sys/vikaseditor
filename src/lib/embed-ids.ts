@@ -6,6 +6,7 @@
  */
 const EMBED_ID_PATTERNS: Record<string, RegExp> = {
   google_analytics_id: /^[A-Za-z]{1,3}-[A-Za-z0-9-]{4,30}$/, // G-XXXX, UA-1-1
+  clarity_project_id: /^[a-zA-Z0-9]{5,32}$/,
   adsense_code: /^(ca-)?pub-\d{6,24}$/,
   crisp_website_id: /^[A-Za-z0-9-]{8,64}$/, // UUID
   tawk_property_id: /^[A-Za-z0-9]{8,64}$/,

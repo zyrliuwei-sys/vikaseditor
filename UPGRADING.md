@@ -1,3 +1,9 @@
+## 2026-11-27 — Microsoft Clarity
+
+- Set the public project ID in Admin → Settings → Analytics → Microsoft Clarity or via `CLARITY_PROJECT_ID` in the server environment. An empty ID disables the tag. The Vikas Worker has its own production ID in `deploy/cloudflare.json`.
+- The tag loads on the homepage, pricing page, template pages and creation workbench after the visitor accepts optional cookies. It stops on private routes. Recordings mask account details and creative content. Clarity receives analytics consent through ConsentV2 with advertising consent denied.
+- The site exposes Cookie Settings when a Clarity project is configured. Google Analytics, AdSense and first-party operations keep their own settings. The setup uses the existing config store and takes effect after deployment.
+
 ## 2026-11-27 — Mobile Vikas checkout and single-video purchase
 
 - Deploy the workbench, catalog and payment backend together. `/api/payment/plans` adds a separate US$3.99 `videoOffer`. Its settlement creates a video-only grant through the existing ledger. Image purchases and general credits continue to use their existing balance. Video generation requires a positive, settled, non-refunding order.

@@ -12,7 +12,7 @@ import {
 import { createServerFn } from '@tanstack/react-start';
 import { ThemeProvider } from 'next-themes';
 
-import { Link } from '@/core/i18n/navigation';
+import { Link, usePathname } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import {
   APPEARANCE_CONFIG_KEYS,
@@ -27,7 +27,8 @@ import {
   pickAppearance,
   THEME_COOKIE,
 } from '@/config/appearance';
-import { parseCookieConsent } from '@/lib/cookie-consent';
+import { isClarityPage } from '@/lib/clarity';
+import { COOKIE_CONSENT_NAME, parseCookieConsent } from '@/lib/cookie-consent';
 import { getQueryClient } from '@/lib/query-client';
 import { m } from '@/paraglide/messages.js';
 import { getLocale } from '@/paraglide/runtime.js';
@@ -36,6 +37,7 @@ import { useCookieConsent } from '@/hooks/use-cookie-consent';
 import { CookieConsent } from '@/blocks/cookie-consent';
 import { Ads } from '@/components/analytics/ads';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
+import { MicrosoftClarity } from '@/components/analytics/microsoft-clarity';
 import { OperationsTracker } from '@/components/analytics/operations-tracker';
 import { Plausible } from '@/components/analytics/plausible';
 import { CustomerService } from '@/components/customer-service';
@@ -68,6 +70,10 @@ const getAnalyticsConfigs = createServerFn().handler(async () => {
   const rawPlausibleSrc = configs.plausible_src?.trim() || '';
   const plausibleSrc = safeEmbedSetting('plausible_src', rawPlausibleSrc);
   const plausibleOff = !!rawPlausibleSrc && !plausibleSrc;
+  const clarityProjectId = safeEmbedSetting(
+    'clarity_project_id',
+    configs.clarity_project_id
+  );
   const cookieConsentEnabled = configs.cookie_consent_enabled === 'true';
   // Appearance: off by default, and then the code's own styles apply
   // untouched. On: the admin's site settings; users may override only the
@@ -102,10 +108,12 @@ const getAnalyticsConfigs = createServerFn().handler(async () => {
     userTheme: user.theme,
     userThemeEnabled,
     cookieConsentEnabled,
+    clarityProjectId,
     // The visitor's saved choice, so SSR can render consented scripts.
-    cookieConsent: cookieConsentEnabled
-      ? parseCookieConsent(getCookie('cookie_consent'))
-      : null,
+    cookieConsent:
+      cookieConsentEnabled || clarityProjectId
+        ? parseCookieConsent(getCookie(COOKIE_CONSENT_NAME))
+        : null,
     gaId: configs.google_analytics_id?.trim() || '',
     plausibleDomain: plausibleOff ? '' : configs.plausible_domain?.trim() || '',
     plausibleSrc,
@@ -165,7 +173,9 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const analytics = Route.useLoaderData();
+  const pathname = usePathname();
   const consentEnabled = !!analytics?.cookieConsentEnabled;
+  const clarityProjectId = analytics?.clarityProjectId ?? '';
   const consent = useCookieConsent(analytics?.cookieConsent ?? null);
   // With the banner on, ad scripts wait for an explicit "accept".
   const adsAllowed = !consentEnabled || consent === 'accepted';
@@ -181,7 +191,14 @@ function RootComponent() {
         enableSystem
         disableTransitionOnChange
       >
-        <Outlet />
+        <div
+          className="contents"
+          data-clarity-mask={
+            clarityProjectId && !isClarityPage(pathname) ? 'true' : undefined
+          }
+        >
+          <Outlet />
+        </div>
         <OperationsTracker
           allowed={!consentEnabled || consent === 'accepted'}
         />
@@ -204,6 +221,11 @@ function RootComponent() {
             src={analytics.plausibleSrc || undefined}
           />
         ) : null}
+        <MicrosoftClarity
+          projectId={clarityProjectId}
+          pathname={pathname}
+          consent={consent}
+        />
         {analytics?.adsenseCode ? (
           <Ads code={analytics.adsenseCode} loadScript={adsAllowed} />
         ) : null}
@@ -212,8 +234,11 @@ function RootComponent() {
           tawkPropertyId={analytics?.tawkPropertyId || undefined}
           tawkWidgetId={analytics?.tawkWidgetId || undefined}
         />
-        {consentEnabled ? (
-          <CookieConsent initial={analytics?.cookieConsent ?? null} />
+        {consentEnabled || clarityProjectId ? (
+          <CookieConsent
+            initial={analytics?.cookieConsent ?? null}
+            sessionReplay={!!clarityProjectId}
+          />
         ) : null}
       </ThemeProvider>
       {import.meta.env.DEV && (

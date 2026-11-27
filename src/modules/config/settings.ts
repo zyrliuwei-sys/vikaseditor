@@ -234,6 +234,13 @@ export function getSettingGroups(): SettingGroup[] {
         'Show a cookie banner to visitors. Until they accept, Google Analytics runs in Consent Mode (no cookies) and the AdSense script is not loaded. Plausible is cookieless and unaffected.',
       tab: 'analytics',
     },
+    {
+      name: 'clarity',
+      title: 'Microsoft Clarity',
+      description:
+        'Opt-in heatmaps and session recordings for public creation flows.',
+      tab: 'analytics',
+    },
 
     // Ads
     {
@@ -1081,6 +1088,17 @@ export function getSettings(): Setting[] {
       placeholder: 'https://plausible.example.com/js/pa-XXXXX.js',
       tip: 'Paste the complete site-specific script URL from Plausible, or leave blank to use the legacy cloud script. Accepts a same-site proxy path (e.g. /js/script.js) or an https URL on plausible.io; a self-hosted domain must be listed in the server env PLAUSIBLE_SCRIPT_HOSTS (restart or redeploy, no rebuild)',
       group: 'plausible',
+      tab: 'analytics',
+    },
+
+    // ─── Analytics / Microsoft Clarity ────────────────────────────────
+    {
+      name: 'clarity_project_id',
+      title: 'Project ID',
+      type: 'text',
+      placeholder: 'xxxxxxxxxx',
+      tip: 'Enter the ID from your Clarity tracking code. The tag loads after the visitor accepts optional cookies.',
+      group: 'clarity',
       tab: 'analytics',
     },
 

@@ -872,6 +872,7 @@ export function VikasStudio({
             />
             <div
               className={`vs-upload ${dragging ? 'is-dragging' : ''} ${photoPreview ? 'has-photo' : ''}`}
+              data-clarity-mask={photo ? 'true' : undefined}
               onDragOver={(event) => {
                 event.preventDefault();
                 setDragging(true);
@@ -979,6 +980,7 @@ export function VikasStudio({
                 </div>
                 <Textarea
                   id="vikas-prompt"
+                  data-clarity-mask="true"
                   className="vs-prompt"
                   value={field.state.value}
                   maxLength={2000}
@@ -1284,7 +1286,7 @@ export function VikasStudio({
             >
               {result?.status === 'success' && resultUrl ? (
                 <>
-                  <div className="vs-result-media">
+                  <div className="vs-result-media" data-clarity-mask="true">
                     {mediaError ? (
                       <div className="vs-state">
                         <Info size={27} />
@@ -1312,7 +1314,11 @@ export function VikasStudio({
                       <Check size={15} />
                       {m['vikas.studio.download_expiry']()}
                     </span>
-                    <a href={`/api/generations/${result.id}/download`} download>
+                    <a
+                      href={`/api/generations/${result.id}/download`}
+                      download
+                      data-clarity-mask="true"
+                    >
                       <ArrowDownToLine size={15} />
                       {m['vikas.studio.download']()}
                     </a>
@@ -1369,7 +1375,10 @@ export function VikasStudio({
                       : m['vikas.studio.working_hint']()}
                   </p>
                   {result && (
-                    <span className="vs-task-reference">
+                    <span
+                      className="vs-task-reference"
+                      data-clarity-mask="true"
+                    >
                       {m['vikas.studio.task_reference']()}{' '}
                       {result.id.slice(-12)}
                     </span>
@@ -1477,7 +1486,7 @@ export function VikasStudio({
                   <p>{m['vikas.studio.empty_history_hint']()}</p>
                 </div>
               ) : (
-                <div className="vs-history-list">
+                <div className="vs-history-list" data-clarity-mask="true">
                   {history.data.map((item) => (
                     <button
                       key={item.id}

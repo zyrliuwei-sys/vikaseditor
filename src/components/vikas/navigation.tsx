@@ -95,6 +95,7 @@ export function VikasNavigation({
                   <span
                     className="inline-flex size-11 items-center justify-center"
                     aria-hidden="true"
+                    data-clarity-mask="true"
                   >
                     {user.name.charAt(0).toUpperCase()}
                   </span>

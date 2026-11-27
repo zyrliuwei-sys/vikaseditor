@@ -1,3 +1,5 @@
+import { trackClarityEvent } from './clarity';
+
 type MarketingProperty = string | number | boolean;
 
 type Plausible = (
@@ -21,5 +23,10 @@ export function trackMarketingEvent(
     window.plausible?.(event, props ? { props } : undefined);
   } catch {
     // Analytics must never break creation or navigation.
+  }
+  try {
+    trackClarityEvent(event);
+  } catch {
+    // The replay script is optional too.
   }
 }

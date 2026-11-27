@@ -1902,5 +1902,10 @@
   "vikas.studio.checkout_checking": "正在确认付款。款项确认后即可生成。",
   "vikas.studio.animate_image": "把这张照片变成 5 秒视频",
   "vikas.studio.animate_failed": "暂时无法载入这张图。你可以下载后在视频工作台上传。",
-  "admin.operations.first_image": "已完成首图"
+  "admin.operations.first_image": "已完成首图",
+  "admin.settings.groups.clarity.title": "Microsoft Clarity",
+  "admin.settings.groups.clarity.description": "在访客同意后，为公开创作流程提供热图和会话录制。",
+  "admin.settings.fields.clarity_project_id": "项目 ID",
+  "admin.settings.tips.clarity_project_id": "填写 Clarity 跟踪代码中的项目 ID。访客接受可选 Cookie 后才加载 Clarity。",
+  "common.cookie_consent.clarity_description": "我们使用必要 Cookie 运行网站。如果您接受可选 Cookie，我们会使用 Microsoft Clarity 的分析、热图和会话录制功能来了解网站的使用情况。"
 }
